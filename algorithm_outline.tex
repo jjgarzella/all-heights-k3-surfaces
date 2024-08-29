@@ -1,0 +1,132 @@
+
+\subsection{The Witt Vectors}
+
+TODO: at a polite introduction to the Witt Vectors here
+
+* the Witt vectors
+* the truncated Witt vectors
+
+\subsection{Splittings of Frobenius}
+
+* the u map
+* colon ideals
+* fedder's criterion
+
+\subsection{An algorithmic description of Fedder's criterion}
+
+We now describe how the Witt Vectors can be used to calculate the 
+quasi-F-split height / Artin-Mazur height of a Calabi-Yau 
+hypersurface, following \cite{quasifedder}.
+We will describe the algorithm in more detail, while proofs can be
+found in \cite{quasifedder}.
+
+\subsubsection{\(\Delta_{1}\)}
+
+For the following discussion, 
+let \(k\) be a perfect field of characteristic \(p\) and 
+let \(S := k[x_{1}, \ldots, x_{n}\).
+Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
+
+\begin{defn}
+	Let \(\Delta_{1}(f)\)
+	be defined by the following equation in \(W_{2}(S)\) :
+	\[
+		(0, \Delta_{1}(f)) = (f,0) - \sum_{I}^{} (a_{I}\mathbf{x}^{I}, 0) 
+	\] 
+\end{defn}
+
+The following proposition demonstrates how we can calculate 
+\(\Delta_{1}(f)\) algorithmically.
+
+\begin{prop}
+	\label{prop:delta1:formula}
+	Let \([f]\) be a lift of \(f\) to the integers,
+	i.e.
+	\(f = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
+	If \(k = \mathbb{F}_{p}\),
+	we can compute \(\Delta_{1}(f)\) by 
+	taking the reduction of
+	\[
+		\frac{[f]^{p} - \sum_{I}^{} ([a_{I}]x^{I})^{p} }{p}
+	\] 
+	mod \(p\).
+\end{prop}
+
+\begin{proof}
+	Unwind the definition of addition in the Witt Vectors
+\end{proof}
+
+\begin{rmk}
+	If \(f\) is a homogeneous polynomial of degree \(d\), 
+	then \(\Delta_{1}(f)\) is a polynomial of degree \(pd\).
+\end{rmk}
+
+\subsection{The algorithm}
+
+Let \(f\) be a homogeneous polynomial of degree \(n\) 
+in \(S\). 
+Then \(Z(f)\) is a Calabi-Yau hypersurface.
+
+Let \(u\) be the generator of \(\Hom(S,F_{\star}S)\) from the 
+previous section.
+Define \(\theta\) by  (INSERT HERE BASED ON PREV SECTION NOTATION)
+
+\begin{alg}
+	\label{alg:qfs:outline}
+
+	Inputs: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
+	polynomial of degree \(n\) in \(S\).
+	\begin{enumerate}[(1)]
+		\item Compute \(f^{p-1}\)
+		\item If \(f^{p-1} \notin \mathfrak{m}^{p}\), return \(1\). 
+		\item Compute \(\Delta_{1}(f^{p-1})\) via Proposition \ref{prop:delta1:formula}.
+		\item Set \(n = 2\) and \(g = f^{p-1}\)
+		\item Loop
+			\begin{enumerate}[(1)]
+				\item \(g := \theta(g)\) (using the output of Step 3)
+				\item If \(g \notin \mathfrak{m}^{p},\) return \(n\).
+				\item If \(n < b\), return \(\infty\)	
+			\end{enumerate}
+	\end{enumerate}
+\end{alg}
+
+\begin{theorem}
+	[\cite{quasifedder}, Theorem C]
+	Assume that
+	\(Z(f)\) has quasi-F-split height \(h < b\),
+	then Algorithm \ref{alg:qfs:outline} terminates
+	and returns \(h\).
+\end{theorem}
+
+\begin{proof}
+	This is just rephrasing \cite{quasifedder}, Theorem C.
+\end{proof}
+
+In the case of Calabi-Yau hypersurfaces, we have bounds on the height by
+(INSERT CITATION OF THE RIGHT VAN DER GEER AND KATSURA PAPER, THERE ARE FOUR OPTIONS), 
+so we can deterministically recover the height.  
+
+\subsubsection{Our improvements}
+
+A naive implmentation of Algorithm \ref{alg:qfs:outline}
+is provided in MMPSingularities.jl.
+The bottleneck ends up being polynomial multiplication, 
+in two places:
+raising \(f^{p-1}\) to the \(p\)-th power in the integers,
+and multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
+in \(\theta\).
+
+For the first, we implement a gpu-based FFT that is
+further optimized for homogeneous inputs.
+For the second, we observe that \(f^{p-1}\) has degree
+\(n(p-1)\). 
+Furthermore, we observe that by Remark \ref{} and 
+(REF FSPLIT SECTION), \(\theta\) is a linear map
+from the vectors space of 
+homogenous polynomials of degree \(n(p-1)\) 
+to itself.
+Thus, if we can efficiently compute the matrix of \(\theta\),
+we can repeatedly apply matrix-vector multiplication,
+which is much faster.
+
+
