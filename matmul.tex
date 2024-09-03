@@ -1,0 +1,103 @@
+
+\subsection{General Overview}
+
+Matrix multiplication, particularly between large matrices, primarily presents two problems: how to store the matrices efficiently, and how to multiply them. For the first, sparse data structures and more efficient memory access patterns exist [CITE]. For the latter, many implementations use the GPU to speed up multiplication, particularly utilizing Nvidia's CUDA system to massively parallelize the computation.
+
+Though many fast implementations exist for matrix multiplication [CITE] that solve the above two problems, we were unable to find one that: (1) Was open-source in Julia and (2) Supported matrix multiplication over a field, i.e. $\mod N$. As such, we made our own implementation in [CITE] that satisfies both requirements.
+
+TODO: Add references to the literature about various GPU-based matmul implementations.
+
+\subsection{Maximum Operations under mod p}
+
+We start by defining notation. Let our matrices $A$ be $m \times n$ and $B$ $n \times k$ in dimension, and $N$ be the modulus we use. One major problem with matrix multiplication is the magnitude of each entry in the resulting matrix $C$, which is at most $n L^2$, where $L$ is the largest entry in $A$ and $B$. When dealing matrices of size $m,n,k \geq 5000$, and large $L$, $n L^2$ may be larger than the numerical datatype used, and thus larger datatypes may be necessary.
+
+However, in matrix multiplication mod $N$, the maximum size of any element in $C$ is $n (N-1)^2$, which is oftentimes much smaller than the integer limit of Float32, the most common datatype used in CUDA programming. We take a moment to remark that by IEEE standards, integer multiplication (that only uses the mantissa) is guaranteed to be exact even in Float32 types. As such, it is often preferrable to use Float32 or Float64 datatypes since these are often more optimized than their Int counterparts due to [CITE].
+
+Thus, we wish to find the maximum number of operations $o$ before our datatype overflows. That is, the maximum number of operations $o$ is one less than the value $o'$ such that $o' \cdot (N^2 - 2N - 1)$ is larger than the integer limit $I$. Thus
+\begin{align*}
+    o = \left\lfloor \frac{I}{(N^2 - 2N - 1)} \right\rfloor - 1
+\end{align*}
+
+We list common values of $o$ for the standard Julia datatypes and a selection of values for $N$:
+
+\begin{center}
+\begin{tabular}{llrrrrr}
+\hline
+\textbf{Datatype} & \multicolumn{1}{l}{\textbf{Largest Int}} & \textbf{3} & \textbf{11} & \textbf{101} & \textbf{8191} & \textbf{9765625} \\ \hline
+Float16           & 1.02E+03                                     & 510        & 9           & -1           & -1            & -1               \\
+Float32           & 8.39E+06                                     & 4.19E+06   & 8.56E+04    & 838          & -1            & -1               \\
+Float64           & 4.50E+15                                     & 2.25E+15   & 4.60E+13    & 4.50E+11     & 6.71E+07      & 46               \\
+Int8              & 1.27E+02                                     & 62         & 0           & -1           & -1            & -1               \\
+Int16             & 3.28E+04                                     & 16382      & 333         & 2            & -1            & -1               \\
+Int32             & 2.15E+09                                     & 1.07E+09   & 2.19E+07    & 2.15E+05     & 31            & -1               \\
+Int64             & 9.22E+18                                     & 4.61E+18   & 9.41E+16    & 9.23E+14     & 1.38E+11      & 96713            \\
+UInt8             & 2.55E+02                                     & 126        & 1           & -1           & -1            & -1               \\
+UInt16            & 6.55E+04                                     & 32766      & 667         & 5            & -1            & -1               \\
+UInt32            & 4.29E+09                                     & 2.15E+09   & 4.38E+07    & 4.30E+05     & 63            & -1               \\
+UInt64            & 1.84E+19                                     & 9.22E+18   & 1.88E+17    & 1.85E+15     & 2.75E+11      & 1.93E+05         \\ \hline
+\end{tabular}
+\end{center}
+%
+Note that $-1$ indicates that a single operation would already overflow, i.e. $N^2 - 2N - 1 > I$.
+
+Knowing $o$ before computing helps us choose the smallest datatype such that matrix multiplication can occur without issues. However, for larger $p$ and $n$, it may be necessary to $\mod$ the current sum before adding the product of the other elements. 
+
+For example, suppose we have multiplied $o$ elements of $A$ and $B$ and placed their sum in a local Float32 variable. By definition of $o$, if we were to add the product of two more elements (which is at most $N^2$), we run the risk of overflowing the variable. To prevent this, we can $\mod$ the result by $N$, making its magnitude at most $N$, such that we can add $o-1$ more products before needing to mod again.
+
+The above method allows us to use considerably smaller datatypes while maintaining large $N$ and $n$. However, it comes with cost of needing to $mod$ the result every so often.
+
+\subsection{GPU and CUDA Considerations}
+
+In the previous subsection we discussed how there are two regimes to matrix multiplication mod $p$, based on the datatype used. Here, we introduce another related regime due to the result of CUDA's architecture.
+
+In CUDA, there are three main ways to optimize a process: (A) memory access, (B) spread the work amongst threads, and (C) simplify the processes in each thread to only raw computation. We go through each and their implications.
+
+\subsubsection{Memory Access}
+
+Like CPUs, GPUs have multiple layers of caches and memory. In our case, we move over matrices $A, B$ and an empty $C$ to the GPU's memory before computing. Then, matrices are split into blocks of size $32$ by $32$, since CUDA thread calls are in batches of $32$. If the matrix's dimensions are not divisible by $32$, we pad it with extra zeroes. This is because checking for edge cases with conditionals is more computationally expensive than doing the redundant multiplication and addition of zeros.
+
+Then for each block, load the corresponding column in $B$ into shared memory. Then, looping through each row in the block, load the corresponding $A$ row into shared memory. We load rows instead of columns in the loop, since Julia is column-major order, and we use shared memory so that multiple threads can access the same elements (particularly the columns of $B$) at once.
+
+\subsubsection{Parallelizing Threads}
+
+If we were solely maximizing threads, it is sensible to have each thread only multiply one and then attempt to add the result to $C$. However, this would make it so that each thread would have to wait for one another, defeating the purpose of parallelization. Instead, we have each thread be responsbile for one element of $C$ using blocks. 
+
+In other words, we use $32 \times 32$ threads, each of which will be responsible for finding one element in $C$. Thus, each thread will multiply $32$ times and add $31$ times in each block, before loading in the next relevant part of memory until the result is reached. See the implementation at [CITE] for a more detailed explanation.
+
+TODO: Add diagrams like in that GPU memory access impact paper for different thread structures.
+
+\subsubsection{Conditionals in Threads}
+
+Nvidia's architecture means that GPUs are very good at doing simple arithmetic, but have great difficulty with conditionals. As such, we try to minimize the number of conditionals called by replacing for loops with while loops (as recommended in the CUDA.jl documentation). This also motivates us to try and remove conditionals as much as possible. In parituclar, if $o - 1 > 32$, then we can mod at the end of every block, which ends up being more computationally efficient that checking if a mod is necessary every block.
+
+\subsection{The Four-Regimed Algorithm}
+
+Thus, we end up with four different regimes:
+
+TODO: Add diagrams representing the regimes.
+
+\begin{alg}
+    Inputs: $o$ max operations, $n$ cols of $A$ / rows of $B$
+    \begin{algorithmic}
+        \If{$n \leq 3000$ and $p \leq 7$}
+            \State Do matmul on the CPU.
+        \ElsIf{$o \geq n$}
+            \State Use CUBLAS' matmul and mod the result.
+        \ElsIf{$o \geq 32$}
+            \State Mod after every block
+        \Else
+            \State Use conditionals to check for overlow every addition
+        \EndIf
+    \end{algorithmic}
+\end{alg}
+The above pseudocode is implemented in \texttt{mat\_mul\_hybrid.jl} in [CITE].
+
+We remark that the first regime exists due to the time cost of moving matrices back and forth between traditional CPU memory and the GPU local memory. Furthermore, the other three regimes exist to minimize the number of conditionals done during computation. We refer to the computations section for the specific times, but we remark that each GPU regime takes significantly different amounts of time to complete.
+
+\subsection{Benchmarks and Comparisons}
+
+TODO: Compare to other implementations e.g. MAGMA
+
+We offer two ways to compare our implementation with other options. One is through raw speed in the amount of time it takes to complete the operation, and the other is by counring the number of floating point operations (flops) or Finite Field operations (Flops) completed per second. We remark that the number of flops is always larger than Flops, and that this number depends on the regime chosen.
+
+TODO: Add benchmarks from the 2080ti here.
