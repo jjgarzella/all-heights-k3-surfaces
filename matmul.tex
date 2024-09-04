@@ -5,7 +5,7 @@ Matrix multiplication, particularly between large matrices, primarily presents t
 
 Though many fast implementations exist for matrix multiplication [CITE] that solve the above two problems, we were unable to find one that: (1) Was open-source in Julia and (2) Supported matrix multiplication over a field, i.e. $\mod N$. As such, we made our own implementation in [CITE] that satisfies both requirements.
 
-TODO: Add references to the literature about various GPU-based matmul implementations.
+\textbf{TODO: Add references to the literature about various GPU-based matmul implementations.}
 
 \subsection{Maximum Operations under mod p}
 
@@ -38,7 +38,11 @@ UInt64            & 1.84E+19                                     & 9.22E+18   & 
 \end{tabular}
 \end{center}
 %
-Note that $-1$ indicates that a single operation would already overflow, i.e. $N^2 - 2N - 1 > I$.
+Note that $-1$ indicates that a single operation would already overflow, i.e. $N^2 - 2N - 1 > I$. We also summarize the results in the below chart:
+
+\begin{center}
+\includegraphics*[width=0.5\textwidth]{MatMulMaxOps.png}
+\end{center}
 
 Knowing $o$ before computing helps us choose the smallest datatype such that matrix multiplication can occur without issues. However, for larger $p$ and $n$, it may be necessary to $\mod$ the current sum before adding the product of the other elements. 
 
@@ -64,7 +68,11 @@ If we were solely maximizing threads, it is sensible to have each thread only mu
 
 In other words, we use $32 \times 32$ threads, each of which will be responsible for finding one element in $C$. Thus, each thread will multiply $32$ times and add $31$ times in each block, before loading in the next relevant part of memory until the result is reached. See the implementation at [CITE] for a more detailed explanation.
 
-TODO: Add diagrams like in that GPU memory access impact paper for different thread structures.
+\textbf{TODO: Add diagrams like in that GPU memory access impact paper for different thread structures.}
+
+\begin{center}
+\includegraphics*[width=0.5\textwidth]{MatMulThreads.png}
+\end{center}
 
 \subsubsection{Conditionals in Threads}
 
@@ -74,7 +82,7 @@ Nvidia's architecture means that GPUs are very good at doing simple arithmetic, 
 
 Thus, we end up with four different regimes:
 
-TODO: Add diagrams representing the regimes.
+\textbf{TODO: Add diagrams representing the regimes. Use $\square$, $\boxdot$, $\boxminus$, $\boxplus$ like in the code.}
 
 \begin{alg}
     Inputs: $o$ max operations, $n$ cols of $A$ / rows of $B$
@@ -100,4 +108,4 @@ TODO: Compare to other implementations e.g. MAGMA
 
 We offer two ways to compare our implementation with other options. One is through raw speed in the amount of time it takes to complete the operation, and the other is by counring the number of floating point operations (flops) or Finite Field operations (Flops) completed per second. We remark that the number of flops is always larger than Flops, and that this number depends on the regime chosen.
 
-TODO: Add benchmarks from the 2080ti here.
+TODO: Add benchmarks from the 2080ti.
