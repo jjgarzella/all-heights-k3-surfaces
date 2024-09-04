@@ -1,4 +1,12 @@
 
+% Feedback
+
+% Think about audience, math / computational people know need to do mods every so often
+% Maybe not how GPU does memory - edit down the mods
+% Can embed integers into floats and other detais not novel but say it is well known
+
+% Consistent terms with lit. 
+
 \subsection{General Overview}
 
 Matrix multiplication, particularly between large matrices, primarily presents two problems: how to store the matrices efficiently, and how to multiply them. For the first, sparse data structures and more efficient memory access patterns exist [CITE]. For the latter, many implementations use the GPU to speed up multiplication, particularly utilizing Nvidia's CUDA system to massively parallelize the computation.
@@ -87,7 +95,7 @@ Thus, we end up with four different regimes:
 \begin{alg}
     Inputs: $o$ max operations, $n$ cols of $A$ / rows of $B$
     \begin{algorithmic}
-        \If{$n \leq 3000$ and $p \leq 7$}
+        \If{$n \leq SOMETHING$ and $p \leq SOMETHING$}
             \State Do matmul on the CPU.
         \ElsIf{$o \geq n$}
             \State Use CUBLAS' matmul and mod the result.
