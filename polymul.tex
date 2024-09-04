@@ -1,0 +1,53 @@
+\subsection{Kronecker Substitution and Homogeneity}
+In multivariate polynomial arithmetic, it is commonplace to map a multivariate polynomial to a univariate 
+polynomial. This is because a comparison between two degree sequences $(d_1, \dots , d_n)$ of monomials 
+$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. One method of doing this is the Kronecker 
+substitution:
+
+\begin{defn}
+    Let $D$ be an upper bound on the degree of any variable of the polynomial $f \in R[x_1, \dots, x_n]$. 
+    Then, the Kronecker Substitution produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
+    the evaluation of $f$: [cite this]{https://arxiv.org/pdf/1401.6694}
+
+    \begin{center}
+        $g(z) = f(z, z^D, z^{D^2}, \dots, z^{D^{n-1}})$
+    \end{center}
+\end{defn}
+
+\noindent Additionally, because our polynomials are homogeneous, we can simply ignore one variable in all of our 
+operations between monomials of the same degree, since the variable can be recovered by subtracting the 
+total degree of the monomial from the homogeneous degree.
+
+\subsection{Fast Fourier Transform}
+In the context of polynomial arithmetic, the Discete Fourier Transform and its famous optimized version, 
+the Fast Fourier Transform, are used to compute products and powers of polynomials. The Discrete Fourier 
+Transform works by polynomial interpolation. Given $n$ points in $\mathbb{R}^2$, there exists a unique polynomial of degree at most $n - 1$ that passes through all $n$ points.
+
+Unsure of if I still explain FFT/DFT, there are numerous easily accessible resources that explain what FFT is.
+
+\subsubsection{FFT over a ring}
+The Fast Fourier Transform generalizes nicely to finite fields. We need a principal 
+
+In order to determine which moduli to perform our FFT in, we first need to obtain an upper bound on all of the coefficients of $f ^ p$.
+
+\subsection{Finding the Maximum Coefficient}
+To obtain an upper bound on the coefficients of the resulting polynomial, we use the RMUL algorithm (3.4.1) implemented with coefficients represented as Julia's BigInt datatype on the maximal polynomial, which in our case, is $\sum_{min}^{max}$
+
+\subsection{Other algorithms}
+Many other algorithms are described in [CITE]. In this section we touch on them, and discuss why they
+weren't used.
+
+\subsubsection{RMUL and RSQR}
+GPU parallelized versions even slower than CPU fps algorithm in OSCAR. (will benchmark later)
+
+\subsubsection{BINA and BINB}
+Also even slower than CPU fps algorithm (will also benchmark later)
+
+\subsubsection{MNE}
+We don't have 15 petabytes of memory. (prove why we need 15 petabytes later)
+
+\subsubsection{SUMS and FPS}
+FPS, the more optimized version of SUMS, performs better than FFT at < 10 starting terms. However,
+parallelization faces diminishing returns per thread added, to the point where the merge algorithm needed
+will take longer than the CPU version. (in theory, I've been too lazy to actually implement it with GPU 
+heap)
