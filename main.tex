@@ -22,6 +22,10 @@
 \usepackage{algpseudocode}
 %\usepackage{hyperref}
 
+% Packages Alex added (Don't think there's any conflicts)
+\usepackage{nicefrac}
+\usepackage{array}
+
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{cor}[thm]{Corollary}
@@ -80,6 +84,7 @@
 % custom ops here
 
 % custom commands here
+\newcommand\bsfrac[2]{\reflectbox{\nicefrac{\reflectbox{$#1$}}{\reflectbox{$#2$}}}}
 
 \title{K3 surfaces of any Artin-Mazur height over \(\mathbb{F}_{5}\) via quasi-F-split singularities and gpu acceleration}
 \author{Ryan Batubara, Jack J. Garzella, Alex Pan}
@@ -96,7 +101,7 @@
 
 \input{algorithm_outline.tex}
 
-\section{Step I: GPU polynomial multiplication in characteristic p via FFT}
+\section{Step I: Polynomial powering mod p}
 
 \input{polymul.tex}
 
