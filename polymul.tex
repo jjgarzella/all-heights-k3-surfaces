@@ -5,33 +5,69 @@ $x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. One
 substitution:
 
 \begin{defn}
-    Let $D$ be an upper bound on the degree of any variable of the polynomial $f \in R[x_1, \dots, x_n]$. 
-    Then, the Kronecker Substitution produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
+    Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
+    $f \in R[x_1, \dots, x_n]$. Then, the Kronecker Substitution produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
     the evaluation of $f$: [cite this]{https://arxiv.org/pdf/1401.6694}
 
     \begin{center}
-        $g(z) = f(z, z^D, z^{D^2}, \dots, z^{D^{n-1}})$
+        $g(z) = f(z, z^M, z^{M^2}, \dots, z^{M^{n-1}})$
     \end{center}
 \end{defn}
 
 \noindent Additionally, because our polynomials are homogeneous, we can simply ignore one variable in all of our 
 operations between monomials of the same degree, since the variable can be recovered by subtracting the 
-total degree of the monomial from the homogeneous degree.
+known total degree of the monomial from the homogeneous degree.
 
-\subsection{Fast Fourier Transform}
-In the context of polynomial arithmetic, the Discete Fourier Transform and its famous optimized version, 
-the Fast Fourier Transform, are used to compute products and powers of polynomials. The Discrete Fourier 
-Transform works by polynomial interpolation. Given $n$ points in $\mathbb{R}^2$, there exists a unique polynomial of degree at most $n - 1$ that passes through all $n$ points.
+\subsubsection{FFT}
 
-Unsure of if I still explain FFT/DFT, there are numerous easily accessible resources that explain what FFT is.
+For our algorithms of choice, we chose Monagan's powfps algorithm for computing $g = f^{p-1} \; (1)$, and the 
+Fast Fourier Transform for computing $g^p \; (3)$. Monagan's powfps algorithm already computes $(1)$ in time 
+on the order of milliseconds, so we focus more on the bottleneck, $(3)$. Even though the FFT isn't suited for 
+sparse problems, the massive performance boost from GPU parallelization allows it to run faster than other 
+algorithms, as discussed in section 3.3.
 
-\subsubsection{FFT over a ring}
-The Fast Fourier Transform generalizes nicely to finite fields. We need a principal 
+To determine the size of our FFT, we need to compute the largest possible degree that the Kronecker 
+Substitution can map a monomial of $g^p$ to. Let $f \in R[x_1, \dots, x_n]$ be homogeneous with degree $d$. Then, 
+$(f^{p-1})^p$ is homogeneous with degree $D = dp(p - 1)$. Then, by Definition 3.1, we can select an upper bound 
+of $M = D + 1$, and the maximum degree the Kronecker Substitution will be able to map to is $D*M^{n - 1}$. But 
+if we ignore one variable of $f$ due to the homogeneous property, we get a maximum degree of $D*M^{n - 2}$. 
+Because we use a radix-2 FFT, we find the next power of 2 after $D*M^{n - 2} + 1$, the $+1$ coming from a 
+$k$-length FFT representing a $k-1$ degree polynomial.
 
-In order to determine which moduli to perform our FFT in, we first need to obtain an upper bound on all of the coefficients of $f ^ p$.
+Below is a table of FFT lengths needed to compute $g^p$:
+
+
+\begin{center}
+    \textbf{Required FFT lengths to compute $g^p$}
+    \begin{tabular}{c|c|c|c|c}
+    $\bsfrac{\,p}{n}$ & 5 & 7 & 11 & 13 \\ \hline
+    4 & 1,048,576 & 8,388,608 & 134,217,728 & 268,435,456 \\
+    5 & 134,217,728 & 2,147,483,648 & 137,438,953,472 & 549,755,813,888
+    \end{tabular}
+\end{center}    
+
+To make computing $\Delta_1(f^{p-1})$ even faster, we look for ways to reduce the FFT size. One such way is by imposing restrictions on the space of possible monomials. Consider the restriction where we remove all terms containing only one variable raised to the $n$-th power from the basis of monomials of $f$.
+
+[Explanation on how the restriction affects kroneckersubstitution]
+
+Below is a table of FFT lenghts needed to compute the restricted $g^p$:
+
+
+\begin{center}
+    \textbf{Required FFT lengths to compute restricted $g^p$}
+    \begin{tabular}{c|c|c|c|c}
+    $\bsfrac{\,p}{n}$ & 5 & 7 & 11 & 13 \\ \hline
+    4 & 262,144 & 2,097,152 & 67,108,864 & 134,217,728 \\
+    5 & 67,108,864 & 1,073,741,824 & 68,719,476,736 & 274,877,906,944
+    \end{tabular}
+\end{center}
+
 
 \subsection{Finding the Maximum Coefficient}
-To obtain an upper bound on the coefficients of the resulting polynomial, we use the RMUL algorithm (3.4.1) implemented with coefficients represented as Julia's BigInt datatype on the maximal polynomial, which in our case, is $\sum_{min}^{max}$
+In order to determine which moduli to perform our FFT in, we first need to obtain an upper bound on all of 
+the coefficients of $g ^ p$.
+
+To do this, we generate the maximum possible polynomial and throw it into OSCAR and raise it to the p and call it a day
 
 \subsection{Other algorithms}
 Many other algorithms are described in [CITE]. In this section we touch on them, and discuss why they
@@ -44,7 +80,13 @@ GPU parallelized versions even slower than CPU fps algorithm in OSCAR. (will ben
 Also even slower than CPU fps algorithm (will also benchmark later)
 
 \subsubsection{MNE}
-We don't have 15 petabytes of memory. (prove why we need 15 petabytes later)
+Note that a basic implementation of MNE actually outperforms FPS for computing $g = f^{p - 1}$. However, 
+since this step is already instantaneous compared to computing $g ^ p$, we use FPS because it doesn't require 
+the hassle of pregeneration.
+
+The memory consumption of MNE scales terribly with the number of input terms, meaning it isn't exactly suited for computing $g ^ p$. In fact, for the $(n, p) = (4, 5)$ problem, 1294 yottabytes are required to store the multinomial lookup table. This is 100 million times more than the entire internet. So, we cannot use this method.
+
+% In order to generate a multinomial coefficient lookup table for $g^p$, we need to compute the most number of terms $g^p$ can have. Letting $n$ be the number of variables of $g$, this turns out to be the number of ways to distribute $n(p - 1)$ balls into $n$ bins, or $T = \binom{n(p - 1) + n - 1}{n - 1}$. 
 
 \subsubsection{SUMS and FPS}
 FPS, the more optimized version of SUMS, performs better than FFT at < 10 starting terms. However,
