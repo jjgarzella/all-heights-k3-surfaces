@@ -1,10 +1,139 @@
 
 \subsection{The Witt Vectors}
 
-TODO: at a polite introduction to the Witt Vectors here
+We begin by defining the Witt Vectors. 
+Since the theory of Witt vectors is a vast and active topic of research,
+we only recall what is required for the Fedder's criterion algorithm.
+For more (REFERENCES HERE ETC ETC)
 
-* the Witt vectors
-* the truncated Witt vectors
+\begin{defn}
+	The \(n\)-th Witt Polynomial \(\omega_{n}\) is defined as
+	\[
+		\omega_{n}(X_{0}, \ldots, X_{n}) = X_{0}^{p^{n}} + pX_{1}^{p^{n-1}} + \ldots + p^{n}X_{n}
+	\] 
+\end{defn}
+
+Now let \(R\) be a ring of characteristic \(p\).
+We define the map \(\Phi\) to be the map 
+\[
+	\prod_{n \in \mathbb{N}}^{} R 
+	\xrightarrow{(\omega_{n})_{n}} 
+	\prod_{n \in \mathbb{N}}^{} R  
+\] 
+defined as \(\omega_{n}\) for the \(n\)-th component.
+
+\begin{lem}
+	There exist integer polynomials 
+	\(S_n(X_{0}, \ldots, X_{n}, Y_{0}, \ldots, Y_{n})\) 
+	with the property that 
+	\[
+		\Phi((S_{n})_{n \in \mathbb{N}}) =
+		\Phi((X_{n})_{n \in \mathbb{N}}) 
+		+ \Phi((Y_{n})_{n \in \mathbb{N}})
+	.\] 
+	Likewise, there exist integer polynomials 
+	\(P_{n}(X_{0}, \ldots, X_{n}, Y_{0}, \ldots, Y_{n})\)
+	such that
+	\[
+		\Phi((P_{n})_{n \in \mathbb{N}}) =
+		\Phi((X_{n})_{n \in \mathbb{N}}) 
+		\cdot \Phi((Y_{n})_{n \in \mathbb{N}})
+	.\] 
+\end{lem}
+
+\begin{proof}
+	See Rabinoff for example for a proof.
+\end{proof}
+
+We now define the ring of Witt vectors 
+\(W(R)\) to be 
+\(\prod_{n \in \mathbb{N}}^{} R \) 
+as a set, with the ring structure defined
+by 
+\[
+	(a_{n})_{n \in \mathbb{N}} + 
+	(b_{n})_{n \in \mathbb{N}} =
+	(S_{n}(a_{0}, \ldots, a_{n}, b_{0}, \ldots, b_{n}))_{n \in \mathbb{N}}
+\] 
+and likewise multiplication is defined
+using the \(P_{n}\).
+The lemma then shows that \(\Phi\) is a homomorphism 
+\[
+	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R 
+.\] 
+
+The main example, which also provides the fundamental motivation
+for the Witt vectors, is the case when \(R = \mathbb{F}_{p}\).
+It is well known that \(W(\mathbb{F}_{p}) = \mathbb{Z}_{p}\), 
+giving an alternative construction of the \(p\)-adic numbers.
+However, we caution the reader that if one takes a
+naive \(p\)-adic expansion 
+\(\sum_{n = 0}^{\infty} c_{n}p^{n} \in \mathbb{Z}_{p}\)
+with \(c_{n} \in \{0, \ldots, p-1\}\), this does not correspond
+to the Witt vector \((c_{0}, c_{1}, c_{2}, \ldots)\).
+In fact, the aforementioned sum corresponds to 
+\((c_{0}, c_{1}^{p}, c_{2}^{p^{2}}, \ldots)\), see
+(e.g. cite Kim section 2, perhaps rabinoff). 
+This motivates the following, which we recall without proof:
+
+\begin{defn}
+	There exists a homomorphism \(F \colon W(R) \xrightarrow{} W(R)\),
+	called the \textit{Frobenius},
+	defined by
+	\[
+	 (c_{0}, c_{1}, \ldots) \mapsto (c_{0}^{p}, c_{1}^{p}, \ldots)
+	\] 
+\end{defn}
+
+\begin{defn}
+	There exists a homomorphism \(V \colon W(R) \xrightarrow{} W(R)\),
+	called the \textit{Vershibung},
+	defined by
+	\[
+		(c_{0}, c_{1}, c_{2}, \ldots) \mapsto  (0, c_{0}, c_{1}, \ldots)
+	\] 
+\end{defn}
+
+\begin{lem}
+	The composition \(F \circ V = V \circ F\) is the multiplication by
+	\(p\) map on \(W(R)\).
+\end{lem}
+
+\begin{proof}
+	Cite Rabinoff
+\end{proof}
+
+Thus, we see that \(W(R) / pW(R) \isom R\).
+This is sometimes called the first \textit{truncated}
+Witte vectors.
+We also have higher truncated variants.
+
+\begin{defn}
+	The \(n\)-truncated Witt vectors
+	\(W_{n}(R)\) are defined as
+	\(W(R) / p^{n}W(R)\).
+\end{defn}
+
+By the above lemma, this translates to an actual truncation
+in the coordinates of the Witt vector.
+
+
+* motivate with Z_p example
+* warn that the coordinates are different
+* state the definitions of frobenius and vershibung
+* quote that FV = p
+* deduce that that W(R) / pW(R) = R
+* thus define truncated Witt vectors
+
+* polite definition of the Witt vectors
+  * also truncated Witt vectors
+* references
+  * rabinoff, Hazewinkel ch 17, kim, Schnieder, Kedlaya 
+  * bunch of theory papers
+
+Comment on the description of the polynomials S_0 and S_1,
+and how they are computationally related to 
+raising to powers of p
 
 \subsection{Splittings of Frobenius}
 
