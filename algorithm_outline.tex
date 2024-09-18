@@ -3,8 +3,20 @@
 
 We begin by defining the Witt Vectors. 
 Since the theory of Witt vectors is a vast and active topic of research,
-we only recall what is required for the Fedder's criterion algorithm.
-For more (REFERENCES HERE ETC ETC)
+we only recall the bare minimum 
+required for the Fedder's criterion algorithm.
+For a more complete introduction to the Witt vectors with proofs, 
+see \cite{rabinoff-2014-witt-vec}.
+For an intuitive introduction/derivation of the Witt vectors, see
+\cite{kim-2017-witt-vec}.
+There are many other perspectives on Witt vectors. 
+For example:
+\cite[Chapter~17]{hazewinkel-1978-formal-groups} covers the Witt vectors
+and its relationship with formal groups; 
+\cite{kedlaya-2021-prismatic} gives a categorical perspecitve on Witt vectors
+that relates to lifts of the Frobenius; and
+\cite[Chapter~1]{schneider-2017-galois-rep-phi-gamma} defines a generalization
+known as the \textit{ramified Witt vectors} in detail.
 
 \begin{defn}
 	The \(n\)-th Witt Polynomial \(\omega_{n}\) is defined as
@@ -42,7 +54,8 @@ defined as \(\omega_{n}\) for the \(n\)-th component.
 \end{lem}
 
 \begin{proof}
-	See Rabinoff for example for a proof.
+	\cite[Theorem~2.6]{rabinoff-2014-witt-vec} and the 
+	surrounding discussion, for example.
 \end{proof}
 
 We now define the ring of Witt vectors 
@@ -100,7 +113,7 @@ This motivates the following, which we recall without proof:
 \end{lem}
 
 \begin{proof}
-	Cite Rabinoff
+	\cite[Proposition~5]{kim-2017-witt-vec}
 \end{proof}
 
 Thus, we see that \(W(R) / pW(R) \isom R\).
@@ -118,18 +131,7 @@ By the above lemma, this translates to an actual truncation
 in the coordinates of the Witt vector.
 
 
-* motivate with Z_p example
-* warn that the coordinates are different
-* state the definitions of frobenius and vershibung
-* quote that FV = p
-* deduce that that W(R) / pW(R) = R
 * thus define truncated Witt vectors
-
-* polite definition of the Witt vectors
-  * also truncated Witt vectors
-* references
-  * rabinoff, Hazewinkel ch 17, kim, Schnieder, Kedlaya 
-  * bunch of theory papers
 
 Comment on the description of the polynomials S_0 and S_1,
 and how they are computationally related to 
