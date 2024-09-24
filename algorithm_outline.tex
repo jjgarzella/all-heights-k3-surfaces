@@ -74,20 +74,29 @@ The lemma then shows that \(\Phi\) is a homomorphism
 \[
 	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R 
 .\] 
+Moreover, the fact that the polynomials do not depend on the base
+ring \(R\) means that the construction is functorial; that is,
+for a map of rings \(R \xrightarrow{} R^{\prime} \), we get a 
+map \(W(R) \xrightarrow{} W(R^{\prime})\).
 
 The main example, which also provides the fundamental motivation
 for the Witt vectors, is the case when \(R = \mathbb{F}_{p}\).
 It is well known that \(W(\mathbb{F}_{p}) = \mathbb{Z}_{p}\), 
 giving an alternative construction of the \(p\)-adic numbers.
-However, we caution the reader that if one takes a
-naive \(p\)-adic expansion 
-\(\sum_{n = 0}^{\infty} c_{n}p^{n} \in \mathbb{Z}_{p}\)
-with \(c_{n} \in \{0, \ldots, p-1\}\), this does not correspond
-to the Witt vector \((c_{0}, c_{1}, c_{2}, \ldots)\).
-In fact, the aforementioned sum corresponds to 
-\((c_{0}, c_{1}^{p}, c_{2}^{p^{2}}, \ldots)\), see
-(e.g. cite Kim section 2, perhaps rabinoff). 
-This motivates the following, which we recall without proof:
+
+\begin{warn}
+    %However, we caution the reader that 
+	If one takes a
+    naive \(p\)-adic expansion 
+    \(\sum_{n = 0}^{\infty} c_{n}p^{n} \in \mathbb{Z}_{p}\)
+    with \(c_{n} \in \{0, \ldots, p-1\}\), this does not correspond
+    to the Witt vector \((c_{0}, c_{1}, c_{2}, \ldots)\).
+    In fact, the aforementioned sum corresponds to 
+    \((c_{0}, c_{1}^{p}, c_{2}^{p^{2}}, \ldots)\), see
+    (e.g. cite Kim section 2, perhaps rabinoff). 
+    This motivates the following, which we recall without proof:
+\end{warn}
+
 
 \begin{defn}
 	There exists a homomorphism \(F \colon W(R) \xrightarrow{} W(R)\),
@@ -96,6 +105,7 @@ This motivates the following, which we recall without proof:
 	\[
 	 (c_{0}, c_{1}, \ldots) \mapsto (c_{0}^{p}, c_{1}^{p}, \ldots)
 	\] 
+	(this is induced by the Frobenius on \(R\) by functoriality).
 \end{defn}
 
 \begin{defn}
@@ -128,27 +138,187 @@ We also have higher truncated variants.
 \end{defn}
 
 By the above lemma, this translates to an actual truncation
-in the coordinates of the Witt vector.
+in the coordinates of the Witt vectors.
+
+\begin{rmk}
+	\label{rmk:polyraise:w2}
+    Our computations will end up primarily involving
+    \(W_{2}(R)\)\footnote{
+    This comes from the delta formula,
+    \cite[Theorem~D]{kty-2022-fedder}},
+    where addition is governed by the polynomials
+	\(S_{0}(X_{0}, Y_{0}) = X_{0} + Y_{0}\)
+	and
+	\[
+		S_{1}(X_{0}, X_{1}, Y_{0}, Y_{1})
+		= X_{1} + Y_{1} + 
+		\frac{(X_{0} + Y_{0})^{p} - X_{0}^{p} - Y_{0}^{p}}{p}
+	.\] 
+	Thus we see that addition in \(W_{2}(R)\) involves raising 
+	things in \(R\) (i.e. the first component) to the \(p\)-th
+	power in the integers.
+	This is the first place that raising polynomials
+	to the \(p\)-th power comes into the picture 
+	algorithmically.
+\end{rmk}
 
 
-* thus define truncated Witt vectors
 
-Comment on the description of the polynomials S_0 and S_1,
-and how they are computationally related to 
-raising to powers of p
 
 \subsection{Splittings of Frobenius}
 
-* the u map
-* colon ideals
-* fedder's criterion
+Let \(R\) be a ring of characteristic \(p\). 
+We have the Frobenius morphism 
+\(F \colon R \xrightarrow{} R\), 
+defined as \(F(x) = x^p\).
+We describe a few alternative perspectives on
+the Frobenius which will be useful later.
 
-\subsection{An algorithmic description of Fedder's criterion}
+\begin{rmk}
+	\label{rmk:frob:perspectives}
+
+    \begin{enumerate}[(1)]
+    	\item Let \(R\) be reduced. 
+    		Then we may view the Frobenius as the inclusion
+    		\(R \ins R^{1 / p}\), where \(R^{1 / p}\) 
+    		is the ring of formal \(p\)-th roots of elements
+    		of \(R\).
+    	\item Similarly, again assuming that \(R\) is reduced
+    		we may view the Frobenius as the inclusion
+    		\(R^{p} \ins R\), 
+    	\item More generally, we define \(F_{\star}R\) to
+			be the \(R\)-algebra with ring structure 
+			the same as \(R\), with module structure
+			\(r \cdot x = F(r)x = r^{p}x\).
+			Then we view the Frobenius as a map
+			\(R \xrightarrow{} F_{\star}R\).
+			In this description, \(F\) is a module 
+			homomorphism as well. 
+			The module \(F_{\star}R\) corresponds to the
+			pushforward construction from geometry
+			(i.e. pushforward of quasi-coherent
+			sheaves on \(\Spec R\)).
+			Even more generally, for any \(R\)-module
+			\(M\) we denote \(F_{\star}M\) to be
+			the analogously defined pushforward by
+			Frobenius.
+    \end{enumerate}
+\end{rmk}
+
+\begin{defn}
+	We say that \(R\) is \(F\)-split if the map \(F\) is
+	split as a map of 
+	\(R\)-modules \(R \xrightarrow{} F_{\star}R\).
+\end{defn}
+
+We will be cheifly concerned with \textit{hypersurfaces},
+so we specialize to this case now.
+
+\begin{defn}
+	Let \(S = k[x_{1}, \ldots, x_{n}\).
+	Then \(f \in S\) is \(F\)-split if 
+	\(S / (f)\) is.
+\end{defn}
+
+A fundamental fact about \(F\)-splitness is that there
+exists a very concrete criterion for whether or 
+not a polynomial (hypersurface) \(f\) is \(F\)-split.
+First, though, we introduce some notation.
+If \(I\) is a finitely generated 
+ideal of some ring \(R\) 
+with generating set \((x_{1}, \ldots, x_{n})\),
+then \(I^{[n]}\)
+
+\begin{thm}
+	[Fedder's Criterion]
+	Let \(f \in S = k[x_{1}, \ldots, x_{n}]\).
+	Let \(\mathfrak{m} = (x_{1}, \ldots, x_{n})\) 
+	be the ideal generated by the variables.
+	Then \(f\) is \(F\)-split if and only if 
+	\(f^{p-1} \notin \mathfrak{m}^{[p]}\)
+\end{thm}
+
+\begin{proof}
+	See \cite[Theorem~2.5]{ma-polstra-2021-F-sing-comm-alg}
+\end{proof}
+
+\begin{rmk}
+	Fedder's criterion is the second place where raising
+	homogeneous polynomials to powers enters the picture
+	algorithmically.
+	This time, unlike Remark \ref{rmk:polyraise:w2},
+	the raising to a power happens in characteristic \(p\).
+\end{rmk}
+
+Particular interest is in the case when \(f\) is 
+homogeneous of degree \(n\), which geometrically
+corresponds to a \textit{Calabi-Yau} hypersurface.
+In this case, we have
+
+\begin{thm}
+	\label{thm:fsplit:ordinary}
+	If \(f \in S\) 
+	homogeneous of degree \(n\) 
+	is \(F\)-split,
+	then the Artin-Mazur height 
+	of \(Z(f) = \Proj (S / (f))\) 
+	is 1, i.e. \(Z(f)\) is weakly ordinary.
+\end{thm}
+
+Recently, in \cite{yobuko-2019-qfs-calabi-yau}
+Yobuko introduced the notion of 
+quasi-\(F\)-splitness, which generalizes \(F\)-splitness.
+
+\begin{defn}
+	The ring \(R\) is \(n\)-quasi-\(F\)-split if there exists
+	a map \(\phi \colon W_{n}(R) \xrightarrow{} R\) such that
+	\[
+	\begin{tikzcd}
+		W(R) \arrow{r}{F} \arrow{d}[swap]{} &
+		F_{\star}W(R) \arrow{ld}{\phi} \\
+	R 
+	\end{tikzcd}
+	,\]
+	where the vertical map is the \(1\)-st Witt vector truncation.
+
+	The quasi-\(F\)-split height of \(R\) is the smallest \(n\) 
+	for which \(R\) is \(n\)-quasi-\(F\)-split.
+
+	As above, the quasi-\(F\)-split height of 
+	\(f \in S = k[x_{1}, \ldots, x_{n}]\) is that
+	of \(R = S / (f)\).
+\end{defn}
+
+\begin{rmk}
+	Both \(F\)-splitness and quasi-\(F\)-splitness have 
+	various geometric
+	variants which are more general then the 
+	ring-theoretic/affine versions given here. 
+	These are covered extensively in the literature, for example
+	see \cite{kttwyy-2022-qfs-birat}.
+\end{rmk}
+
+The quasi-\(F\)-split height also gives a generalization
+of Theorem \ref{thm:fsplit:ordinary}:
+
+\begin{thm}
+	If \(f \in S\) is homogenous of degree \(n\),
+	then the Artin-Mazur height of \(Z(f)\)
+	is equal to the quasi-\(F\)-split height
+	of \(f\).
+\end{thm}
+
+\begin{proof}
+	This is a special case of 
+	\cite[Theorem~4.5]{yobuko-2019-qfs-calabi-yau}.
+\end{proof}
+
+\subsection{Fedder's criterion for quasi-F-splitness: an algorithmic perspective}
 
 We now describe how the Witt Vectors can be used to calculate the 
 quasi-F-split height / Artin-Mazur height of a Calabi-Yau 
-hypersurface, following \cite{quasifedder}.
-We will describe the algorithm in more detail, while proofs can be
+hypersurface, using the version of Fedder's criterion in \cite{quasifedder}.
+We will describe the algorithm in more detail, proofs can be
 found in \cite{quasifedder}.
 
 \subsubsection{\(\Delta_{1}\)}
@@ -184,7 +354,8 @@ The following proposition demonstrates how we can calculate
 \end{prop}
 
 \begin{proof}
-	Unwind the definition of addition in the Witt Vectors
+	Iteratively apply the formula for \(S_{1}\) 
+	to the monomials of \(f\).
 \end{proof}
 
 \begin{rmk}
@@ -192,15 +363,19 @@ The following proposition demonstrates how we can calculate
 	then \(\Delta_{1}(f)\) is a polynomial of degree \(pd\).
 \end{rmk}
 
-\subsection{The algorithm}
+\subsection{The map \(\theta\)}
 
-Let \(f\) be a homogeneous polynomial of degree \(n\) 
-in \(S\). 
-Then \(Z(f)\) is a Calabi-Yau hypersurface.
+* the u map
 
 Let \(u\) be the generator of \(\Hom(S,F_{\star}S)\) from the 
 previous section.
 Define \(\theta\) by  (INSERT HERE BASED ON PREV SECTION NOTATION)
+
+\subsection{The algorithm}
+
+Let \(f\) be a homogeneous polynomial of degree \(n\) 
+in \(S\), 
+so that \(Z(f)\) is a Calabi-Yau hypersurface.
 
 \begin{alg}
 	\label{alg:qfs:outline}
@@ -252,7 +427,7 @@ further optimized for homogeneous inputs.
 For the second, we observe that \(f^{p-1}\) has degree
 \(n(p-1)\). 
 Furthermore, we observe that by Remark \ref{} and 
-(REF FSPLIT SECTION), \(\theta\) is a linear map
+(REF THETA SECTION), \(\theta\) is a linear map
 from the vectors space of 
 homogenous polynomials of degree \(n(p-1)\) 
 to itself.
