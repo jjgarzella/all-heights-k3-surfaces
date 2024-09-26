@@ -1,0 +1,187 @@
+
+To find the matrix of \(\theta\), mathematically
+speaking we must first multiply by \(\Delta_{1}(f)\) 
+and then apply the map \(u\).
+Our first observation is that naively 
+multiplying and then applying \(u\) 
+as in algorithm \ref{alg:naive:u}
+does a lot of unnecessary work.
+In particular, any term in the 
+product \(\Delta_{1}(f)a\) which 
+is not congruent to 
+\((p-1, \ldots, p-1) \mod p\)
+is not needed. 
+Even if \(a\) is a monomial, giving a linear
+algoritm for multiplication, using naive
+multiplication stores a lot of unnecessary terms
+in memory.
+Here, we give an algorithm that calculates
+the matrix of \(\theta\) by only
+using such terms.
+We start with an elementary fact.
+
+\begin{lem}
+	\label{lem:tuples:modp}
+	Let \(\underbar{a} = (a_{1}, \ldots, a_{n}),
+	\underbar{b} = (b_{1}, \ldots, b_{n})\)
+	be in \(\{0, \ldots, p-1\}^{n} \ins \mathbb{Z}^{n}\).
+
+	Then \(\underbar{a} + \underbar{b} = 
+	(p-1, \ldots, p-1) \mod p\)
+	if and only if 
+	\(\underbar{a} + \underbar{b} = 
+	(p-1, \ldots, p-1)\).
+\end{lem}
+
+\begin{proof}
+	Each coordinate has \(a_{i} + b_{i} \leq 2(p-1) = 2p-2\).
+\end{proof}
+
+\begin{defn}
+	Let \(M\) be a monomial in \(S\). 
+	Then we say that \(M\) \textit{matches}
+	with another monomial \(M^{\prime}\) 
+	if the monomial \(MM^{\prime}\) is
+	not killed by \(u\).
+\end{defn}
+
+\begin{cor}
+	Let \(\underbar{a}\) be as above.
+	Let \(\underbar{x}^{\underbar{a}}\)
+	denote \(x_{1}^{a_{1}} \ldots x_{n}^{a_{n}}\).
+	Then there exists a unique
+	match \(m(\underbar{a}) \in \{0, \ldots, p-1\}^{n}\) 
+\end{cor}
+
+\begin{proof}
+	\(m(\underbar{a}) = 
+	(p-1, \ldots, p-1) - \underbar{a}\).
+	The claim follows from 
+	\ref{lem:tuples:modp}.
+\end{proof}
+
+Essentially, this corollary says that
+when we consider arbitrary monomials \(M\),
+when we consider its exponent vector 
+mod \(p\), it has a unique
+match mod \(p\).
+However, we have even more:
+
+\begin{cor}
+	\label{cor:match:order}
+	Let \(\leq_{lex}\) denote the 
+	lexographical ordering.
+	If \(\underbar{a} \leq_{lex} \underbar{b}\),
+	then 
+	\(m(\underbar{b}) \leq_{lex} m(\underbar{a})\)
+\end{cor}
+
+\begin{proof}
+	Follows from the definition of lexographical
+	ordering.
+\end{proof}
+
+The previous two corollaries justify
+the following algorithm.
+
+\begin{cxt}
+	Let \(f \in S\) be a homogeneous
+	polynomial of degree \(n\).
+	Let \(\Delta\) be an array containing the 
+	exponent vectors of \(\Delta_{1}(f^{p-1})\).
+	Let \(M\) be an array containing the exponent
+	vectors of the monomial basis of
+	homogeneous polynomials of degree
+	\(n*(p-1)\).
+\end{cxt}
+
+In what follows, when we put a dot (\(.\))
+before an operation, that denotes
+componentwise application
+of that operation, similar to Julia syntax.
+
+\begin{alg}
+	\(answer \colonequals []\)
+	\(L \colonequals \Delta .\% p\) 
+	and \(R \colonequals M .\% p\).
+
+	Sort both \(L\) and \(R\) mod \(p\).
+	Sort \(\Delta\) and \(M\) according to the 
+	same permutation.
+
+	Let \(\ell \colonequals 1, r \colonequals \text{length}(R)\)
+
+	while \(1 \leq r && l \leq \text{length}(L)\)
+
+	--- \(cmp \colonequals L[\ell] + R[r] - (p-1, \ldots, p-1)\)
+
+	--- switch \(cmp\)
+
+	--- --- case  \(cmp < 0\) 
+
+	--- --- --- \(l += 1\) 
+
+	--- --- case \(0 < cmp\) 
+
+	--- --- --- \(r -= 1\) 
+
+	--- --- case \(cmp == 0\) 
+
+	--- --- --- \(matchr \colonequals R[r]\) 
+
+    --- --- --- \(numLmatches \colonequals \) the number of
+	adjacent entrices in \(L\) that are equal to \(L[\ell]\)
+
+	--- --- --- while \(R[r] == matchr\) 
+
+	--- --- --- --- for \(\ell\ell\) in \(\ell\) to \(\ell\) + numLmatches
+
+	--- --- --- --- --- Extract \(\Delta[\ell\ell]\) 
+	and its corresponding coeffient,
+	as well as \(M[r]\)
+
+	--- --- --- --- --- Apply \(u\) to the product
+	of the resulting monomials
+
+	--- --- --- --- --- add this term to \(answer\)
+
+	--- --- --- ---  end for
+
+	--- --- --- --- \(r += 1\) 
+
+	--- --- --- end while
+
+	--- --- --- \(l += numLmatches\) 
+	
+	--- end switch
+
+	end while
+
+\end{alg}
+
+Note that the inner while loops account for the fact that
+after modding by \(p\), one does not expect 
+either array to have unique keys.
+The algorithm is justified by the previous corollaries.
+
+
+* complexity analysis
+n = length L, m = length R
+we need n + m + n log n + m log m operations.
+Thus, the algorithm is big o of max(n log n, m log m),
+and in practice the \(\Delta_{1}\) length
+usually dominates.
+
+* picture
+
+Implementation details: 
+* sortperm
+* kronecker substitution
+
+
+
+
+
+
+
+
