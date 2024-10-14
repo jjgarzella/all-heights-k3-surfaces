@@ -111,7 +111,7 @@ of that operation, similar to Julia syntax.
 
 	Let \(\ell \colonequals 1, r \colonequals \text{length}(R)\)
 
-	while \(1 \leq r && l \leq \text{length}(L)\)
+	while \(1 \leq r \&\& l \leq \text{length}(L)\)
 
 	--- \(cmp \colonequals L[\ell] + R[r] - (p-1, \ldots, p-1)\)
 
@@ -164,6 +164,15 @@ after modding by \(p\), one does not expect
 either array to have unique keys.
 The algorithm is justified by the previous corollaries.
 
+In practice, instead of sorting the arrays in place, 
+we use a method like julia's ``sortperm''
+%TODO: code font
+to get the sort permutation.
+
+We also may use the kronecker substitution to make
+the comparisons and additions use machine integers
+rather than vectors.
+In practice, this speeds the algorithm up a lot.
 
 * complexity analysis
 n = length L, m = length R
@@ -174,9 +183,6 @@ usually dominates.
 
 * picture
 
-Implementation details: 
-* sortperm
-* kronecker substitution
 
 
 
