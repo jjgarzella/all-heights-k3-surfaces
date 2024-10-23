@@ -101,62 +101,112 @@ componentwise application
 of that operation, similar to Julia syntax.
 
 \begin{alg}
-	\(answer \colonequals []\)
-	\(L \colonequals \Delta .\% p\) 
-	and \(R \colonequals M .\% p\).
+\begin{lstlisting}
 
-	Sort both \(L\) and \(R\) mod \(p\).
-	Sort \(\Delta\) and \(M\) according to the 
-	same permutation.
+delta1 = terms of delta1
+mons = all homogeneous monomials
+nMons = length(mons)
 
-	Let \(\ell \colonequals 1, r \colonequals \text{length}(R)\)
+answer := zeros(nMons,nMons)
+L := delta1 .% p
+R := M .% p
 
-	while \(1 \leq r \&\& l \leq \text{length}(L)\)
+sort both L and R (mod p)
+sort delta1 and M according to the same permutation
 
-	--- \(cmp \colonequals L[\ell] + R[r] - (p-1, \ldots, p-1)\)
+l := 1, r := length(R)
 
-	--- switch \(cmp\)
+while 1 <= r && l <= length(R)
+    cmp := L[l] + R[r] - (p-1, ..., p-1)
+    switch cmp
+    case cmp < 0
+        l += 1
+    case 0 < cmp
+        r -= 1
+    case cmp == 0
+        matchr := R[r]
+        numLmatches := (the number of 
+            adjacent entries in L that are equal to L[l])
+        while R[r] == matchr
+            for ll in l:l+numLmatches
 
-	--- --- case  \(cmp < 0\) 
+                Extract delta1[ll] and its 
+                corresponding coefficient, as well as M[r]
 
-	--- --- --- \(l += 1\) 
+                Apply u to the product of the resulting monomials
 
-	--- --- case \(0 < cmp\) 
+                Add this term to the correct entry of answer
+            end
+        end
+    end	
+end		
+	    
 
-	--- --- --- \(r -= 1\) 
 
-	--- --- case \(cmp == 0\) 
-
-	--- --- --- \(matchr \colonequals R[r]\) 
-
-    --- --- --- \(numLmatches \colonequals \) the number of
-	adjacent entrices in \(L\) that are equal to \(L[\ell]\)
-
-	--- --- --- while \(R[r] == matchr\) 
-
-	--- --- --- --- for \(\ell\ell\) in \(\ell\) to \(\ell\) + numLmatches
-
-	--- --- --- --- --- Extract \(\Delta[\ell\ell]\) 
-	and its corresponding coeffient,
-	as well as \(M[r]\)
-
-	--- --- --- --- --- Apply \(u\) to the product
-	of the resulting monomials
-
-	--- --- --- --- --- add this term to \(answer\)
-
-	--- --- --- ---  end for
-
-	--- --- --- --- \(r += 1\) 
-
-	--- --- --- end while
-
-	--- --- --- \(l += numLmatches\) 
 	
-	--- end switch
 
-	end while
 
+\end{lstlisting}
+%\begin{lstlisting}
+%	
+%	
+%	\(answer \colonequals []\)
+%	\(L \colonequals \Delta .\% p\) 
+%	and \(R \colonequals M .\% p\).
+%
+%	Sort both \(L\) and \(R\) mod \(p\).
+%	Sort \(\Delta\) and \(M\) according to the 
+%	same permutation.
+%
+%	Let \(\ell \colonequals 1, r \colonequals \text{length}(R)\)
+%
+%	while \(1 \leq r \&\& l \leq \text{length}(L)\)
+%
+%	--- \(cmp \colonequals L[\ell] + R[r] - (p-1, \ldots, p-1)\)
+%
+%	--- switch \(cmp\)
+%
+%	--- --- case  \(cmp < 0\) 
+%
+%	--- --- --- \(l += 1\) 
+%
+%	--- --- case \(0 < cmp\) 
+%
+%	--- --- --- \(r -= 1\) 
+%
+%	--- --- case \(cmp == 0\) 
+%
+%	--- --- --- \(matchr \colonequals R[r]\) 
+%
+%    --- --- --- \(numLmatches \colonequals \) the number of
+%	adjacent entrices in \(L\) that are equal to \(L[\ell]\)
+%
+%	--- --- --- while \(R[r] == matchr\) 
+%
+%	--- --- --- --- for \(\ell\ell\) in \(\ell\) to \(\ell\) + numLmatches
+%
+%	--- --- --- --- --- Extract \(\Delta[\ell\ell]\) 
+%	and its corresponding coeffient,
+%	as well as \(M[r]\)
+%
+%	--- --- --- --- --- Apply \(u\) to the product
+%	of the resulting monomials
+%
+%	--- --- --- --- --- add this term to \(answer\)
+%
+%	--- --- --- ---  end for
+%
+%	--- --- --- --- \(r += 1\) 
+%
+%	--- --- --- end while
+%
+%	--- --- --- \(l += numLmatches\) 
+%	
+%	--- end switch
+%
+%	end while
+%
+%\end{lstlisting}
 \end{alg}
 
 Note that the inner while loops account for the fact that
