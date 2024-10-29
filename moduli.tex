@@ -1,46 +1,64 @@
 
-The purpose of the following section is the following statement:
+We have the following:
 
 \begin{thm}
-	Given a random quartic K3 surface over \(\mathbb{F}_{p}\),
-	the probability of guessing a surface of height \(h\) 
-	is \(1 / p^{h}\).
+	[Lang-Weil, Theorem 1]
+	Let \(X \ins \mathbb{P}^{n}\)
+	be a projective variety of dimension \(r\). 
+	Then 
+	\[
+		\#X(\mathbb{F}_{p}) = p^r + O(p^{r - \frac{1}{2}})
+	\] 
 \end{thm}
 
-\begin{proof}
-	Let \(M\)
+Say we have an ambient projective variety
+\(Y\) with chosen
+hypersurface \(D\).
+The Lang-Weil estimate roughly
+says that if we pick a random point \(x\),
+we can expect \(x\) to lie in \(D\) 
+with probably about \(1 / p\).
+By \cite[Section~7]{artin-1974-k3-surfaces}, 
+the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
+is cut out by a single section in 
+\(M_{i-1}\).
+If we apply both of these facts,
+with \(Y\) the 
+moduli space\footnote{
+	say, the course moduli space of polarized K3 surfaces,
+	though one should be able to make a similar statement
+	for the moduli stack
+} of quartic K3 surfaces,
+we can conclude that the locus 
+the probability of a random point 
+in the moduli space being in the locus
+\(M_{2}\) is about \(1 / p\). 
+Inductively, we see 
 
-	By \cite[Section~7]{artin-1974-k3-surfaces}, 
-	the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
-	is cut out by a single section in 
-	\(M_{i-1}\).
+\begin{heur}
+The probability of a randomly
+chosen surface having height \(h\) is about \(1 / p^{h}\).
+\end{heur}
 
-	INSERT ZARISKI TOLOPOGY ARGUMENT.
-\end{proof}
+Thus, we may find a surface of height \(h\) by 
+randomly choosing quartic K3 surfaces, and 
+if we compute a few times \(p^{h}\) 
+samples, we can be confident that we'll find
+one with high probability.
 
-In practice, when we guess quartic polynomials with random coefficients,
-we are choosing a point in the vector space
+In practice, our methodology is to choose
+random quartic polynomials,
+by sampling a point in the vector space
 of homogeneous polynomials, which is isomorphic to
-\(\mathbb{F}_{p}^{56}\).
+\(\mathbb{F}_{p}^{35}\).
 To obtain the moduli space \(M\) of quartic K3 surfaces, 
 we must projectivize and take the quotient by the action of 
 \(PGL_{4}\) which acts by changes of variables. 
-In other words, \(M = \left[  \mathbb{P}^{55} / PGL_{4} \right] \).
-Picking points in this moduli space should give us precisely
-a  \(1 / p^{h}\) chance. 
-
-However, the probability of picking a random
-polynomial \(f\)
-(equivalently, an element of \(\mathbb{F}_{p}^{56}\))
-whose associated hypersurface
-\(Z(f)\) has height \(h\) is still nonzero,
-and seems to be roughly the same.
-That is, projectivization
-and the quotient by changes of variables 
-don't seem to affect the probabilities
-too much. 
+Thus, there may be two sources of deviation from the expected
+probability--the group quoteint and the actual 
+error term in the estimate.
  
-For \(p = 7\) and above, when we restrict the coefficients
+For \(p = 7\) and above, we restrict 
 that may appear in the random polynomial (to speed up the FFT),
-the probabilities of getting higher heights
-seem to be less.
+so this likely further effect the probability of getting
+a surface of height \(h\).
