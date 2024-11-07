@@ -101,6 +101,7 @@ componentwise application
 of that operation, similar to Julia syntax.
 
 \begin{alg}
+
 \begin{lstlisting}
 
 delta1 = terms of delta1
@@ -140,13 +141,10 @@ while 1 <= r && l <= length(R)
         end
     end	
 end		
-	    
-
-
-	
-
 
 \end{lstlisting}
+
+
 %\begin{lstlisting}
 %	
 %	
@@ -234,6 +232,38 @@ usually dominates.
 * picture
 
 
+This next algorithm iterates through the terms of $delta1$, and directly generates the terms of $\Delta_1(f)a$ which are congruent to $(p - 1, \dots, p - 1)$
+
+As part of this computation, we use an algorithm called $find\_next\_pminus1$:
+
+\begin{alg}
+    $find\_next\_pminus1$ is a map from $(d, p) \rightarrow (d', m', c)$, where $d, d', m' \in \mathbb{Z}^n$, and $p, c \in \mathbb{Z}$.
+\end{alg}
+
+In our case, $d$ is the degree sequence of a term in $\Delta_{1}(f ^ {p - 1})$.
+
+The idea behind this algorithm is that we want to add to the coordinates of $d$ until we get some vector $d'$ which is congruent to $(p - 1, \dots, p - 1) \mod p$, and record how much we added to each entry in $m'$. $m'$ won't be a monomial in $M$, so we add $p$ to each coordinate until it is. $c$ is simply the sum of the coordinates of $m'$, which dictates how many $p$'s we add to $m'$ to get a monomial in $M$. ($M$ is the basis of the vector space of polynomials with degree $n(p - 1)$)
+
+Given $d$ and $p$, we want to add to the coordinates of $d$ until we get some vector $d' \equiv (p - 1, \dots, p - 1) \mod p$. Because $d$ is a term of $\Delta_{1}(f ^ {p - 1})$, the sum of the coordinates of $d$ is $n \cdot (p - 1) \cdot p \equiv 0 \mod p$. Since $d' \equiv (p - 1, \dots, p - 1) \mod p$, the sum of the coordinates of $d'$ is congruent to $n \cdot (p - 1) \equiv -n \mod p$. This means that we will always add $-n \mod p$ to the coordinates of $d$ to get $d'$, and since $m \in M$ has homogeneous degree $n \cdot (p - 1) \equiv -n \mod p$, we have some multiple of $p$ to add to the coordinates of $d'$ to get a term of $\Delta_{1}(f ^ {p - 1})$. Let $m' = d' - d$: this is the foundation of the "relevant" monomial (sum of coordinates of $m'$ is congruent to $-n \mod p$). To actually get an element $m \in M$, we need to add a multiple of $p$ to each coordinate (probably needs a lemma). Since we need to add to $sum(d') \equiv -n \mod p$ from $sum(m') \equiv -n \mod p$, we arrive at the problem of adding $\frac{n * (p - 1) - c}{p}$ $p$'s to $m'$, which can be solved using weak integer compositions.
+
+\begin{alg}
+\begin{lstlisting}
+
+delta1 = terms of delta1
+mons = all homogeneous monomials
+nMons = length(mons)
+
+answer := zeros(nMons,nMons)
+
+for term in delta1
+    d', m', c = find_next_pminus1(term, p)
+    for comp in wics(divexact(n * (p - 1) - c, n)) .* p
+        relevantMon = m' + comp
+        
+    end
+end
+\end{lstlisting}
+\end{alg}
 
 
 
