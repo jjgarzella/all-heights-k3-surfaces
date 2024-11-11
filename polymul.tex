@@ -7,8 +7,8 @@ $x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. Thi
 
 \begin{defn}
     Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
-    $f \in R[x_1, \dots, x_n]$. Then, the Kronecker Substitution produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
-    the evaluation of $f$: [cite this]{https://arxiv.org/pdf/1401.6694}
+    $f \in R[x_1, \dots, x_n]$. Then, the Kronecker Substitution \cite{arnold-2014-kronecker} produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
+    the evaluation of $f$: 
 
     \begin{center}
         $g(z) = f(z, z^M, z^{M^2}, \dots, z^{M^{n-1}})$
@@ -150,10 +150,10 @@ This formula provides a quick way to compute a relatively accurate upper bound f
 
 
 \subsection{Other algorithms}
-Many other algorithms are described in [CITE]. They compare performance in sparse and dense cases. In this section we consider whether or not they benefit from massive parallelization.
+Many other algorithms are described in \cite{monagan-2012-sparse-powering}. They compare performance in sparse and dense cases. In this section we consider whether or not they benefit from massive parallelization.
 
 \subsubsection{RMUL and RSQR}
-These algorithms are bottlenecked by a sort, which does benefit from parallelization, but not by much. We tried implementing the sorting algorithm from [CITE], but couldn't reproduce the results.
+These algorithms are bottlenecked by a sort, which does benefit from parallelization, but not by much. We tried implementing the sorting algorithm from \cite{gupta-2023-gpu-sort}, but couldn't reproduce the results.
 
 \subsubsection{BINA and BINB}
 BINA and BINB both call RMUL, which again, doesn't benefit much from parallelization.
@@ -166,4 +166,4 @@ MNE again, requires a sort, but isn't dominated by the sort. The computation of 
 % In order to generate a multinomial coefficient lookup table for $g^p$, we need to compute the most number of terms $g^p$ can have. Letting $n$ be the number of variables of $g$, this turns out to be the number of ways to distribute $n(p - 1)$ balls into $n$ bins, or $T = \binom{n(p - 1) + n - 1}{n - 1}$. 
 
 \subsubsection{SUMS and FPS}
-The parallelization of FPS is discussed in [CITE], but the implementation uses a lock, as well as a heap data structure, both of which aren't easily compatible with the GPU.
+The parallelization of FPS is discussed in \cite{monagan-2012-sparse-powering}, but the implementation uses a lock, as well as a heap data structure, both of which aren't easily compatible with the GPU.
