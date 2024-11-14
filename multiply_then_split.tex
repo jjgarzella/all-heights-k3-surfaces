@@ -1,5 +1,52 @@
 
+* comment on the general problem of multiply then split
+* TODO: rephrase everything in terms of the general problem, without 
+reference to delta_1
+
+\begin{cxt}
+	Let \(f \in S\) be a homogeneous
+	polynomial of degree \(n\).
+	Let \(\Delta\) be an array containing the 
+	terms $\delta$ of \(\Delta_{1}(f^{p-1})\).
+	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
+	homogeneous polynomials of degree
+	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
+\end{cxt}
+
 \subsection{The Naive Algorithm}
+
+\begin{algorithm}[H]
+    \caption{Matrix of $\theta$: Trivial Algorithm}
+    \label{alg:matrix:trivial}
+    \begin{algorithmic}[1]
+    \State \textbf{Input}: $\Delta, M, p$
+    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
+    \State mat $\gets zeros(len(M), len(M))$
+    \For{$m \in M$}
+        \State $c \gets M_{m}$
+        \For{$\delta \in \Delta$}
+            \If{$(exps(\delta) .+ exps(m)) .\% p =[p-1, \dots, p-1]$} \Comment{Check for match}
+                \State res $\gets u(exps(\delta m))$
+                \State $r \gets M_{res}$
+                \State mat $[r, c] += coeff(\delta)$
+            \EndIf
+        \EndFor
+    \EndFor
+    \State \Return mat
+    \end{algorithmic}
+\end{algorithm}
+
+In this algorithm, we iterate through the monomials $m \in M$, each corresponding to a column in the
+resulting matrix. For each monomial, we search for matching terms $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
+get the lexographical index of the result to find which row to add to.
+
+Letting $x = len(M)$ and $y = len(\Delta)$, the matrix can be generated in $O(xy)$ operations. This can easily be
+seen from the nested loop, and that all of the operations within the loop are constant.
+
+Observe that the majority of the $xy$ combinations of terms of $\Delta$ and $M$ don't match. This means in
+Algorithm \ref{alg:matrix:trivial}, much of our runtime is wasted on checking for whether our terms match. With this in mind:
+
+* TODO: state the complexity analysis in terms of the size of f (i.e. n, d, and p)
 
 \subsection{Modified Merge-based Algorithm}
 
@@ -88,51 +135,117 @@ However, we have even more:
 The previous two corollaries justify
 the following algorithm.
 
-\begin{cxt}
-	Let \(f \in S\) be a homogeneous
-	polynomial of degree \(n\).
-	Let \(\Delta\) be an array containing the 
-	terms $\delta$ of \(\Delta_{1}(f^{p-1})\).
-	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
-	homogeneous polynomials of degree
-	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
-\end{cxt}
-
-In what follows, when we put a dot (\(.\))
-before an operation, that denotes
-componentwise application
-of that operation, similar to Julia syntax.
-
-\begin{algorithm}[H]
-    \caption{Matrix of $\theta$: Trivial Algorithm}
-    \label{alg:matrix:trivial}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M, p$
-    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
-    \State mat $\gets zeros(len(M), len(M))$
-    \For{$m \in M$}
-        \State $c \gets M_{m}$
-        \For{$\delta \in \Delta$}
-            \If{$(exps(\delta) .+ exps(m)) .\% p =[p-1, \dots, p-1]$} \Comment{Check for match}
-                \State res $\gets u(exps(\delta m))$
-                \State $r \gets M_{res}$
-                \State mat $[r, c] += coeff(\delta)$
-            \EndIf
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
+\begin{algorithm}
+\caption{Multiply than split: merge-based algorithm}
+\label{alg:theta:merge}
+\begin{algorithmic}[1]
+\State \textbf{Inputs:} \(\Delta, M\)
+\State mat \(\gets zeros(length(M), length(M))\) 
+\State \(L \gets exponents(\Delta) .\% p\) 
+\State \(R \gets exponents(M) .\% p\)
+\State sort both  \(L\) and \(R\) 
+\State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
+\State \(l \gets 1, r \gets legnth(R)\)
+\While{\(1 \leq R \&\& l \leq length(L)\)}
+	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
+	\If{cmp < 0}
+	    \State \(l \gets l + 1\) 
+	\ElsIf{0 < cmp}
+	    \State \(r \gets r - 1\)
+    \ElsIf{0 == cmp}
+        \State matchr \(\gets R[r]\) 
+        \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
+        \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
+		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
+                \State exponents \(\gets (exponents(\Delta^{\prime}[ll]) .+ exponents(M^{\prime}[r]) .- (p-1, \ldots, p-1)) ./ p\) 
+                \State coeff \(\gets coeff(\Delta^{\prime}[ll])\)
+                \State \(col \gets indexof(M,M^{\prime}[r])\)
+                \State \(row \gets indexof(M, \text{exponents})\)
+                \State \(mat[row,col] += coeff\) 
+            \EndFor
+            \State \(r \gets r - 1\)
+        \EndWhile     
+        \State \(l \gets l + \text{numLmatches} - 1\) 
+    \EndIf
+\EndWhile
+\State \Return mat
+\end{algorithmic}
 \end{algorithm}
 
-In this algorithm, we iterate through the monomials $m \in M$, each corresponding to a column in the
-resulting matrix. For each monomial, we search for matching terms $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
-get the lexographical index of the result to find which row to add to.
+%\begin{alg}
+%
+%\begin{lstlisting}
+%
+%delta1 = terms of delta1
+%mons = all homogeneous monomials
+%nMons = length(mons)
+%
+%answer := zeros(nMons,nMons)
+%L := delta1 .% p
+%R := M .% p
+%
+%sort both L and R (mod p)
+%sort delta1 and M according to the same permutation
+%
+%l := 1, r := length(R)
+%
+%while 1 <= r && l <= length(R)
+%    cmp := L[l] + R[r] - (p-1, ..., p-1)
+%    switch cmp
+%    case cmp < 0
+%        l += 1
+%    case 0 < cmp
+%        r -= 1
+%    case cmp == 0
+%        matchr := R[r]
+%        numLmatches := (the number of 
+%            adjacent entries in L that are equal to L[l])
+%        while R[r] == matchr
+%            for ll in l:l+numLmatches
+%
+%                Extract delta1[ll] and its 
+%                corresponding coefficient, as well as M[r]
+%
+%                Apply u to the product of the resulting monomials
+%
+%                Add this term to the correct entry of answer
+%            end
+%        end
+%    end	
+%end		
+%
+%\end{lstlisting}
+%\end{alg}
 
-Letting $x = len(M)$ and $y = len(\Delta)$, the matrix can be generated in $O(xy)$ operations. This can easily be
-seen from the nested loop, and that all of the operations within the loop are constant.
+Note that the inner while loops account for the fact that
+after modding by \(p\), one does not expect 
+either array to have unique keys.
+The algorithm is justified by the previous corollaries.
 
-Observe that the majority of the $xy$ combinations of terms of $\Delta$ and $M$ don't match. This means in
-Algorithm 5, much of our runtime is wasted on checking for whether our terms match. With this in mind:
+In practice, instead of sorting the arrays in place, 
+we use a method like julia's ``sortperm''
+%TODO: code font
+to get the sort permutation.
+
+We also may use the kronecker substitution to make
+the comparisons and additions use machine integers
+rather than vectors.
+In practice, this speeds the algorithm up a lot.
+
+* complexity analysis
+n = length L, m = length R
+we need n + m + n log n + m log m operations.
+Thus, the algorithm is big o of max(n log n, m log m),
+and in practice the \(\Delta_{1}\) length
+usually dominates.
+TODO: state the complexity results in terms of the size of f
+
+%In what follows, when we put a dot (\(.\))
+%before an operation, that denotes
+%componentwise application
+%of that operation, similar to Julia syntax.
+
+\subsection{Algorithm based on Generating weak integer compositions}
 
 \begin{defn}
     $generateMatchingMonomials(\delta, p, M)$ produces a set of monomials $m \in M$ that match with $\delta$
@@ -178,50 +291,7 @@ With this, we have a faster version of our trivial algorithm:
 
 Again, letting $x = len(M)$ and $y = len(\Delta)$, this algorithm generates the matrix in $O(y)$ operations. The number of matching monomials each term $\delta$ has is bounded above by $\binom{\lfloor \frac{n(p - 1)}{p} \rfloor + n - 1}{n}$ (I have a proof but requires me to explain details of generateMatchingMonomials()), which is effectively constant for all $n$ and $p$ computable in the near future.
 
-
-\begin{alg}
-
-\begin{lstlisting}
-
-delta1 = terms of delta1
-mons = all homogeneous monomials
-nMons = length(mons)
-
-answer := zeros(nMons,nMons)
-L := delta1 .% p
-R := M .% p
-
-sort both L and R (mod p)
-sort delta1 and M according to the same permutation
-
-l := 1, r := length(R)
-
-while 1 <= r && l <= length(R)
-    cmp := L[l] + R[r] - (p-1, ..., p-1)
-    switch cmp
-    case cmp < 0
-        l += 1
-    case 0 < cmp
-        r -= 1
-    case cmp == 0
-        matchr := R[r]
-        numLmatches := (the number of 
-            adjacent entries in L that are equal to L[l])
-        while R[r] == matchr
-            for ll in l:l+numLmatches
-
-                Extract delta1[ll] and its 
-                corresponding coefficient, as well as M[r]
-
-                Apply u to the product of the resulting monomials
-
-                Add this term to the correct entry of answer
-            end
-        end
-    end	
-end		
-
-\end{lstlisting}
+TODO: state the complexity stuff in terms of the size of f
 
 
 %\begin{lstlisting}
@@ -284,33 +354,11 @@ end
 %	end while
 %
 %\end{lstlisting}
-\end{alg}
 
-Note that the inner while loops account for the fact that
-after modding by \(p\), one does not expect 
-either array to have unique keys.
-The algorithm is justified by the previous corollaries.
 
-In practice, instead of sorting the arrays in place, 
-we use a method like julia's ``sortperm''
-%TODO: code font
-to get the sort permutation.
 
-We also may use the kronecker substitution to make
-the comparisons and additions use machine integers
-rather than vectors.
-In practice, this speeds the algorithm up a lot.
+%* picture
 
-* complexity analysis
-n = length L, m = length R
-we need n + m + n log n + m log m operations.
-Thus, the algorithm is big o of max(n log n, m log m),
-and in practice the \(\Delta_{1}\) length
-usually dominates.
-
-* picture
-
-\subsection{Algorithm based on Generating weak integer compositions}
 
 % Given $d$ and $p$, we want to add to the coordinates of $d$ until we get some vector $d' \equiv (p - 1, \dots, p - 1) \mod p$. Because $d$ is a term of $\Delta_{1}(f ^ {p - 1})$, the sum of the coordinates of $d$ is $n \cdot (p - 1) \cdot p \equiv 0 \mod p$. Since $d' \equiv (p - 1, \dots, p - 1) \mod p$, the sum of the coordinates of $d'$ is congruent to $n \cdot (p - 1) \equiv -n \mod p$. This means that we will always add $-n \mod p$ to the coordinates of $d$ to get $d'$, and since $m \in M$ has homogeneous degree $n \cdot (p - 1) \equiv -n \mod p$, we have some multiple of $p$ to add to the coordinates of $d'$ to get a term of $\Delta_{1}(f ^ {p - 1})$. Let $m' = d' - d$: this is the foundation of the "relevant" monomial (sum of coordinates of $m'$ is congruent to $-n \mod p$). To actually get an element $m \in M$, we need to add a multiple of $p$ to each coordinate (probably needs a lemma). Since we need to add to $sum(d') \equiv -n \mod p$ from $sum(m') \equiv -n \mod p$, we arrive at the problem of adding $\frac{n * (p - 1) - c}{p}$ $p$'s to $m'$, which can be solved using weak integer compositions.
 
