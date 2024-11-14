@@ -38,10 +38,10 @@ We start with an elementary fact.
 \end{proof}
 
 \begin{defn}
-	Let \(M\) be a monomial in \(S\). 
-	Then we say that \(M\) \textit{matches}
-	with another monomial \(M^{\prime}\) 
-	if the monomial \(MM^{\prime}\) is
+	Let \(m\) be a monomial in \(S\). 
+	Then we say that \(m\) \textit{matches}
+	with another monomial \(m^{\prime}\) 
+	if the monomial \(mm^{\prime}\) is
 	not killed by \(u\).
 \end{defn}
 
@@ -88,17 +88,92 @@ the following algorithm.
 	Let \(f \in S\) be a homogeneous
 	polynomial of degree \(n\).
 	Let \(\Delta\) be an array containing the 
-	exponent vectors of \(\Delta_{1}(f^{p-1})\).
-	Let \(M\) be an array containing the exponent
-	vectors of the monomial basis of
+	terms $\delta$ of \(\Delta_{1}(f^{p-1})\).
+	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
 	homogeneous polynomials of degree
-	\(n*(p-1)\).
+	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
 \end{cxt}
 
 In what follows, when we put a dot (\(.\))
 before an operation, that denotes
 componentwise application
 of that operation, similar to Julia syntax.
+
+\begin{algorithm}[H]
+    \caption{Matrix of $\theta$: Trivial Algorithm}
+    \label{alg:matrix:trivial}
+    \begin{algorithmic}[1]
+    \State \textbf{Input}: $\Delta, M, p$
+    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
+    \State mat $\gets zeros(len(M), len(M))$
+    \For{$m \in M$}
+        \State $c \gets M_{m}$
+        \For{$\delta \in \Delta$}
+            \If{$(exps(\delta) .+ exps(m)) .\% p =[p-1, \dots, p-1]$} \Comment{Check for match}
+                \State res $\gets u(exps(\delta m))$
+                \State $r \gets M_{res}$
+                \State mat $[r, c] += coeff(\delta)$
+            \EndIf
+        \EndFor
+    \EndFor
+    \State \Return mat
+    \end{algorithmic}
+\end{algorithm}
+
+In this algorithm, we iterate through the monomials $m \in M$, each corresponding to a column in the
+resulting matrix. For each monomial, we search for matching terms $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
+get the lexographical index of the result to find which row to add to.
+
+Letting $x = len(M)$ and $y = len(\Delta)$, the matrix can be generated in $O(xy)$ operations. This can easily be
+seen from the nested loop, and that all of the operations within the loop are constant.
+
+Observe that the majority of the $xy$ combinations of terms of $\Delta$ and $M$ don't match. This means in
+Algorithm 5, much of our runtime is wasted on checking for whether our terms match. With this in mind:
+
+\begin{defn}
+    $generateMatchingMonomials(\delta, p, M)$ produces a set of monomials $m \in M$ that match with $\delta$
+\end{defn}
+
+This function and its implementation are best explained with an example.
+
+\begin{ex}
+    Let $p = 5$, and $\delta$ be a monomial with degree sequence $[21, 16, 21, 22]$, where $a$ is some arbitrary coefficient. This is a term that may
+    result from the computation of $\Delta_1(f^{p - 1})$ for a quartic K3 surface $f$ over $\mathbb{F}_5$. In this case, $M$ is an array
+    of all possible $4$-variate monomials with homogeneous degree $16$. From [21, 16, 21, 22] we add [3, 3, 3, 2] to obtain [24, 19, 24, 24], which
+    has all elements congruent to $p-1 \mod p$. Because our monomials are homogeneous of degree $16$, and
+    we have only added $3 + 3 + 3 + 2 = 11$ to the degree sequence of $\delta$, we still have $16 - 11 = 5$ more to add.
+    To maintain congruence to $p-1 \mod p$, we must add all $5$ to one select variable. With 4 variables to choose from, doing this gives the
+    matching monomials $\{[8, 3, 3, 2], [3, 8, 3, 2], [3, 3, 8, 2], [3, 3, 3, 7]\}$.
+\end{ex}
+
+\begin{thm}
+    generateMatchingMonomials() correctly generates all matching monomials (Should I give a full algorithm for the implementation and why each step works, or can I just remove this Theorem and leave it to the reader? The proof is just a bunch of number crunching which I have the components of commented out at the bottom of this file)
+\end{thm}
+
+With this, we have a faster version of our trivial algorithm:
+
+\begin{algorithm}[H]
+    \caption{Matrix of $\theta$: WICS Algorithm}
+    \label{alg:matrix:WICS}
+    \begin{algorithmic}[1]
+    \State \textbf{Input}: $\Delta, M, p$
+    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
+    \State mat $\gets zeros(len(M), len(M))$
+    \For{$\delta \in \Delta$}
+        \State mons $\gets generateMatchingMonomials(\delta, p, M)$
+        \For{$m \in mons$}
+            \State $c \gets M_m$
+            \State res $\gets u(exps(\delta m))$
+            \State $r \gets M_{res}$
+            \State mat $[r, c] += coeff(\delta)$
+        \EndFor
+    \EndFor
+    \State \Return mat
+    \end{algorithmic}
+\end{algorithm}
+
+Again, letting $x = len(M)$ and $y = len(\Delta)$, this algorithm generates the matrix in $O(y)$ operations. The number of matching monomials each term $\delta$ has is bounded above by $\binom{\lfloor \frac{n(p - 1)}{p} \rfloor + n - 1}{n}$ (I have a proof but requires me to explain details of generateMatchingMonomials()), which is effectively constant for all $n$ and $p$ computable in the near future.
+
 
 \begin{alg}
 
@@ -231,39 +306,8 @@ usually dominates.
 
 * picture
 
+% Given $d$ and $p$, we want to add to the coordinates of $d$ until we get some vector $d' \equiv (p - 1, \dots, p - 1) \mod p$. Because $d$ is a term of $\Delta_{1}(f ^ {p - 1})$, the sum of the coordinates of $d$ is $n \cdot (p - 1) \cdot p \equiv 0 \mod p$. Since $d' \equiv (p - 1, \dots, p - 1) \mod p$, the sum of the coordinates of $d'$ is congruent to $n \cdot (p - 1) \equiv -n \mod p$. This means that we will always add $-n \mod p$ to the coordinates of $d$ to get $d'$, and since $m \in M$ has homogeneous degree $n \cdot (p - 1) \equiv -n \mod p$, we have some multiple of $p$ to add to the coordinates of $d'$ to get a term of $\Delta_{1}(f ^ {p - 1})$. Let $m' = d' - d$: this is the foundation of the "relevant" monomial (sum of coordinates of $m'$ is congruent to $-n \mod p$). To actually get an element $m \in M$, we need to add a multiple of $p$ to each coordinate (probably needs a lemma). Since we need to add to $sum(d') \equiv -n \mod p$ from $sum(m') \equiv -n \mod p$, we arrive at the problem of adding $\frac{n * (p - 1) - c}{p}$ $p$'s to $m'$, which can be solved using weak integer compositions.
 
-This next algorithm iterates through the terms of $delta1$, and directly generates the terms of $\Delta_1(f)a$ which are congruent to $(p - 1, \dots, p - 1)$
-
-As part of this computation, we use an algorithm called $find\_next\_pminus1$:
-
-\begin{alg}
-    $find\_next\_pminus1$ is a map from $(d, p) \rightarrow (d', m', c)$, where $d, d', m' \in \mathbb{Z}^n$, and $p, c \in \mathbb{Z}$.
-\end{alg}
-
-In our case, $d$ is the degree sequence of a term in $\Delta_{1}(f ^ {p - 1})$.
-
-The idea behind this algorithm is that we want to add to the coordinates of $d$ until we get some vector $d'$ which is congruent to $(p - 1, \dots, p - 1) \mod p$, and record how much we added to each entry in $m'$. $m'$ won't be a monomial in $M$, so we add $p$ to each coordinate until it is. $c$ is simply the sum of the coordinates of $m'$, which dictates how many $p$'s we add to $m'$ to get a monomial in $M$. ($M$ is the basis of the vector space of polynomials with degree $n(p - 1)$)
-
-Given $d$ and $p$, we want to add to the coordinates of $d$ until we get some vector $d' \equiv (p - 1, \dots, p - 1) \mod p$. Because $d$ is a term of $\Delta_{1}(f ^ {p - 1})$, the sum of the coordinates of $d$ is $n \cdot (p - 1) \cdot p \equiv 0 \mod p$. Since $d' \equiv (p - 1, \dots, p - 1) \mod p$, the sum of the coordinates of $d'$ is congruent to $n \cdot (p - 1) \equiv -n \mod p$. This means that we will always add $-n \mod p$ to the coordinates of $d$ to get $d'$, and since $m \in M$ has homogeneous degree $n \cdot (p - 1) \equiv -n \mod p$, we have some multiple of $p$ to add to the coordinates of $d'$ to get a term of $\Delta_{1}(f ^ {p - 1})$. Let $m' = d' - d$: this is the foundation of the "relevant" monomial (sum of coordinates of $m'$ is congruent to $-n \mod p$). To actually get an element $m \in M$, we need to add a multiple of $p$ to each coordinate (probably needs a lemma). Since we need to add to $sum(d') \equiv -n \mod p$ from $sum(m') \equiv -n \mod p$, we arrive at the problem of adding $\frac{n * (p - 1) - c}{p}$ $p$'s to $m'$, which can be solved using weak integer compositions.
-
-\begin{alg}
-\begin{lstlisting}
-
-delta1 = terms of delta1
-mons = all homogeneous monomials
-nMons = length(mons)
-
-answer := zeros(nMons,nMons)
-
-for term in delta1
-    d', m', c = find_next_pminus1(term, p)
-    for comp in wics(divexact(n * (p - 1) - c, n)) .* p
-        relevantMon = m' + comp
-        
-    end
-end
-\end{lstlisting}
-\end{alg}
 
 
 
