@@ -1,17 +1,65 @@
 
-* comment on the general problem of multiply then split
-* TODO: rephrase everything in terms of the general problem, without 
-reference to delta_1
+Principles: 
+
+* naive gpu algorithm is fast enough
+* naive gpu algorithm can be faster than
+a ``clever'' cpu algorithm with better complexity
+
+%* comment on the general problem of multiply then split
+%* TODO: rephrase everything in terms of the general problem, without 
+%reference to delta_1
 
 \begin{cxt}
-	Let \(f \in S\) be a homogeneous
-	polynomial of degree \(n\).
-	Let \(\Delta\) be an array containing the 
-	terms $\delta$ of \(\Delta_{1}(f^{p-1})\).
-	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
-	homogeneous polynomials of degree
-	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
+	\label{cxt:mult:split}
+	Let \(\Delta \in S = k[x_{1}, \ldots, x_{n}]\)
+	be a homogeneous
+	polynomial of degree \(D\).
+	In algorithms, we will sometimes conflate \(\Delta\) 
+	with a list containing all its terms.
+	For \(d\) an integer,
+	and let \(S_{d}\) denote the homogeneous polynomials of degree \(d\).
+	The dimension of \(S_{d}\) is then \(\binom{n+d-1}{n-1}\).
+	Thus, the number of terms of \(\Delta\) is bounded 
+	above by \(\binom{n+D-1}{n-1}\).
+	We let \(M_{d}\) denote a list (in lexographical order)
+	of the monomial basis of \(S_{d}\).
+	Let \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
+	Then 
+	We wish to have an algorithm that calculates the matrix of
+	the linear operator
+	\begin{align*}
+		\theta : S_{d} &\longrightarrow S_{d^{\prime}} \\
+		g &\longmapsto u(\Delta g)
+	.\end{align*}
 \end{cxt}
+
+\begin{rmk}
+	Note that if  \(d^{\prime} = \frac{d+D-p(n-1)}{p}\)
+	is not an integer, \(\theta\) is the zero map
+	and ther is nothing more to do.
+	
+	If \(\Delta = \Delta_{1}(f^{p-1})\) and \(d = n(p-1)\),
+	then \(d^{\prime} = d\) and \(\theta\) is
+	represented by
+	a square matrix.
+\end{rmk}
+
+\begin{defn}
+	Let \(m\) be a monomial in \(S\). 
+	Then we say that \(m\) \textbf{matches}
+	with another monomial \(m^{\prime}\) 
+	if the monomial \(mm^{\prime}\) is
+	not killed by \(u\).
+\end{defn}
+
+In the case of calculating the quasi-\(F\)-split height of a Calabi-Yau
+hypersurface,
+we have \(d = n(p-1)\) and \(D = np(p-1)\).
+
+Notes for complexity calculations:
+
+TODO: change the algorithms to reflect that the input and output space
+might not be the same vector space in general.
 
 \subsection{The Naive Algorithm}
 
@@ -19,16 +67,17 @@ reference to delta_1
     \caption{Matrix of $\theta$: Trivial Algorithm}
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M, p$
-    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
-    \State mat $\gets zeros(len(M), len(M))$
-    \For{$m \in M$}
-        \State $c \gets M_{m}$
+    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
+    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
+	matrix representing $\theta$
+    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
+    \For{$m \in M_{d}$}
+	    \State $c \gets indexof(m, M _{d})$
         \For{$\delta \in \Delta$}
-            \If{$(exps(\delta) .+ exps(m)) .\% p =[p-1, \dots, p-1]$} \Comment{Check for match}
-                \State res $\gets u(exps(\delta m))$
-                \State $r \gets M_{res}$
-                \State mat $[r, c] += coeff(\delta)$
+            \If{$(exponents(\delta) .+ exponents(m)) .\% p =[p-1, \dots, p-1]$} 
+			\State res $\gets (exponents(\delta) + exponents(m) - (p-1, \ldots, p-1)) / p$
+				\State $r \gets indexof(\text{res},M_{d^{\prime}})$
+                \State $\text{mat}[r, c] += coeff(\delta)$
             \EndIf
         \EndFor
     \EndFor
@@ -36,17 +85,23 @@ reference to delta_1
     \end{algorithmic}
 \end{algorithm}
 
-In this algorithm, we iterate through the monomials $m \in M$, each corresponding to a column in the
-resulting matrix. For each monomial, we search for matching terms $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
+In this algorithm, we iterate through the monomials $m \in M_{d}$, each corresponding to a column in the
+resulting matrix. For each monomial, we search for terms that match $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
 get the lexographical index of the result to find which row to add to.
 
-Letting $x = len(M)$ and $y = len(\Delta)$, the matrix can be generated in $O(xy)$ operations. This can easily be
-seen from the nested loop, and that all of the operations within the loop are constant.
+Since $length(M_{d}) = \binom{n + d - 1}{n - 1}$ and 
+$length(\Delta) = \binom{n + D - 1}{n - 1}$, the matrix can be generated in 
+$O(\binom{n + d - 1}{n - 1}\binom{n + D - 1}{n + d - 1})$ operations. 
+This can be
+seen from the nested loops, assuming that integer arithmetic operations are constant time.
+In the case of the quasi-\(F\)-split height of a K3 surface, 
+this becomes
+\(O(\binom{np - 1}{n-1}\binom{n(p^2 - p + 1)}{n-1})\).
 
-Observe that the majority of the $xy$ combinations of terms of $\Delta$ and $M$ don't match. This means in
-Algorithm \ref{alg:matrix:trivial}, much of our runtime is wasted on checking for whether our terms match. With this in mind:
-
-* TODO: state the complexity analysis in terms of the size of f (i.e. n, d, and p)
+In practice, the majority of the combinations of terms of $\Delta$ and $M_{d}$ don't match. This means in
+Algorithm \ref{alg:matrix:trivial}, much of our runtime is wasted on checking for whether terms match. 
+However, we emphasize that this algorithm, if implemented in parallel on the GPU, is indeed
+fast enough to not be a bottleneck in practice.
 
 \subsection{Modified Merge-based Algorithm}
 
@@ -88,13 +143,6 @@ We start with an elementary fact.
 	Each coordinate has \(a_{i} + b_{i} \leq 2(p-1) = 2p-2\).
 \end{proof}
 
-\begin{defn}
-	Let \(m\) be a monomial in \(S\). 
-	Then we say that \(m\) \textit{matches}
-	with another monomial \(m^{\prime}\) 
-	if the monomial \(mm^{\prime}\) is
-	not killed by \(u\).
-\end{defn}
 
 \begin{cor}
 	Let \(\underbar{a}\) be as above.
@@ -139,10 +187,10 @@ the following algorithm.
 \caption{Multiply than split: merge-based algorithm}
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
-\State \textbf{Inputs:} \(\Delta, M\)
+\State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
 \State mat \(\gets zeros(length(M), length(M))\) 
 \State \(L \gets exponents(\Delta) .\% p\) 
-\State \(R \gets exponents(M) .\% p\)
+\State \(R \gets exponents(M_{d}) .\% p\)
 \State sort both  \(L\) and \(R\) 
 \State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
 \State \(l \gets 1, r \gets legnth(R)\)
@@ -157,11 +205,11 @@ the following algorithm.
         \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
         \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
 		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
-                \State exponents \(\gets (exponents(\Delta^{\prime}[ll]) .+ exponents(M^{\prime}[r]) .- (p-1, \ldots, p-1)) ./ p\) 
+                \State res \(\gets (exponents(\Delta^{\prime}[ll]) .+ exponents(M^{\prime}[r]) .- (p-1, \ldots, p-1)) ./ p\) 
                 \State coeff \(\gets coeff(\Delta^{\prime}[ll])\)
-                \State \(col \gets indexof(M,M^{\prime}[r])\)
-                \State \(row \gets indexof(M, \text{exponents})\)
-                \State \(mat[row,col] += coeff\) 
+                \State \(col \gets indexof(M^{\prime}[r],M_{d})\)
+                \State \(row \gets indexof(\text{res},M_{d^{\prime}})\)
+                \State \(\text{mat}[row,col] += coeff\) 
             \EndFor
             \State \(r \gets r - 1\)
         \EndWhile     
@@ -247,6 +295,10 @@ TODO: state the complexity results in terms of the size of f
 
 \subsection{Algorithm based on Generating weak integer compositions}
 
+	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
+	homogeneous polynomials of degree
+	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
+
 \begin{defn}
     $generateMatchingMonomials(\delta, p, M)$ produces a set of monomials $m \in M$ that match with $\delta$
 \end{defn}
@@ -273,16 +325,16 @@ With this, we have a faster version of our trivial algorithm:
     \caption{Matrix of $\theta$: WICS Algorithm}
     \label{alg:matrix:WICS}
     \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M, p$
-    \State \textbf{Output}: $len(M) \times len(M)$ matrix representing $\theta$
-    \State mat $\gets zeros(len(M), len(M))$
+    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
+    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ matrix representing $\theta$
+    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
     \For{$\delta \in \Delta$}
-        \State mons $\gets generateMatchingMonomials(\delta, p, M)$
+        \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$
         \For{$m \in mons$}
-            \State $c \gets M_m$
-            \State res $\gets u(exps(\delta m))$
-            \State $r \gets M_{res}$
-            \State mat $[r, c] += coeff(\delta)$
+		    \State $c \gets indexof(m,M_{d})$
+			\State res $\gets (exponents(\delta) + exponents(m) - (p-1, \ldots, p-1)) / p$
+			\State $r \gets indexof(\text{res},M_{d^{\prime}})$
+            \State $\text{mat}[r, c] += coeff(\delta)$
         \EndFor
     \EndFor
     \State \Return mat
