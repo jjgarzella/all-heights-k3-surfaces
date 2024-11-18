@@ -2,8 +2,8 @@ In this section, we explore algorithms for raising multivariate homogeneous poly
 
 \subsection{Kronecker Substitution and Homogeneity}
 In multivariate polynomial arithmetic, it is commonplace to map a multivariate polynomial to a univariate 
-polynomial. This is because a comparison between two degree sequences $(d_1, \dots , d_n)$ of monomials 
-$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. This also allows us to use the vast majority of polynomial powering algorithms, which take in univariate polynomials. One method of mapping a multivariate polynomial to a sparse univariate polynomial is the Kronecker Substitution.
+polynomial. This is because a comparison between two exponent tuples $(d_1, \dots , d_n)$ of monomials 
+$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. This also allows us to use the vast majority of polynomial powering algorithms, which take in univariate polynomials. One method of mapping a multivariate polynomial to a sparse univariate polynomial is the Kronecker Substitution:
 
 \begin{defn}
     Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
@@ -16,10 +16,10 @@ $x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. Thi
 \end{defn}
 
 \begin{rmk}
-    In FLINT, degree sequences of multivariate monomials are bitpacked into unsigned integers. The process of bitpacking an array is a kronecker substitution with $M$ being a power of 2.
+    In FLINT, exponent tuples are bitpacked into unsigned integers. The process of bitpacking an array is a Kronecker Substitution with $M$ being a power of 2.
 \end{rmk}
 
-In the case where our polynomial is homogeneous, we can simply ignore one variable in all of our operations between monomials of the same degree. Because the total degree for each monomial is known, the variable can be recovered. This effectively decreases the number of variables of our polynomial by 1, which plays a large role in dense algorithms, like the FFT.
+In the case where our polynomial is homogeneous, we can simply ignore one variable in all of our operations between monomials of the same degree. Because the total degree for each monomial is known, the variable can be recovered at any time. This effectively decreases the number of variables of our polynomial by 1, which plays a large role in dense algorithms, like the FFT.
 
 \subsection{NTT}
 The FFT is a very well-known algorithm, with one of its many applications being raising dense univariate polynomials to powers.
@@ -33,22 +33,25 @@ To begin, we first define the length of an NTT:
 
 A quick overview of the NTT algorithm for polynomial powering is given:
 
-\begin{alg} Inputs: f, p, pow, where f is a dense representation of a 
-polynomial, p is a NTT prime, and pow is an integer.
-Output: dense representation of $g = f ^ {pow} \mod p$
-
-\begin{enumerate}
-    \item Compute the maximum degree of $d = f ^ {pow} \mod p$, and set $L = d + 1$. Pad $f$ with $0$'s to length $L$
-    \item Perform an NTT of length $L$ and prime $p$ on $f$ to obtain $f'$.
-    \item Raise each element of $f'$ to the $pow$th power, and reduce mod $p$.
-    \item Perform an INTT on $f'$ to obtain $g$.
-\end{enumerate}
-
-\end{alg}
+\begin{algorithm}[H]
+    \caption{NTT Algorithm for polynomial powering}
+    \label{nttpowalg}
+    \begin{algorithmic}[1]
+    \State \textbf{Inputs}: $f$: a dense representation of a polynomial, $p$: a NTT prime, $pow$: an integer
+    \State \textbf{Output}: dense representation of $f ^ p$
+	\State $finalDegree \gets degree(f) * pow$
+    \State $L \gets d + 1$
+    \State $f \gets padToL(f)$ \Comment{Append $0$'s to the end of $f$ until $f$ has length $L$}
+    \State $f' \gets NTT(f, p)$
+    \State $f \gets f$ .\textasciicircum $pow$ \Comment{Raise each index of $f$ to $pow$}
+    \State $f \gets INTT(f, p)$
+    \State \Return $f$
+    \end{algorithmic}
+\end{algorithm}
 
 This algorithm is usually performed multiple times with distinct primes $p$, and the results are combined using the Chinese Remainder Theorem to obtain a result in $\mathbb{Z}$
 
-In many cases, using the Kronecker Substitution to map a multivariate polynomial to a univariate polynomial results in  a sparse univariate polynomial. As a result, dense algorithms like Algorithm 3.4 become inefficient in both time and memory complexity when compared to sparse algorithms. However, the massive throughput of the GPU allows the NTT to be competitive for these cases, $4$-variate homogeneous polynomial powering being one of them.
+In many cases, using the Kronecker Substitution to map a multivariate polynomial to a univariate polynomial results in  a sparse univariate polynomial. As a result, dense algorithms like Algorithm \ref{nttpowalg} become inefficient in both time and memory complexity when compared to sparse algorithms. However, the massive throughput of the GPU allows the NTT to be competitive for these cases, $4$-variate homogeneous polynomial powering being one of them.
 
 \subsubsection{NTT Implementation}
 
@@ -74,13 +77,13 @@ This poses the question of finding the maximum coefficient of our result $M$.
     Given a basis $(x^{I_1}, \dots, x^{I_n})$, where $I_i$ are distinct degree sequences of equal length, and a prime field $\mathbb{F}_p$, the \textbf{maximum polynomial} is $(p - 1)(x^{I_1} + \cdots + x^{I_n})$.
 \end{defn}
 
-For small problems, we can simply plug in the maximum possible polynomial $g$ into FLINT, compute $g ^ p$, and linearly iterate through the coefficients to get the maximum possible coefficient.
+For small problems, we can simply plug in the maximum polynomial $g$ into FLINT, compute $g ^ p$, and linearly iterate through the coefficients to get the maximum possible coefficient.
 We know this computation will be correct because FLINT uses GMP. However, for larger problems, such as raising a 4-variate polynomial of homogeneous degree $52$ to the $13$th power (this comes from computing the quasi-F-split height of a quartic $K_3$ surface over $\mathbb{F}_{13}$), FLINT does not finish the computation in a reasonable amount of time, around 3 hours.
 
 We present a method to quickly obtain an upper bound for the case of raising a homogeneous multivariate polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power. To begin, we need to introduce weak integer compositions:
 
 \begin{defn}
-    The weak integer compositions of $n$ into $k$ parts is the set of ordered $k$-length tuples of non-negative integers that add to $n$.
+    The weak integer compositions of $n$ into $k$ parts, denoted $wics(n, k)$, is the set of ordered $k$-length tuples of non-negative integers that add to $n$.
 \end{defn}
 
 For example, the weak integer compositions of $2$ into $3$ parts is:
@@ -93,61 +96,27 @@ For example, the weak integer compositions of $2$ into $3$ parts is:
 \end{lem}
 
 \begin{proof}
-    in stars and bars page on wikipedia
+    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
+    This gives $\binom{n + k - 1}{k - 1}$.
 \end{proof}
 
+\begin{rmk}
+    The dimension of the vector space of $k$-homogeneous $n$-variate polynomials over a field $F$ is $|wics(n, k)|$
+\end{rmk}
+
 \begin{thm}
-    Let $f$ be a homogeneous polynomial of $\mathbb{F}_p[x_1, ..., x_n]$, $g = f ^ {p - 1}$ and $[g]$ a lift of $g$ to the integers. Then, the coefficients of $g ^ k$ are bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$
+    Let $f$ be a homogeneous polynomial of $\mathbb{F}_p[x_1, \dots, x_n]$, $g = f ^ {p - 1}$ and $[g]$ a lift of $g$ to the integers. Then, the coefficients of $g ^ k$ are bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$
 \end{thm}
 
 \begin{proof}
     We induct on $k$. The maximum coefficient of $g^0$ is $1$, which is bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ 0 = 1$.
     
-    Let $(d_1, \dots , d_n)$ denote the degree sequence of a term of $g^k$, let $(d'_1, \dots , d'_n)$ denote the degree sequence of a term of $g^{k + 1}$, and let $(a_1, \dots , a_n)$ denote the degree sequence of a term of $g$.
+    Let $(d_1, \dots , d_n)$ denote the exponent tuple of a term of $g^k$, let $(d'_1, \dots , d'_n)$ denote the exponent tuple of a term of $g^{k + 1}$, and let $(a_1, \dots , a_n)$ denote the exponent tuple of a term of $g$.
 
     Consider an arbitrary term of $g^{k + 1}$. To find all terms in the unreduced expansion of $g^k \cdot g$ that contribute to that term, we look at terms of $g^k$ with degree sequences of the form $(d'_1 - a_1, \dots , d'_n - a_n)$. The number of these terms of $g^k$ is bounded above by $|wics(np, n)|$, or $\binom{np + n - 1}{n - 1}$. Using our inductive assumption, the maximum coefficient of $g^k$ is bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$, so multiplying each of these by coefficients of $g$, which have a maximum value of $p - 1$, and adding up $\binom{np + n - 1}{n - 1}$ copies of these gives $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ {k + 1}$, completing our inductive step.
 \end{proof}
 
 This formula provides a quick way to compute a relatively accurate upper bound for our problem. To find the exact maximum coefficient of raising a maximum polynomial $g ^ p$, we simply use Algorithm 3.4 with primes that multiply past our upper bound, build the result in $\mathbb{Z}$ using Chinese Remainder Theorem, and iterate through the coefficients of $g^p$ to find the actual maximum coefficient.
-
-
-% To determine the size of our FFT, we need to compute the largest possible degree that the Kronecker 
-% Substitution can map a monomial of $g^p$ to. Let $f \in R[x_1, \dots, x_n]$ be homogeneous with degree $d$. Then, 
-% $(f^{p-1})^p$ is homogeneous with degree $D = dp(p - 1)$. Then, by Definition 3.1, we can select an upper bound 
-% of $M = D + 1$, and the maximum degree the Kronecker Substitution will be able to map to is $D*M^{n - 1}$. But 
-% if we ignore one variable of $f$ due to the homogeneous property, we get a maximum degree of $D*M^{n - 2}$. 
-% Because we use a radix-2 FFT, we find the next power of 2 after $D*M^{n - 2} + 1$, the $+1$ coming from a 
-% $k$-length FFT representing a $k-1$ degree polynomial.
-
-% Below is a table of FFT lengths needed to compute $g^p$:
-
-% Because we are doing a FFT with integers, we 
-
-% \begin{center}
-%     \textbf{Required FFT lengths to compute $g^p$}
-%     \begin{tabular}{c|c|c|c|c}
-%     $\bsfrac{\,p}{n}$ & 5 & 7 & 11 & 13 \\ \hline
-%     4 & 1,048,576 & 8,388,608 & 134,217,728 & 268,435,456 \\
-%     5 & 134,217,728 & 2,147,483,648 & 137,438,953,472 & 549,755,813,888
-%     \end{tabular}
-% \end{center}    
-
-% To make computing $\Delta_1(f^{p-1})$ even faster, we look for ways to reduce the FFT size. One such way is by imposing restrictions on the space of possible monomials. Consider the restriction where we remove all terms containing only one variable raised to the $n$-th power from the basis of monomials of $f$.
-
-% [Explanation on how the restriction affects kroneckersubstitution]
-
-% Below is a table of FFT lenghts needed to compute the restricted $g^p$:
-
-
-% \begin{center}
-%     \textbf{Required FFT lengths to compute restricted $g^p$}
-%     \begin{tabular}{c|c|c|c|c}
-%     $\bsfrac{\,p}{n}$ & 5 & 7 & 11 & 13 \\ \hline
-%     4 & 262,144 & 2,097,152 & 67,108,864 & 134,217,728 \\
-%     5 & 67,108,864 & 1,073,741,824 & 68,719,476,736 & 274,877,906,944
-%     \end{tabular}
-% \end{center}
-
 
 \subsection{Other algorithms}
 Many other algorithms are described in \cite{monagan-2012-sparse-powering}. They compare performance in sparse and dense cases. In this section we consider whether or not they benefit from massive parallelization.
@@ -159,11 +128,7 @@ These algorithms are bottlenecked by a sort, which does benefit from paralleliza
 BINA and BINB both call RMUL, which again, doesn't benefit much from parallelization.
 
 \subsubsection{MNE}
-MNE again, requires a sort, but isn't dominated by the sort. The computation of each multinomial coefficient is greatly improved by parallelization, but again, is only feasible for small problems.
-
-% The memory consumption of MNE scales terribly with the number of input terms, meaning it isn't exactly suited for computing $g ^ p$. In fact, for in computing $\Delta_1$ for the problem of , 1294 yottabytes are required to store the multinomial lookup table. This is 100 million times more than the entire internet. So, we cannot use this method. (i must've gotten this computation wrong)
-
-% In order to generate a multinomial coefficient lookup table for $g^p$, we need to compute the most number of terms $g^p$ can have. Letting $n$ be the number of variables of $g$, this turns out to be the number of ways to distribute $n(p - 1)$ balls into $n$ bins, or $T = \binom{n(p - 1) + n - 1}{n - 1}$. 
+MNE also requires a sort, but isn't dominated by it. Though it is competitive for small problems, it is quickly bottlenecked by the memory required to store the table of multinomial coefficients. The memory required reaches 742 GB for raising $969$ terms to the $5$th power, which comes up in the computation of $\delta_1(f ^ {p - 1})$ for a quartic $K_3$ surface $f$ over $\mathbb{F}_5$.
 
 \subsubsection{SUMS and FPS}
 The parallelization of FPS is discussed in \cite{monagan-2012-sparse-powering}, but the implementation uses a lock, as well as a heap data structure, both of which aren't easily compatible with the GPU.
