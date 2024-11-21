@@ -1,86 +1,176 @@
-In this section, we explore algorithms for raising multivariate homogeneous polynomials to powers. Specifically, we consider the benefits mass parallelization using the GPU gives.
+%In this section, we explore algorithms for raising multivariate homogeneous polynomials to powers. Specifically, we consider the benefits mass parallelization using the GPU gives.
 
-\subsection{Kronecker Substitution and Homogeneity}
-In multivariate polynomial arithmetic, it is commonplace to map a multivariate polynomial to a univariate 
-polynomial. This is because a comparison between two exponent tuples $(d_1, \dots , d_n)$ of monomials 
-$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. This also allows us to use the vast majority of polynomial powering algorithms, which take in univariate polynomials. One method of mapping a multivariate polynomial to a sparse univariate polynomial is the Kronecker Substitution:
+%\subsection{Kronecker Substitution and Homogeneity}
 
-\begin{defn}
-    Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
-    $f \in R[x_1, \dots, x_n]$. Then, the Kronecker Substitution \cite{arnold-2014-kronecker} produces a univariate polynomial $g \in R[z]$ by substituting powers of $z$ in 
-    the evaluation of $f$: 
+%In multivariate polynomial arithmetic, it is commonplace to map a multivariate polynomial to a univariate 
+%polynomial. This is because a comparison between two exponent tuples $(d_1, \dots , d_n)$ of monomials 
+%$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. This also allows us to use the vast majority of polynomial powering algorithms, which take in univariate polynomials. One method of mapping a multivariate polynomial to a sparse univariate polynomial is the Kronecker Substitution:
 
-    \begin{center}
-        $g(z) = f(z, z^M, z^{M^2}, \dots, z^{M^{n-1}})$
-    \end{center}
-\end{defn}
+We reduce the problem of multivariate polynomial multiplication to single-variable
+by Kronecker substitution.
+Let $M$ is a non-inclusive upper bound on the degree of any variable of the polynomial
+$f \in R[x_1, \dots, x_n]$. 
+Then the \textit{Kronecker Substitution} 
+\(g(z) = f(z, z^M, z^{M^2}, \dots, z^{M^{n-1}})\)
+produces a univariate polynomial $g \in R[z]$,
+see \cite{arnold-2014-kronecker}.
+Algebraically, this is the same as applying the 
+homomorphism 
+\(R[x_{1}, \ldots, x_{n}] \xrightarrow{} R[z]\)
+which takes \(x_{i}\) to
+\(z^{M^{i-1}}\).
+This map cannot be injective in general, but it
+is injective on the subset of elements of
+\(f \in R[x_{1}, \ldots, x_{n}]\) 
+whose terms have all degrees strictly less than \(M\).
+Given two polynomials \(f_{1}, f_{2}\) that
+we wish to multiply, we may choose \(M\)
+big enough
+so that the product lies in the subset,
+so we may recover the product in 
+\(R[x_{1}, \ldots, x_{n}]\) by performing
+the product in the ring \(R[z]\).
 
 \begin{rmk}
     In FLINT, exponent tuples are bitpacked into unsigned integers. The process of bitpacking an array is a Kronecker Substitution with $M$ being a power of 2.
 \end{rmk}
 
-In the case where our polynomial is homogeneous, we can simply ignore one variable in all of our operations between monomials of the same degree. Because the total degree for each monomial is known, the variable can be recovered at any time. This effectively decreases the number of variables of our polynomial by 1, which plays a large role in dense algorithms, like the FFT.
+In the case where our polynomial is homogeneous, 
+we can simply ignore one variable in all of our operations between monomials of the same degree. 
+As above, algebraically this is applying the evaluation
+homomorphism \(x_{n} \mapsto 1\).
+This map is of course not injective, but it is injective on homogeneous elements.
+This effectively decreases the number of variables of our polynomial by 1, 
+which lowers the bound \(M\) in the
+Kronecker substitution by a lot.
+This improvement is essential for efficiently calculating the heights of
+quartic K3 surfaces.
 
-\subsection{NTT}
-The FFT is a very well-known algorithm, with one of its many applications being raising dense univariate polynomials to powers.
-Because we are working with integers, we use the Number Theoretic Transform (NTT), its finite field counterpart. We also refer to the NTT with ``multi-modular FFT''.
+%\subsection{NTT}
 
-To begin, we first define the length of an NTT:
+%The FFT is a very well-known algorithm, with one of its many applications being raising dense univariate polynomials to powers.
+%Because we are working with integers, we use the Number Theoretic Transform (NTT), its finite field counterpart. We also refer to the NTT with ``multi-modular FFT''.
+%
+%To begin, we first define the length of an NTT:
+%
+%\begin{defn}
+%    Given a NTT from $\mathbb{F}_p^L \rightarrow \mathbb{F}_p^L$, the \textbf{length} of the NTT is $L$.
+%\end{defn}
+%
+%A quick overview of the NTT algorithm for polynomial powering is given:
+%
+%\begin{algorithm}[H]
+%    \caption{NTT Algorithm for polynomial powering}
+%    \label{nttpowalg}
+%    \begin{algorithmic}[1]
+%    \State \textbf{Inputs}: $f$: a dense representation of a polynomial, $p$: a NTT prime, $pow$: an integer
+%    \State \textbf{Output}: dense representation of $f ^ p$
+%	\State $finalDegree \gets degree(f) * pow$
+%    \State $L \gets d + 1$
+%    \State $f \gets padToL(f)$ \Comment{Append $0$'s to the end of $f$ until $f$ has length $L$}
+%    \State $f' \gets NTT(f, p)$
+%    \State $f \gets f$ .\textasciicircum $pow$ \Comment{Raise each index of $f$ to $pow$}
+%    \State $f \gets INTT(f, p)$
+%    \State \Return $f$
+%    \end{algorithmic}
+%\end{algorithm}
 
-\begin{defn}
-    Given a NTT from $\mathbb{F}_p^L \rightarrow \mathbb{F}_p^L$, the \textbf{length} of the NTT is $L$.
-\end{defn}
+%To raise univariate polynomials to powers, we implement a GPU-accelerated
+%multimodular NTT algorithm.
+The \(k\)-th power of a polynomial \(f\) 
+may be computed mod \(p\) by taking the discrete fourier
+transform, raising the components to the \(k\),
+and then computing the inverse discrete fourier transform.
+The multimodular algorithm 
+computes \(f^{k}\) in the integers by
+choosing many primes \(p_{i}\), 
+and combining the results uning the Chinese remainder theorem.
+In practice, one uses the fast fourier transfrom (FFT),
+which is also called the number theoretic transform 
+(NTT) to compute the discrete fourier
+transform in time \(O(n \log n)\).
+Thus, our algorithm is known as the 
+multimodular NTT approach to raising polynomials to powers.
 
-A quick overview of the NTT algorithm for polynomial powering is given:
+%This algorithm is usually performed multiple times with distinct primes $p$, and the results are combined using the Chinese Remainder Theorem to obtain a result in $\mathbb{Z}$
 
-\begin{algorithm}[H]
-    \caption{NTT Algorithm for polynomial powering}
-    \label{nttpowalg}
-    \begin{algorithmic}[1]
-    \State \textbf{Inputs}: $f$: a dense representation of a polynomial, $p$: a NTT prime, $pow$: an integer
-    \State \textbf{Output}: dense representation of $f ^ p$
-	\State $finalDegree \gets degree(f) * pow$
-    \State $L \gets d + 1$
-    \State $f \gets padToL(f)$ \Comment{Append $0$'s to the end of $f$ until $f$ has length $L$}
-    \State $f' \gets NTT(f, p)$
-    \State $f \gets f$ .\textasciicircum $pow$ \Comment{Raise each index of $f$ to $pow$}
-    \State $f \gets INTT(f, p)$
-    \State \Return $f$
-    \end{algorithmic}
-\end{algorithm}
-
-This algorithm is usually performed multiple times with distinct primes $p$, and the results are combined using the Chinese Remainder Theorem to obtain a result in $\mathbb{Z}$
-
-In many cases, using the Kronecker Substitution to map a multivariate polynomial to a univariate polynomial results in  a sparse univariate polynomial. As a result, dense algorithms like Algorithm \ref{nttpowalg} become inefficient in both time and memory complexity when compared to sparse algorithms. However, the massive throughput of the GPU allows the NTT to be competitive for these cases, $4$-variate homogeneous polynomial powering being one of them.
+In many cases, using the Kronecker Substitution to map a multivariate polynomial to a univariate polynomial results in  a sparse univariate polynomial. As a result, dense algorithms like Algorithm \ref{nttpowalg} become inefficient in both time and memory complexity when compared to sparse algorithms. However, the massive throughput of the GPU allows the NTT to be competitive for these cases, 
+quartic K3 surfaces being one of them.
 
 \subsubsection{NTT Implementation}
 
-We use a simple radix-2, 1-dimensional NTT for our polynomial powering algorithm. Because we're using radix-2, our length $L$ is always a power of $2$. For each NTT we perform, we find primes $p$ that satisfy $p = 1 \mod L$, compute primitive $L$th roots of unity for each $p$, and $L^{-1} \mod p$. We cache all of these, so that they can be used again for similar problems, where $L$ and the set of primes are the same.
+We use a simple radix-2, 1-dimensional NTT for our polynomial powering algorithm. Because we're using radix-2, our 
+FFT/NTT length $L$ is always a power of $2$. 
+For each NTT we perform, we search for primes $p$ that satisfy $p = 1 \mod L$, compute primitive $L$th roots of unity for each $p$, and $L^{-1} \mod p$. 
+These are cached, so that they can be used again for problems with the same shape 
+(i.e. the degree of \(f\), the exponent \(k\), and the characteristic are the same).
 
-We choose to use integers in our computations, as opposed to floats. The NTT becomes memory intensive very quickly, so the added precision of integers is a tradeoff we take at the cost of very slightly slower computations.
 
-Additionally, we used fixed-width integers, as opposed to arbitrary-precision integers since GPU SIMT architectures are optimized for operations on fixed-width types. Fixed-width float types beyond 32 and 64 bits typically don't have hardware support, the main benefit from using floats, another reason we choose to use integers over floats.
+%We choose to use integers in our computations, as opposed to floats. The NTT becomes memory intensive very quickly, so the added precision of integers is a tradeoff we take at the cost of very slightly slower computations.
 
-As the length of the NTT increases, the primes we perform the NTT in increases as well, and we need to start worrying about overflowing our integer type. The most memory-intensive operation the NTT requires is powering mod $p$, which can be reduced to iterative multiplication mod $p$. So, for each prime $p$, we find the smallest unsigned integer type $T$ that can represent $p^2$, and perform our NTT using $T$.
+Additionally, we used fixed-width integers, as opposed to arbitrary-precision integers 
+such as in the GNU Multiple Precision library (GMP) \cite{gnu-2024-gmp}.
+The algorithm picks the smallest integer datatype which can be used to compute
+the required NTT mod \(p_{i}\) for all of the selected primes \(p_{i}\).
+For \(p=7\), we may use 128 bit integers, while for \(p=11\) and \(p=13\),
+we must use 256 and 512 bit integers respectively.
+%TODO: @Alex can you confirm these numbers?
+The decision
+to use fixed-width integers is primarily practical. 
+Arbitrary size fixed with integers
+on the GPU are provided by the BitIntegers.jl package 
+\cite{fourquet-2024-bitintegers-jl}.
+On the other hand,Julia's CUDA functionality currently does not provide
+aribtrary-precision integers:
+libraries like GMP only support the CPU, while 
+Nvidia-made alternatives have not yet been ported to Julia.
+On the CPU, fixed-width integers of 256, 512, or 1024 bits
+can outperform arbitrary-precision libraries like GMP 
+since fixed-width integers don't require allocations.
+It would be interesting to compare the performance of both
+approaches on the GPU.
 
-When the memory required by the NTT reaches the point where the GPU can't perform the Cooley-Tukey butterfly in its own memory, we sacrifice performance by moving each vector back to RAM to perform the butterfly, and transferring each vector back to the GPU for the operations that can be done in-place.
+%since GPU SIMT architectures are optimized for operations on fixed-width types. Fixed-width float types beyond 32 and 64 bits typically don't have hardware support, the main benefit from using floats, another reason we choose to use integers over floats.
 
-The Julia language provides tools for us to implement our NTT. Using the BitIntegers.jl package, fixed-width integer arithmetic gets compiled down to an intermediate representation using LLVM, and the CUDA.jl package invokes the nvidia compiler to generate PTX assembly from this intermediate representation.
+Our algorithm also has fallbacks when the memory required becomes too large for the 
+GPU's on-device memory.
+When the problem becomes too big to fit the vectors corresponding to all of the primes
+in device memory at once, we move the vectors
+the GPU one by one, moving them back to the CPU.
+We then perform the Chinese remainder theorem recovery on the CPU.
+Furthermore, when the memory required by the NTT reaches the point where the GPU can't perform the Cooley-Tukey butterfly in its own memory, we sacrifice performance by moving each vector back to RAM to perform the butterfly, and transferring each vector back to the GPU for the operations that can be done in-place.
 
-\subsubsection{Selecting primes}
+%The Julia language provides tools for us to implement our NTT. Using the BitIntegers.jl package, fixed-width integer arithmetic gets compiled down to an intermediate representation using LLVM, and the CUDA.jl package invokes the nvidia compiler to generate PTX assembly from this intermediate representation.
 
-Because we are working in $\mathbb{Z}$, we need to convert the result from our multi-modular NTT over $\mathbb{F}_p$ to $\mathbb{Z}$. To do so, we can either select a prime bigger than the maximum possible resulting coefficient of our result $M$, or select multiple primes $p_1,\dots , p_n$ that satisfy $\prod_{i=0}^{n} p_i > M$, and use the Chinese Remainder Theorem for integers to get a result in $\mathbb{Z}$.
+\subsubsection{Prime Selection}
 
-This poses the question of finding the maximum coefficient of our result $M$. 
+%As the length of the NTT increases, the size of the primes we perform the NTT in increases as well, 
+%and we need to start worrying about overflowing our integer type. 
+%The most memory-intensive operation the NTT requires is powering mod $p$, which can be reduced to iterative multiplication mod $p$. 
+%So, for each prime $p$, we find the smallest unsigned integer type $T$ that can represent $p^2$, and perform our NTT using $T$.
+
+%Because we are working in $\mathbb{Z}$, we need to convert the result from our multi-modular NTT over $\mathbb{F}_p$ to $\mathbb{Z}$. To do so, we can either select a prime bigger than the maximum possible resulting coefficient of our result $M$, or select multiple primes $p_1,\dots , p_n$ that satisfy $\prod_{i=0}^{n} p_i > M$, and use the Chinese Remainder Theorem for integers to get a result in $\mathbb{Z}$.
+
+To select primes, we need to find the maximum coefficient of the result of our multiplication.
+%This poses the question of finding the maximum coefficient of our result $M$. 
 
 \begin{defn}
     Given a basis $(x^{I_1}, \dots, x^{I_n})$, where $I_i$ are distinct degree sequences of equal length, and a prime field $\mathbb{F}_p$, the \textbf{maximum polynomial} is $(p - 1)(x^{I_1} + \cdots + x^{I_n})$.
 \end{defn}
 
-For small problems, we can simply plug in the maximum polynomial $g$ into FLINT, compute $g ^ p$, and linearly iterate through the coefficients to get the maximum possible coefficient.
-We know this computation will be correct because FLINT uses GMP. However, for larger problems, such as raising a 4-variate polynomial of homogeneous degree $52$ to the $13$th power (this comes from computing the quasi-F-split height of a quartic $K_3$ surface over $\mathbb{F}_{13}$), FLINT does not finish the computation in a reasonable amount of time, around 3 hours.
+For small problems, we can simply plug in the maximum polynomial $g$ into FLINT, compute $g ^ p$, and 
+get the maximum possible coefficient of the result.
+We know this computation will be correct because FLINT uses GMP,
+and it also must be the optimal bound on the coefficients. 
+%TODO: @Alex shouldn't this be 48 = 12*4, not 52?
+However, for larger problems, such as raising a 4-variate polynomial of homogeneous degree $52$ to the $13$th power (this comes from computing the quasi-F-split height of a quartic $K_3$ surface over $\mathbb{F}_{13}$), FLINT does not finish the computation in a reasonable amount of time, around 3 hours.
+If one only cares about a single shape of the problem (i.e. the same degree, \(k\), and charachteristic),
+this might be acceptable.
+However, for a single computation, it completely removes the advantage of using the GPU,
+since we must perform an expensive CPU mutliplication to set up the algorithm.
 
-We present a method to quickly obtain an upper bound for the case of raising a homogeneous multivariate polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power. To begin, we need to introduce weak integer compositions:
+Alternatively, we can obtain an upper bound for the case of raising a homogeneous multivariate polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power
+by bounding the number of terms in the power. 
 
 \begin{defn}
     The weak integer compositions of $n$ into $k$ parts, denoted $wics(n, k)$, is the set of ordered $k$-length tuples of non-negative integers that add to $n$.
@@ -96,8 +186,9 @@ For example, the weak integer compositions of $2$ into $3$ parts is:
 \end{lem}
 
 \begin{proof}
-    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
-    This gives $\binom{n + k - 1}{k - 1}$.
+	This is a classical argument which goes by the name ``sticks and stones'', ``stars and bars'', or ``dots and dividers''.
+%    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
+%    This gives $\binom{n + k - 1}{k - 1}$.
 \end{proof}
 
 \begin{rmk}
@@ -113,22 +204,63 @@ For example, the weak integer compositions of $2$ into $3$ parts is:
     
     Let $(d_1, \dots , d_n)$ denote the exponent tuple of a term of $g^k$, let $(d'_1, \dots , d'_n)$ denote the exponent tuple of a term of $g^{k + 1}$, and let $(a_1, \dots , a_n)$ denote the exponent tuple of a term of $g$.
 
-    Consider an arbitrary term of $g^{k + 1}$. To find all terms in the unreduced expansion of $g^k \cdot g$ that contribute to that term, we look at terms of $g^k$ with degree sequences of the form $(d'_1 - a_1, \dots , d'_n - a_n)$. The number of these terms of $g^k$ is bounded above by $|wics(np, n)|$, or $\binom{np + n - 1}{n - 1}$. Using our inductive assumption, the maximum coefficient of $g^k$ is bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$, so multiplying each of these by coefficients of $g$, which have a maximum value of $p - 1$, and adding up $\binom{np + n - 1}{n - 1}$ copies of these gives $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ {k + 1}$, completing our inductive step.
+    Consider an arbitrary term of $g^{k + 1}$. To find all terms in the unreduced expansion of $g^k \cdot g$ that contribute to that term, we look at terms of $g^k$ with degree sequences of the form $(d'_1 - a_1, \dots , d'_n - a_n)$. The number of these terms of $g^k$ is bounded above by $|wics(np, n)|$, or $\binom{np + n - 1}{n - 1}$. Using our inductive assumption, the maximum coefficient of $g^k$ is bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$, so multiplying each of these by coefficients of $g$, which have a maximum value of $p - 1$, and adding up $\binom{np + n - 1}{n - 1}$ copies of these gives $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ {k + 1}$.
 \end{proof}
 
-This formula provides a quick way to compute a relatively accurate upper bound for our problem. To find the exact maximum coefficient of raising a maximum polynomial $g ^ p$, we simply use Algorithm 3.4 with primes that multiply past our upper bound, build the result in $\mathbb{Z}$ using Chinese Remainder Theorem, and iterate through the coefficients of $g^p$ to find the actual maximum coefficient.
+%This formula provides a quick way to compute a relatively accurate upper bound for our problem. To find the exact maximum coefficient of raising a maximum polynomial $g ^ p$, we simply use Algorithm 3.4 with primes that multiply past our upper bound, build the result in $\mathbb{Z}$ using Chinese Remainder Theorem, and iterate through the coefficients of $g^p$ to find the actual maximum coefficient.
 
 \subsection{Other algorithms}
-Many other algorithms are described in \cite{monagan-2012-sparse-powering}. They compare performance in sparse and dense cases. In this section we consider whether or not they benefit from massive parallelization.
 
-\subsubsection{RMUL and RSQR}
-These algorithms are bottlenecked by a sort, which does benefit from parallelization, but not by much. We tried implementing the sorting algorithm from \cite{gupta-2023-gpu-sort}, but couldn't reproduce the results.
+Many other algorithms are described in \cite{monagan-2012-sparse-powering}. 
+They compare performance in sparse and dense cases. 
+Here, we breifly comment on how these algorithms perform on the GPU.
+We refer the reader to \cite{monagan-2012-sparse-powering}
+for a more precise description of all these algorithms.
+In the following, assume we have some polynomial \(f\) which we wish 
+to raise to the \(k\)-th power.
 
-\subsubsection{BINA and BINB}
-BINA and BINB both call RMUL, which again, doesn't benefit much from parallelization.
+\textbf{RMUL} is analogous to the classic FOIL algorithm which is taught in schools. 
+This is bottlenecked (at least on the GPU) by the ``collect like terms'' step, 
+which requires a parallel sort.
+While there are GPU-optimized sorting algorithms, such as the parallel merge sort
+provided by CUDA.jl, it is a relatively expensive operation on the GPU.
+There is an algorithm proposed in \cite{gupta-2023-gpu-sort}
+which claims to beat the state-of-the-art, but we were unable to reproduce the result.
 
-\subsubsection{MNE}
-MNE also requires a sort, but isn't dominated by it. Though it is competitive for small problems, it is quickly bottlenecked by the memory required to store the table of multinomial coefficients. The memory required reaches 742 GB for raising $969$ terms to the $5$th power, which comes up in the computation of $\delta_1(f ^ {p - 1})$ for a quartic $K_3$ surface $f$ over $\mathbb{F}_5$.
+\textbf{RSQR} uses the binary expansion of \(k\) to find the power in less
+total multiplications than \textbf{RMUL}.
+\textbf{BINA} and \textbf{BINB} use binomial expansion to more efficiently 
+expand \(f^{k}\), using \textbf{RMUL} to merge at the end.
+They both perform better in the case that the problem is sparse.
+On the GPU, all of these are bottlenecked by sorting, just like
+\textbf{RMUL}.
 
-\subsubsection{SUMS and FPS}
-The parallelization of FPS is discussed in \cite{monagan-2012-sparse-powering}, but the implementation uses a lock, as well as a heap data structure, both of which aren't easily compatible with the GPU.
+\textbf{MNE} uses multinomial coefficients to expand \(f^{k}\) 
+and then combines like terms with a sort. 
+Unlike the previous four algorithms, it is not bottlenecked by the sort;
+instead, it is bottlenecked by the memory required to store the table of
+multinomial coefficients. 
+The amount of memory theoretically required to compute 
+$\delta_1(f ^ {p - 1})$ when \(p=5\) 
+would be something like 742 GB.\footnote{
+	That is, raising 
+    $969$ terms to the $5$th power
+	in the integers.
+}
+However, \textbf{MNE} is competetive for small problems.
+
+\textbf{SUMS} and \textbf{FPS} have dense and sparse versions which are described in 
+\cite{monagan-2012-sparse-powering}, including parallel versions.
+In particualr, \textbf{FPS} is implemented in FLINT, and is called by our
+code when we need powering on the CPU.
+They can be parallelized, as discussed in \cite{monagan-2012-sparse-powering},
+but this requires the use of locks and a heap data structure,
+which are more challenging to implement on the GPU.
+It would be interesting to have a GPU-accelerated version of
+\textbf{FPS} and compare it's performance with 
+multimodular FFT.
+The authors expect one could get a big improvement in the sparse case.
+
+
+
+
