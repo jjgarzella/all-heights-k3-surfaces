@@ -162,8 +162,7 @@ For small problems, we can simply plug in the maximum polynomial $g$ into FLINT,
 get the maximum possible coefficient of the result.
 We know this computation will be correct because FLINT uses GMP,
 and it also must be the optimal bound on the coefficients. 
-%TODO: @Alex shouldn't this be 48 = 12*4, not 52?
-However, for larger problems, such as raising a 4-variate polynomial of homogeneous degree $52$ to the $13$th power (this comes from computing the quasi-F-split height of a quartic $K_3$ surface over $\mathbb{F}_{13}$), FLINT does not finish the computation in a reasonable amount of time, around 3 hours.
+However, for larger problems, such as raising a 4-variate polynomial of homogeneous degree $48$ to the $13$th power (this comes from computing the quasi-F-split height of a quartic $K_3$ surface over $\mathbb{F}_{13}$), FLINT does not finish the computation in a reasonable amount of time, around 3 hours.
 If one only cares about a single shape of the problem (i.e. the same degree, \(k\), and charachteristic),
 this might be acceptable.
 However, for a single computation, it completely removes the advantage of using the GPU,
