@@ -1,109 +1,7 @@
-
-Principles: 
-
-* naive gpu algorithm is fast enough
-* naive gpu algorithm can be faster than
-a ``clever'' cpu algorithm with better complexity
-
-%* comment on the general problem of multiply then split
-%* TODO: rephrase everything in terms of the general problem, without 
-%reference to delta_1
-
-\begin{cxt}
-	\label{cxt:mult:split}
-	Let \(\Delta \in S = k[x_{1}, \ldots, x_{n}]\)
-	be a homogeneous
-	polynomial of degree \(D\).
-	In algorithms, we will sometimes conflate \(\Delta\) 
-	with a list containing all its terms.
-	For \(d\) an integer,
-	and let \(S_{d}\) denote the homogeneous polynomials of degree \(d\).
-	The dimension of \(S_{d}\) is then \(\binom{n+d-1}{n-1}\).
-	Thus, the number of terms of \(\Delta\) is bounded 
-	above by \(\binom{n+D-1}{n-1}\).
-	We let \(M_{d}\) denote a list (in lexographical order)
-	of the monomial basis of \(S_{d}\).
-	Let \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
-	Then 
-	We wish to have an algorithm that calculates the matrix of
-	the linear operator
-	\begin{align*}
-		\theta : S_{d} &\longrightarrow S_{d^{\prime}} \\
-		g &\longmapsto u(\Delta g)
-	.\end{align*}
-\end{cxt}
-
-\begin{rmk}
-	Note that if  \(d^{\prime} = \frac{d+D-p(n-1)}{p}\)
-	is not an integer, \(\theta\) is the zero map
-	and ther is nothing more to do.
-	
-	If \(\Delta = \Delta_{1}(f^{p-1})\) and \(d = n(p-1)\),
-	then \(d^{\prime} = d\) and \(\theta\) is
-	represented by
-	a square matrix.
-\end{rmk}
-
-\begin{defn}
-	Let \(m\) be a monomial in \(S\). 
-	Then we say that \(m\) \textbf{matches}
-	with another monomial \(m^{\prime}\) 
-	if the monomial \(mm^{\prime}\) is
-	not killed by \(u\).
-\end{defn}
-
-In the case of calculating the quasi-\(F\)-split height of a Calabi-Yau
-hypersurface,
-we have \(d = n(p-1)\) and \(D = np(p-1)\).
-
-Notes for complexity calculations:
-
-TODO: change the algorithms to reflect that the input and output space
-might not be the same vector space in general.
-
-\subsection{The Naive Algorithm}
-
-\begin{algorithm}[H]
-    \caption{Matrix of $\theta$: Trivial Algorithm}
-    \label{alg:matrix:trivial}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
-	matrix representing $\theta$
-    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
-    \For{$m \in M_{d}$}
-	    \State $c \gets indexof(m, M _{d})$
-        \For{$\delta \in \Delta$}
-            \If{$(exponents(\delta) .+ exponents(m)) .\% p =[p-1, \dots, p-1]$} 
-			\State res $\gets (exponents(\delta) + exponents(m) - (p-1, \ldots, p-1)) / p$
-				\State $r \gets indexof(\text{res},M_{d^{\prime}})$
-                \State $\text{mat}[r, c] += coeff(\delta)$
-            \EndIf
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
-\end{algorithm}
-
-In this algorithm, we iterate through the monomials $m \in M_{d}$, each corresponding to a column in the
-resulting matrix. For each monomial, we search for terms that match $\delta \in \Delta$, apply $u$ to their product $\delta u$, and 
-get the lexographical index of the result to find which row to add to.
-
-Since $length(M_{d}) = \binom{n + d - 1}{n - 1}$ and 
-$length(\Delta) = \binom{n + D - 1}{n - 1}$, the matrix can be generated in 
-$O(\binom{n + d - 1}{n - 1}\binom{n + D - 1}{n + d - 1})$ operations. 
-This can be
-seen from the nested loops, assuming that integer arithmetic operations are constant time.
-In the case of the quasi-\(F\)-split height of a K3 surface, 
-this becomes
-\(O(\binom{np - 1}{n-1}\binom{n(p^2 - p + 1)}{n-1})\).
-
-In practice, the majority of the combinations of terms of $\Delta$ and $M_{d}$ don't match. This means in
-Algorithm \ref{alg:matrix:trivial}, much of our runtime is wasted on checking for whether terms match. 
-However, we emphasize that this algorithm, if implemented in parallel on the GPU, is indeed
-fast enough to not be a bottleneck in practice.
-
-\subsection{Modified Merge-based Algorithm}
+% Move these to main.tex eventually maybe
+\newcommand{\triv}{\texttt{TRIV}}
+\newcommand{\merge}{\texttt{MERGE}}
+\newcommand{\wics}{\texttt{WICS}}
 
 To find the matrix of \(\theta\), mathematically
 speaking we must first multiply by \(\Delta_{1}(f)\) 
@@ -121,21 +19,163 @@ Even if \(a\) is a monomial, giving a linear
 algoritm for multiplication, using naive
 multiplication stores a lot of unnecessary terms
 in memory.
-Here, we give an algorithm that calculates
+In this section, we give algorithms that calculates
 the matrix of \(\theta\) by only
 using such terms.
-We start with an elementary fact.
+
+To begin, we introduce some notation.
+
+\begin{defn}
+    The \textbf{exponent tuple} of a monomial $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. It is given by $exps(m)$, and $a = coeff(m)$
+\end{defn}
+
+\begin{nota}
+    $exps(m)$ returns the exponent tuple of a monomial $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$, and $coeff(m) = a$.
+\end{nota}
+
+In this section, we frequently need to apply some operation to all elements of an array, so:
+\begin{nota}
+    Let $A$ and $B$ be tuples, denoted $(a_1, \dots, a_n)$ and $(b_1, \dots, b_n)$ respectively. Let $\star$ be a binary operator, and let $x$ be some object. Then, $A ~.\star x= (\star(a_1, x), \dots, \star(a_n, x))$, and $A ~.\star B = (\star(a_1, b_1), \dots, \star(a_n, b_n))$.
+\end{nota}
+
+This is a formalization of Julia's broadcasting notation. 
+Examples of this notation are 
+\begin{align*}
+    [0, 1, 2] ~.+ 5 &= [5, 6, 7] \\
+    [0, 1, 2] ~.+ [1, 2, 3] &= [1, 3, 5]
+\end{align*}
+
+We also introduce the weak integer compositions:
+
+\begin{defn}
+    The weak integer compositions of $k$ into $n$ parts, denoted $wics(k, n)$, is the set of ordered $n$-length tuples of non-negative integers that add to $k$.
+\end{defn}
+
+For example, the weak integer compositions of $2$ into $3$ parts is:
+\begin{center}
+    $wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$
+\end{center}
+
+\begin{lem}
+    \label{lem:wics:size}
+    $|wics(k, n)| = \binom{k + n - 1}{n - 1}$
+\end{lem}
+
+\begin{proof}
+    Using a stars and bars argument, there are $k$ stars and $n - 1$ bars. There are $k + n - 1$ slots to place the stars and bars in, of which we choose $n - 1$ to be bars.
+    This gives $\binom{k + n - 1}{n - 1}$.
+\end{proof}
+
+\begin{rmk}
+    $wics(d, n)$ generates the exponent tuples of the monomial basis of the vector space of $d$-homogeneous $n$-variate polynomials over a field $F$.
+    It follows that the dimension of the vector space is $|wics(k, n)|$
+\end{rmk}
+
+\begin{cxt}
+	\label{cxt:mult:split}
+	Let $S_d$ denote the vector space of $d$-homogeneous $n$-variate polynomials over a field.
+    Let \(\Delta \in S_D\).
+	In algorithms, we will sometimes conflate \(\Delta\) 
+	with a list containing all its terms.
+	The number of terms of \(\Delta\) is bounded 
+	above by \(\binom{D+n-1}{n-1}\) by Lemma \ref{lem:wics:size}.
+	We let \(M_{d}\) denote a lexographically-ordered list
+	of the monomial basis of \(S_{d}\).
+	Let \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
+	We wish to have an algorithm that calculates the matrix of
+	the linear operator
+	\begin{align*}
+		\theta : S_{d} &\longrightarrow S_{d^{\prime}} \\
+		g &\longmapsto u(\Delta g)
+	.\end{align*}
+\end{cxt}
+
+In the case of calculating the quasi-\(F\)-split height of a Calabi-Yau
+hypersurface,
+we have \(d = n(p-1)\) and \(D = np(p-1)\).
+
+\begin{rmk}
+	Note that if  \(d^{\prime} = \frac{d+D-p(n-1)}{p}\)
+	is not an integer, \(\theta\) is the zero map
+	and there is nothing more to do. 
+    If \(\Delta = \Delta_{1}(f^{p-1})\) and \(d = n(p-1)\),
+	then \(d^{\prime} = d\) and \(\theta\) is
+	represented by
+	a square matrix.
+\end{rmk}
+
+\begin{defn}
+	Let \(m\) be a monomial in \(S\). 
+	Then we say that \(m\) \textbf{matches}
+	with another monomial \(m^{\prime}\) 
+	if the monomial \(mm^{\prime}\) is
+	not killed by \(u\).
+\end{defn}
+
+Computationally, this means that $exps(m) ~.+ exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$
+
+We now present our first algorithm.
+% Notes for complexity calculations:
+
+% TODO: change the algorithms to reflect that the input and output space
+% might not be the same vector space in general.
+
+\subsection{The Trivial Algorithm}
+
+\begin{algorithm}[H]
+    \caption{Matrix of $\theta$: Trivial Algorithm}
+    \label{alg:matrix:trivial}
+    \begin{algorithmic}[1]
+    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
+    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
+	matrix representing $\theta$
+    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
+    \For{$m \in M_{d}$}
+	    \State $c \gets indexof(m, M _{d})$
+        \For{$\delta \in \Delta$}
+            \If{$(exps(\delta) .+ exps(m)) .\% p = (p-1, \dots, p-1)$} \Comment{\textbf{if} $\delta$ matches with $m$}
+			\State res $\gets (exps(\delta) ~.+ exps(m) ~.- (p-1, \ldots, p-1)) ~./ p$ \Comment{Apply $u$ to $\delta m$}
+				\State $r \gets indexof(\text{res},M_{d^{\prime}})$
+                \State $\text{mat}[r, c] = coeff(\delta)$
+            \EndIf
+        \EndFor
+    \EndFor
+    \State \Return mat
+    \end{algorithmic}
+\end{algorithm}
+
+In this algorithm, we iterate through the monomials $m \in M_{d}$, each corresponding to a column in the
+resulting matrix. For each monomial, we search for terms that match $\delta \in \Delta$, apply $u$ to their product $\delta m$, and 
+get the lexographical index of the result to find which row to add to.
+
+For all of our time complexity calculations, we let $x = length(M_{d}) = \binom{n + d - 1}{n - 1}$, and $y = length(\Delta) = \binom{n + D - 1}{n - 1}$.
+In the case of the quasi-F-split height of a K3 surface, $x = \binom{n(p - 1) + n - 1}{n - 1} = \binom{np - 1}{n - 1}$, and $y = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$
+
+In this algorithm, the matrix can be generated in 
+$O(xy)$ operations. 
+This can be
+seen from the nested loops, assuming that integer arithmetic operations are constant time.
+
+In practice, the majority of the combinations of terms of $\Delta$ and $M_{d}$ don't match. This means in
+Algorithm \ref{alg:matrix:trivial}, much of our runtime is wasted on checking for whether terms match.
+However, we emphasize that this algorithm, if implemented in parallel on the GPU, is indeed
+fast enough to not be a bottleneck in practice.
+
+\subsection{Modified Merge-based Algorithm}
+
+We now introduce an algorithm that utilizes some ordering properties of monomials to reduce the number of comparisons 
+performed in checking whether two terms match.
 
 \begin{lem}
 	\label{lem:tuples:modp}
-	Let \(\underbar{a} = (a_{1}, \ldots, a_{n}),
-	\underbar{b} = (b_{1}, \ldots, b_{n})\)
+	Let \(A = (a_{1}, \ldots, a_{n}),
+	B = (b_{1}, \ldots, b_{n})\)
 	be in \(\{0, \ldots, p-1\}^{n} \ins \mathbb{Z}^{n}\).
 
-	Then \(\underbar{a} + \underbar{b} = 
+	Then \(A ~.+ B = 
 	(p-1, \ldots, p-1) \mod p\)
 	if and only if 
-	\(\underbar{a} + \underbar{b} = 
+	\(A ~.+ B = 
 	(p-1, \ldots, p-1)\).
 \end{lem}
 
@@ -143,25 +183,23 @@ We start with an elementary fact.
 	Each coordinate has \(a_{i} + b_{i} \leq 2(p-1) = 2p-2\).
 \end{proof}
 
-
 \begin{cor}
-	Let \(\underbar{a}\) be as above.
-	Let \(\underbar{x}^{\underbar{a}}\)
-	denote \(x_{1}^{a_{1}} \ldots x_{n}^{a_{n}}\).
+    \label{cor:unique:match}
+	Let $A$ be as above.
 	Then there exists a unique
-	match \(m(\underbar{a}) \in \{0, \ldots, p-1\}^{n}\) 
+	match \(m(A) \in \{0, \ldots, p-1\}^{n}\) 
 \end{cor}
 
 \begin{proof}
-	\(m(\underbar{a}) = 
-	(p-1, \ldots, p-1) - \underbar{a}\).
+	\(m(A) = 
+	(p-1, \ldots, p-1) ~.- A\).
 	The claim follows from 
 	\ref{lem:tuples:modp}.
 \end{proof}
 
 Essentially, this corollary says that
 when we consider arbitrary monomials \(M\),
-when we consider its exponent vector 
+when we consider its exponent tuple 
 mod \(p\), it has a unique
 match mod \(p\).
 However, we have even more:
@@ -170,9 +208,10 @@ However, we have even more:
 	\label{cor:match:order}
 	Let \(\leq_{lex}\) denote the 
 	lexographical ordering.
-	If \(\underbar{a} \leq_{lex} \underbar{b}\),
+	If \(A \leq_{lex} B\),
 	then 
-	\(m(\underbar{b}) \leq_{lex} m(\underbar{a})\)
+	\(m(A) \leq_{lex} m(B)\)
+    (shouldnt this be the other way around btw)
 \end{cor}
 
 \begin{proof}
@@ -180,22 +219,21 @@ However, we have even more:
 	ordering.
 \end{proof}
 
-The previous two corollaries justify
-the following algorithm.
+Using these two corollaries, we have the following algorithm:
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Multiply than split: merge-based algorithm}
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
-\State mat \(\gets zeros(length(M), length(M))\) 
-\State \(L \gets exponents(\Delta) .\% p\) 
-\State \(R \gets exponents(M_{d}) .\% p\)
+\State mat \(\gets zeros(length(M_{d}), length(M_{d^{\prime}}))\) 
+\State $L \gets [exps(\delta) ~.\% p ~|~ \delta \in \Delta]$
+\State $R \gets [exps(m) ~.\% p ~|~ m \in M_{d}]$
 \State sort both  \(L\) and \(R\) 
 \State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
-\State \(l \gets 1, r \gets legnth(R)\)
-\While{\(1 \leq R \&\& l \leq length(L)\)}
-	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
+\State \(l \gets 1, r \gets length(R)\)
+\While{\(1 \leq r ~and~ l \leq length(L)\)}
+	\State cmp \(\gets L[l] ~.+ R[r] ~.- (p-1, \ldots, p-1)\) 
 	\If{cmp < 0}
 	    \State \(l \gets l + 1\) 
 	\ElsIf{0 < cmp}
@@ -205,7 +243,7 @@ the following algorithm.
         \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
         \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
 		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
-                \State res \(\gets (exponents(\Delta^{\prime}[ll]) .+ exponents(M^{\prime}[r]) .- (p-1, \ldots, p-1)) ./ p\) 
+                \State res \(\gets (exps(\Delta^{\prime}[ll]) .+ exps(M^{\prime}[r]) .- (p-1, \ldots, p-1)) ./ p\) 
                 \State coeff \(\gets coeff(\Delta^{\prime}[ll])\)
                 \State \(col \gets indexof(M^{\prime}[r],M_{d})\)
                 \State \(row \gets indexof(\text{res},M_{d^{\prime}})\)
@@ -220,106 +258,67 @@ the following algorithm.
 \end{algorithmic}
 \end{algorithm}
 
-%\begin{alg}
-%
-%\begin{lstlisting}
-%
-%delta1 = terms of delta1
-%mons = all homogeneous monomials
-%nMons = length(mons)
-%
-%answer := zeros(nMons,nMons)
-%L := delta1 .% p
-%R := M .% p
-%
-%sort both L and R (mod p)
-%sort delta1 and M according to the same permutation
-%
-%l := 1, r := length(R)
-%
-%while 1 <= r && l <= length(R)
-%    cmp := L[l] + R[r] - (p-1, ..., p-1)
-%    switch cmp
-%    case cmp < 0
-%        l += 1
-%    case 0 < cmp
-%        r -= 1
-%    case cmp == 0
-%        matchr := R[r]
-%        numLmatches := (the number of 
-%            adjacent entries in L that are equal to L[l])
-%        while R[r] == matchr
-%            for ll in l:l+numLmatches
-%
-%                Extract delta1[ll] and its 
-%                corresponding coefficient, as well as M[r]
-%
-%                Apply u to the product of the resulting monomials
-%
-%                Add this term to the correct entry of answer
-%            end
-%        end
-%    end	
-%end		
-%
-%\end{lstlisting}
-%\end{alg}
-
 Note that the inner while loops account for the fact that
 after modding by \(p\), one does not expect 
 either array to have unique keys.
 The algorithm is justified by the previous corollaries.
 
 In practice, instead of sorting the arrays in place, 
-we use a method like julia's ``sortperm''
-%TODO: code font
+we use a method like julia's \texttt{sortperm}
 to get the sort permutation.
 
-We also may use the kronecker substitution to make
-the comparisons and additions use machine integers
-rather than vectors.
-In practice, this speeds the algorithm up a lot.
+Again, we let $x = length(M_d)$ and $y = length(\Delta)$.
+Because we perform two sorts, then a linear merge, we perform $x \log x + y \log y + x + y$ operations, 
+giving the algorithm complexity $O(\max(x \log x, y \log y))$.
+In practice, the $y \log y$ usually dominates.
 
-* complexity analysis
-n = length L, m = length R
-we need n + m + n log n + m log m operations.
-Thus, the algorithm is big o of max(n log n, m log m),
-and in practice the \(\Delta_{1}\) length
-usually dominates.
-TODO: state the complexity results in terms of the size of f
+\subsection{Weak Integer Compositions-based Algorithm}
 
-%In what follows, when we put a dot (\(.\))
-%before an operation, that denotes
-%componentwise application
-%of that operation, similar to Julia syntax.
+\begin{lem}
+    \label{lem:generate:matching}
+    Let $M$ be a set containing the basis monomials of a $n$-variate, $d$-homogeneous polynomial vector space.
+    The set of exponent tuples of the monomials of $M$ that match with $\delta$ is given by 
+    \[
+        \left\{ m(exps(\delta) .\% p) + w ~.*p ~\Big|~ w \in wics \left(\frac{d - sum(m(exps(\delta) .\% p))}{p}, n \right) \right\}
+    \]
+    where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}
+\end{lem}
 
-\subsection{Algorithm based on Generating weak integer compositions}
-
-	Let \(M\) be a lexographically-ordered array containing the terms $m$ of the monomial basis of
-	homogeneous polynomials of degree
-	\(n*(p-1)\). Let $M_m$ denote the index of $m$ in $M$. Let $coeff(t)$ and $exps(t)$ denote the coefficient of monomial $t$ and exponent vector of $t$ respectively.
-
-\begin{defn}
-    $generateMatchingMonomials(\delta, p, M)$ produces a set of monomials $m \in M$ that match with $\delta$
-\end{defn}
-
-This function and its implementation are best explained with an example.
+Because this expression is quite convoluted, we provide an example of a computation 
+that may come up in calculating the quasi-F-split height of a K3 quartic surface over $\mathbb{F}_5$.
 
 \begin{ex}
-    Let $p = 5$, and $\delta$ be a monomial with degree sequence $[21, 16, 21, 22]$, where $a$ is some arbitrary coefficient. This is a term that may
-    result from the computation of $\Delta_1(f^{p - 1})$ for a quartic K3 surface $f$ over $\mathbb{F}_5$. In this case, $M$ is an array
-    of all possible $4$-variate monomials with homogeneous degree $16$. From [21, 16, 21, 22] we add [3, 3, 3, 2] to obtain [24, 19, 24, 24], which
-    has all elements congruent to $p-1 \mod p$. Because our monomials are homogeneous of degree $16$, and
-    we have only added $3 + 3 + 3 + 2 = 11$ to the degree sequence of $\delta$, we still have $16 - 11 = 5$ more to add.
-    To maintain congruence to $p-1 \mod p$, we must add all $5$ to one select variable. With 4 variables to choose from, doing this gives the
-    matching monomials $\{[8, 3, 3, 2], [3, 8, 3, 2], [3, 3, 8, 2], [3, 3, 3, 7]\}$.
+    Let $p = 5$, and $\delta$ a monomial with exponent tuple $(21, 19, 22, 18)$. 
+    Let $M_d$ be the monomial basis of $16$-homogeneous, $4$-variate polynomials over $\mathbb{F}_5$. 
+    To find the monomials of $M$ that match with $\delta$, we begin by reducing $(21, 19, 22, 18) ~.\% 5 = (1, 4, 2, 3)$.
+    This makes $m((1, 4, 2, 3)) = (3, 0, 2, 1)$ the exponent tuple of a matching monomial, though it isn't in $M_d$. 
+    For it to be in $M_d$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ to the degree, and to maintain congruence to $(4, 4, 4, 4) \mod 5$, we need to add two $5$'s to the elements of $(3, 0, 2, 1)$. This corresponds to $\{w ~.* 5 ~|~ w \in wics(2, 4)\}$, which is:
+    \begin{align*}
+        \{&(10, 0, 0, 0), (5, 5, 0, 0), (5, 0, 5, 0), (5, 0, 0, 5), (0, 10, 0, 0), \\
+        &(0, 5, 5, 0), (0, 5, 0, 5), (0, 0, 10, 0), (0, 0, 5, 0), (0, 0, 0, 10)\}
+    \end{align*}
+        
+    \noindent Adding each of these to $(3, 0, 2, 1)$, we get the exponent tuples of monomials that match with $(21, 19, 22, 18)$
+    \begin{align*}
+        \{&(13, 0, 2, 1), (8, 7, 0, 1), (8, 0, 7, 1), (8, 0, 2, 6), (3, 10, 2, 1), \\
+        &(3, 5, 7, 1), (3, 5, 2, 6), (3, 0, 12, 1), (3, 0, 7, 1), (3, 0, 2, 11)\}
+    \end{align*}    
 \end{ex}
 
-\begin{thm}
-    generateMatchingMonomials() correctly generates all matching monomials (Should I give a full algorithm for the implementation and why each step works, or can I just remove this Theorem and leave it to the reader? The proof is just a bunch of number crunching which I have the components of commented out at the bottom of this file)
-\end{thm}
+Because we need it later for our complexity computation, we have the corollary:
 
-With this, we have a faster version of our trivial algorithm:
+\begin{cor}
+    \label{cor:num:matches}
+    The number of matching monomials of term $\delta$ is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
+\end{cor}
+
+\begin{proof}
+    By Lemma \ref{lem:generate:matching}, there are $\Big |wics \left(\frac{d - sum(m(exps(\delta) .\% p))}{p}, n \right) \Big |$ monomials that match with $\delta$.
+    Because the division is exact, $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(exps(\delta) .\% p))}{p}$,
+    giving the upper bound $|wics(\lfloor \frac{d}{p} \rfloor, n)| = \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
+\end{proof}
+
+Packing the expression from Lemma \ref{lem:generate:matching} into $generateMatchingMonomials(\delta, p, M_d)$, we have:
 
 \begin{algorithm}[H]
     \caption{Matrix of $\theta$: WICS Algorithm}
@@ -341,83 +340,23 @@ With this, we have a faster version of our trivial algorithm:
     \end{algorithmic}
 \end{algorithm}
 
-Again, letting $x = len(M)$ and $y = len(\Delta)$, this algorithm generates the matrix in $O(y)$ operations. The number of matching monomials each term $\delta$ has is bounded above by $\binom{\lfloor \frac{n(p - 1)}{p} \rfloor + n - 1}{n}$ (I have a proof but requires me to explain details of generateMatchingMonomials()), which is effectively constant for all $n$ and $p$ computable in the near future.
+Again, letting $x = length(M_d)$ and $y = length(\Delta)$, this algorithm generates the matrix in $O \left( y \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.
+The number of matching monomials each term $\delta$ has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n}$ by Corollary \ref{cor:num:matches}, which is effectively constant for all $n$ and $p$ computable in the near future.
 
-TODO: state the complexity stuff in terms of the size of f
+\subsection{Implementation}
+In the implementation of these three algorithms, which we refer to as \triv, \merge, and \wics, there are a few optimizations and considerations to take account of.
 
+First, all exponent tuples are bitpacked into unsigned integers, improving memory efficiency and allowing for faster comparisons.
+Note that a comparison between two unsigned integers is the same as a lexicographical comparison between the tuples.
+Broadcasted addition and subtraction on bitpacked $n$-tuples reduces to addition and subtraction of integers, though broadcasted division and modulo still require $n$ separate operations.
 
-%\begin{lstlisting}
-%	
-%	
-%	\(answer \colonequals []\)
-%	\(L \colonequals \Delta .\% p\) 
-%	and \(R \colonequals M .\% p\).
-%
-%	Sort both \(L\) and \(R\) mod \(p\).
-%	Sort \(\Delta\) and \(M\) according to the 
-%	same permutation.
-%
-%	Let \(\ell \colonequals 1, r \colonequals \text{length}(R)\)
-%
-%	while \(1 \leq r \&\& l \leq \text{length}(L)\)
-%
-%	--- \(cmp \colonequals L[\ell] + R[r] - (p-1, \ldots, p-1)\)
-%
-%	--- switch \(cmp\)
-%
-%	--- --- case  \(cmp < 0\) 
-%
-%	--- --- --- \(l += 1\) 
-%
-%	--- --- case \(0 < cmp\) 
-%
-%	--- --- --- \(r -= 1\) 
-%
-%	--- --- case \(cmp == 0\) 
-%
-%	--- --- --- \(matchr \colonequals R[r]\) 
-%
-%    --- --- --- \(numLmatches \colonequals \) the number of
-%	adjacent entrices in \(L\) that are equal to \(L[\ell]\)
-%
-%	--- --- --- while \(R[r] == matchr\) 
-%
-%	--- --- --- --- for \(\ell\ell\) in \(\ell\) to \(\ell\) + numLmatches
-%
-%	--- --- --- --- --- Extract \(\Delta[\ell\ell]\) 
-%	and its corresponding coeffient,
-%	as well as \(M[r]\)
-%
-%	--- --- --- --- --- Apply \(u\) to the product
-%	of the resulting monomials
-%
-%	--- --- --- --- --- add this term to \(answer\)
-%
-%	--- --- --- ---  end for
-%
-%	--- --- --- --- \(r += 1\) 
-%
-%	--- --- --- end while
-%
-%	--- --- --- \(l += numLmatches\) 
-%	
-%	--- end switch
-%
-%	end while
-%
-%\end{lstlisting}
+All algorithms require the $indexof()$ function, which we implement using Julia's \texttt{Dict\{K,V\}}, which is implemented as a hashtable.
 
+\triv ~and \wics ~are easily GPU-parallelizable by creating a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
+This creates the problem of needing an $indexof()$ function, since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
+The solution we implement is a static hashmap, with size and hashing function decided at runtime.
+Due to Julia's JIT compilation nature, creating this hashmap is quite slow.
+Another solution can be to perform a binary search for the $indexof()$ function, since $M_d$ is lexicographically sorted, but for one-off computations, users are better off using non-parallelized \merge ~or \wics ~to avoid first-time GPU kernel compilation times.
+However, if many matrices need to be created, caching the hashtable allows the GPU implementations to far outpace the non-parallelized CPU implementations.
 
-
-%* picture
-
-
-% Given $d$ and $p$, we want to add to the coordinates of $d$ until we get some vector $d' \equiv (p - 1, \dots, p - 1) \mod p$. Because $d$ is a term of $\Delta_{1}(f ^ {p - 1})$, the sum of the coordinates of $d$ is $n \cdot (p - 1) \cdot p \equiv 0 \mod p$. Since $d' \equiv (p - 1, \dots, p - 1) \mod p$, the sum of the coordinates of $d'$ is congruent to $n \cdot (p - 1) \equiv -n \mod p$. This means that we will always add $-n \mod p$ to the coordinates of $d$ to get $d'$, and since $m \in M$ has homogeneous degree $n \cdot (p - 1) \equiv -n \mod p$, we have some multiple of $p$ to add to the coordinates of $d'$ to get a term of $\Delta_{1}(f ^ {p - 1})$. Let $m' = d' - d$: this is the foundation of the "relevant" monomial (sum of coordinates of $m'$ is congruent to $-n \mod p$). To actually get an element $m \in M$, we need to add a multiple of $p$ to each coordinate (probably needs a lemma). Since we need to add to $sum(d') \equiv -n \mod p$ from $sum(m') \equiv -n \mod p$, we arrive at the problem of adding $\frac{n * (p - 1) - c}{p}$ $p$'s to $m'$, which can be solved using weak integer compositions.
-
-
-
-
-
-
-
-
+\merge ~may be parallelizable, but the sorting bottleneck still exists, which isn't improved much by parallelization, so we don't implement it. (real reason is im lazy)
