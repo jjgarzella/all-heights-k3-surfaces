@@ -354,7 +354,7 @@ All algorithms require the $indexof()$ function, which we implement using Julia'
 
 \triv ~and \wics ~are easily GPU-parallelizable by creating a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
 This creates the problem of needing an $indexof()$ function, since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
-The solution we implement is a static hashmap, with size and hashing function decided at runtime.
+The solution we implement is a static hashmap, with size and hashing function decided at compiletime.
 Due to Julia's JIT compilation nature, creating this hashmap is quite slow.
 Another solution can be to perform a binary search for the $indexof()$ function, since $M_d$ is lexicographically sorted, but for one-off computations, users are better off using non-parallelized \merge ~or \wics ~to avoid first-time GPU kernel compilation times.
 However, if many matrices need to be created, caching the hashtable allows the GPU implementations to far outpace the non-parallelized CPU implementations.
