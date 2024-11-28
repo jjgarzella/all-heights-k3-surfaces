@@ -171,28 +171,28 @@ since we must perform an expensive CPU mutliplication to set up the algorithm.
 Alternatively, we can obtain an upper bound for the case of raising a homogeneous multivariate polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power
 by bounding the number of terms in the power. 
 
-\begin{defn}
-    The weak integer compositions of $n$ into $k$ parts, denoted $wics(n, k)$, is the set of ordered $k$-length tuples of non-negative integers that add to $n$.
-\end{defn}
-
-For example, the weak integer compositions of $2$ into $3$ parts is:
-\begin{center}
-    $wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$
-\end{center}
-
-\begin{lem}
-    $|wics(n, k)| = \binom{n + k - 1}{k - 1}$
-\end{lem}
-
-\begin{proof}
-	This is a classical argument which goes by the name ``sticks and stones'', ``stars and bars'', or ``dots and dividers''.
-%    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
-%    This gives $\binom{n + k - 1}{k - 1}$.
-\end{proof}
-
-\begin{rmk}
-    The dimension of the vector space of $k$-homogeneous $n$-variate polynomials over a field $F$ is $|wics(n, k)|$
-\end{rmk}
+%\begin{defn}
+%    The weak integer compositions of $n$ into $k$ parts, denoted $wics(n, k)$, is the set of ordered $k$-length tuples of non-negative integers that add to $n$.
+%\end{defn}
+%
+%For example, the weak integer compositions of $2$ into $3$ parts is:
+%\begin{center}
+%    $wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$
+%\end{center}
+%
+%\begin{lem}
+%    $|wics(n, k)| = \binom{n + k - 1}{k - 1}$
+%\end{lem}
+%
+%\begin{proof}
+%	This is a classical argument which goes by the name ``sticks and stones'', ``stars and bars'', or ``dots and dividers''.
+%%    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
+%%    This gives $\binom{n + k - 1}{k - 1}$.
+%\end{proof}
+%
+%\begin{rmk}
+%    The dimension of the vector space of $k$-homogeneous $n$-variate polynomials over a field $F$ is $|wics(n, k)|$
+%\end{rmk}
 
 \begin{thm}
     Let $f$ be a homogeneous polynomial of $\mathbb{F}_p[x_1, \dots, x_n]$, $g = f ^ {p - 1}$ and $[g]$ a lift of $g$ to the integers. Then, the coefficients of $g ^ k$ are bounded above by $((p - 1) \cdot \binom{np + n - 1}{n - 1}) ^ k$
@@ -210,7 +210,9 @@ For example, the weak integer compositions of $2$ into $3$ parts is:
 
 \subsection{Other algorithms}
 
-Many other algorithms are described in \cite{monagan-2012-sparse-powering}. 
+Many other algorithms 
+for polynomial powering
+are described in \cite{monagan-2012-sparse-powering}. 
 They compare performance in sparse and dense cases. 
 Here, we breifly comment on how these algorithms perform on the GPU.
 We refer the reader to \cite{monagan-2012-sparse-powering}
