@@ -1,0 +1,265 @@
+\subsection{Recollections on the moduli of K3 surfaces}
+
+We have the following:
+
+\begin{thm}
+	[Lang-Weil, Theorem 1]
+	Let \(X \ins \mathbb{P}^{n}\)
+	be a projective variety of dimension \(r\). 
+	Then 
+	\[
+		\#X(\mathbb{F}_{p}) = p^r + O(p^{r - \frac{1}{2}})
+	\] 
+\end{thm}
+
+Say we have an ambient projective variety
+\(Y\) with chosen
+hypersurface \(D\).
+The Lang-Weil estimate roughly
+says that if we pick a random point \(x\),
+we can expect \(x\) to lie in \(D\) 
+with probably about \(1 / p\).
+By \cite[Section~7]{artin-1974-k3-surfaces}, 
+the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
+is cut out by a single section in 
+\(M_{i-1}\).
+If we apply both of these facts,
+with \(Y\) the 
+moduli space\footnote{
+	say, the course moduli space of polarized K3 surfaces,
+	though one should be able to make a similar statement
+	for the moduli stack
+} of quartic K3 surfaces,
+we can conclude that the locus 
+the probability of a random point 
+in the moduli space being in the locus
+\(M_{2}\) is about \(1 / p\). 
+Inductively, we see 
+
+\begin{heur}
+The probability of a randomly
+chosen surface having height \(h\) is about \(1 / p^{h}\).
+\end{heur}
+
+Thus, we may find a surface of height \(h\) by 
+randomly choosing quartic K3 surfaces, and 
+if we compute a few times \(p^{h}\) 
+samples, we can be confident that we'll find
+one with high probability.
+
+In practice, our methodology is to choose
+random quartic polynomials,
+by sampling a point in the vector space
+of homogeneous polynomials, which is isomorphic to
+\(\mathbb{F}_{p}^{35}\).
+To obtain the moduli space \(M\) of quartic K3 surfaces, 
+we must projectivize and take the quotient by the action of 
+\(PGL_{4}\) which acts by changes of variables. 
+Thus, there may be two sources of deviation from the expected
+probability--the group quoteint and the actual 
+error term in the estimate.
+ 
+For \(p = 7\) and above, we restrict 
+that may appear in the random polynomial (to speed up the FFT),
+so this likely further effect the probability of getting
+a surface of height \(h\).
+
+
+
+\subsection{Computations}
+
+Over \(\mathbb{F}_{5}\), we 
+found that the probability of finding a K3 surface
+of height \(h\) was about \(1 / 5^{h}\), to three digits
+of precision, for all heights \(h \leq 6\).
+For higher heights we had less samples
+and more variance, although
+the probabilities seem to be less than expected
+for higher heights.
+Similarly, over \(\mathbb{F}_{7}\) we found that
+the probabilities very closely matched \(1 / 7^{h}\) 
+for low heights, with a more variance at higher heights.
+
+For \(p=5\), the algorithm throughput was about
+40 surfaces per second on 
+Nvidia 1080Ti and 2080Ti GPUs provided by the 
+UCSD research cluster.
+Since much less time is taken for height \(1\) examples
+(since the classical Fedder's criterion suffices), 
+for the purposes of estimating the time to compute a
+high height example we may ignore them.
+Thus,
+the expected compute time necessary to find a height = \(10\) 
+example is about  \(5^{9} / 40 \approx 48000\) seconds, or about 
+\(12\)-\(13\) compute hours.
+For \(p=7\), the throughput was about 10 surfaces
+per second.
+Thus, the expected compute time to compute
+a height = \(10\) example is 
+\(7^{9} / 10 \approx \) 4 million seconds, or a little
+more than 45 compute days.
+The actual times to find the examples roughly
+matched these numbers, though the \(p=5\) 
+computation was carried out using the \(\merge\) 
+algorithm for ``multiply then split''
+because the authors had not yet discovered \(\wics\),
+so that computation took a few days.
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{tabular}{|p{0.1\linewidth}|p{0.8\linewidth}|}
+			 \hline
+             Height & Equation \\
+			 \hline
+			 1 & \(x_{1}^{4} + x_{2}^{4} + x_{3}^{4} + x_{4}^{4}\) \\
+			 \hline 
+			 2 & \(4 x_1^4 + 2 x_1^3 x_2 + x_1^3 x_4 + 4 x_1^2 x_2^2 + 2 x_1^2 x_2 x_3 + 2 x_1^2 x_3^2 + x_1^2 x_3 x_4 + 3 x_1 x_2^3 + 4 x_1 x_2^2 x_3 + 4 x_1 x_2^2 x_4 + 2 x_1 x_2 x_3 x_4 + 3 x_1 x_2 x_4^2 + 3 x_1 x_3^3 + x_1 x_3^2 x_4 + x_1 x_3 x_4^2 + x_1 x_4^3 + 4 x_2^4 + 2 x_2^3 x_3 + 4 x_2^3 x_4 + 4 x_2^2 x_3^2 + x_2^2 x_3 x_4 + 2 x_2^2 x_4^2 + 3 x_2 x_3^3 + 4 x_2 x_3^2 x_4 + 4 x_2 x_3 x_4^2 + 2 x_2 x_4^3 + 2 x_3^4 + 2 x_3^3 x_4 + 2 x_3^2 x_4^2 + x_3 x_4^3 + 4 x_4^4\) \\
+			 \hline 
+			 3 & \(2 x_1^4 + x_1^3 x_2 + 3 x_1^3 x_3 + x_1^3 x_4 + x_1^2 x_2 x_3 + 4 x_1^2 x_2 x_4 + x_1^2 x_3^2 + 4 x_1^2 x_3 x_4 + 3 x_1^2 x_4^2 + 4 x_1 x_2^3 + 3 x_1 x_2^2 x_3 + x_1 x_2^2 x_4 + 2 x_1 x_2 x_3^2 + 3 x_1 x_2 x_3 x_4 + x_1 x_3^3 + 4 x_1 x_3 x_4^2 + 2 x_1 x_4^3 + x_2^3 x_3 + 3 x_2^3 x_4 + 4 x_2^2 x_3^2 + 4 x_2^2 x_3 x_4 + x_2^2 x_4^2 + 2 x_2 x_3^3 + 3 x_2 x_3^2 x_4 + 4 x_2 x_3 x_4^2 + 3 x_2 x_4^3 + 4 x_3^4 + 3 x_3^3 x_4 + 2 x_3 x_4^3 + 3 x_4^4\) \\
+			 \hline 
+			 4 & \(4 x_1^4 + 2 x_1^3 x_3 + 4 x_1^3 x_4 + 3 x_1^2 x_2^2 + 3 x_1^2 x_2 x_3 + 4 x_1^2 x_2 x_4 + 2 x_1^2 x_3 x_4 + x_1^2 x_4^2 + 3 x_1 x_2^3 + x_1 x_2^2 x_3 + x_1 x_2^2 x_4 + x_1 x_2 x_3^2 + x_1 x_2 x_3 x_4 + x_1 x_2 x_4^2 + 2 x_1 x_3^3 + 2 x_1 x_3^2 x_4 + x_1 x_3 x_4^2 + 2 x_1 x_4^3 + 4 x_2^4 + 3 x_2^3 x_3 + x_2^3 x_4 + 3 x_2^2 x_3^2 + 3 x_2^2 x_3 x_4 + x_2^2 x_4^2 + 2 x_2 x_3^3 + 3 x_2 x_3^2 x_4 + x_2 x_3 x_4^2 + 3 x_2 x_4^3 + 3 x_3^4 + 2 x_3^3 x_4 + 4 x_3^2 x_4^2 + x_3 x_4^3\) \\
+			 \hline 
+			 5 & \(4 x_1^2 x_2^2 + 4 x_1^2 x_2 x_3 + 2 x_1^2 x_2 x_4 + 3 x_1^2 x_3 x_4 + 4 x_1 x_2^2 x_3 + 3 x_1 x_2 x_3 x_4 + x_1 x_3^3 + x_1 x_3^2 x_4 + 3 x_1 x_3 x_4^2 + x_1 x_4^3 + x_2^4 + 2 x_2 x_3^2 x_4 + 4 x_2 x_3 x_4^2\) \\
+			 \hline 
+			 6 & \(4 x_1^3 x_2 + 4 x_1^3 x_4 + 4 x_2^4 + 2 x_2 x_3^2 x_4 + x_2 x_3 x_4^2 + x_3^3 x_4\) \\
+			 \hline 
+			 7 & \(4 x_1^3 x_4 + x_1 x_2^3 + 2 x_1 x_3^3 + 2 x_2^3 x_4 + x_2^2 x_4^2 + x_3^3 x_4 + 3 x_3^2 x_4^2 + 2 x_3 x_4^3\) \\
+			 \hline 
+			 8 & \(2 x_1^3 x_3 + x_1^2 x_2^2 + x_1^2 x_4^2 + x_1 x_2^2 x_4 + 3 x_1 x_3^2 x_4 + x_2^4 + 2 x_2^3 x_3 + 3 x_2^2 x_4^2 + 4 x_2 x_3^2 x_4 + 3 x_3 x_4^3\) \\
+			 \hline 
+			 9 & \(3 x_1^4 + 3 x_1^3 x_2 + 3 x_1^3 x_3 + x_1^2 x_2^2 + 3 x_1^2 x_2 x_3 + 3 x_1^2 x_2 x_4 + 3 x_1^2 x_3^2 + 2 x_1^2 x_3 x_4 + 2 x_1^2 x_4^2 + 4 x_1 x_2^3 + 2 x_1 x_2^2 x_3 + 4 x_1 x_2 x_3^2 + 2 x_1 x_2 x_3 x_4 + 4 x_1 x_2 x_4^2 + x_1 x_3^3 + 3 x_1 x_3^2 x_4 + 3 x_1 x_3 x_4^2 + x_1 x_4^3 + 3 x_2^3 x_3 + 4 x_2^3 x_4 + 3 x_2^2 x_3 x_4 + x_2^2 x_4^2 + 4 x_2 x_3^2 x_4 + 4 x_2 x_3 x_4^2 + 4 x_2 x_4^3 + 3 x_3 x_4^3 + 4 x_4^4\) \\
+			 \hline 
+			 10 & \(2 x_1^4 + 4 x_1^3 x_2 + 3 x_1^3 x_3 + x_1^3 x_4 + x_1^2 x_2^2 + 2 x_1^2 x_2 x_3 + 2 x_1^2 x_2 x_4 + 4 x_1^2 x_3^2 + 4 x_1^2 x_3 x_4 + 2 x_1^2 x_4^2 + x_1 x_2^3 + 4 x_1 x_2^2 x_4 + 3 x_1 x_2 x_3^2 + 3 x_1 x_2 x_4^2 + 2 x_1 x_3^3 + 3 x_1 x_3^2 x_4 + 2 x_1 x_3 x_4^2 + x_1 x_4^3 + 3 x_2^4 + 2 x_2^3 x_3 + 2 x_2^3 x_4 + 4 x_2^2 x_3^2 + 3 x_2^2 x_3 x_4 + 3 x_2^2 x_4^2 + x_2 x_3^3 + 2 x_2 x_3 x_4^2 + 2 x_2 x_4^3 + 4 x_3^4 + x_3^3 x_4 + 3 x_3^2 x_4^2 + 4 x_3 x_4^3 + 3 x_4^4\)\\
+			 \hline
+			 \(\infty\)& \(x_{1}^{4} + x_{2}^{4} + x_{3}^{4} + x_{4}^{4} + x y z w\) \\
+			 \hline 
+		\end{tabular}
+	\end{center}
+	\caption{Quartic K3 surfaces with specified Artin-Mazur height over \(\mathbb{F}_{5}\)}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			 \hline
+			 Height & Equation \\
+			 \hline
+			 1 & \\
+			 \hline 
+			 2 & \\
+			 \hline 
+			 3 & \\
+			 \hline 
+			 4 & \\
+			 \hline 
+			 5 & \\
+			 \hline 
+			 6 & \\
+			 \hline 
+			 7 & \\
+			 \hline 
+			 8 & \\
+			 \hline 
+			 9 & \\
+			 \hline 
+			 10 & \\
+			 \hline
+			 \(\infty\)& \\
+			 \hline 
+		\end{tabular}
+	\end{center}
+	\caption{Quartic K3 surfaces with specified Artin-Mazur height over \(\mathbb{F}_{7}\)}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			 \hline
+			 Height & Equation \\
+			 \hline
+			 1 & \\
+			 \hline 
+			 2 & \\
+			 \hline 
+			 3 & \\
+             \hline
+			 \(\infty\)& \\
+			 \hline 
+		\end{tabular}
+	\end{center}
+	\caption{Quartic K3 surfaces with specified Artin-Mazur height over \(\mathbb{F}_{11}\)}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			 \hline
+			 Height & Equation \\
+			 \hline
+			 1 & \\
+			 \hline 
+			 2 & \\
+			 \hline 
+			 3 & \\
+             \hline
+			 \(\infty\)& \\
+			 \hline 
+		\end{tabular}
+	\end{center}
+	\caption{Quartic K3 surfaces with specified Artin-Mazur height over \(\mathbb{F}_{13}\)}
+\end{figure}
+
+%\subsection{Raising polynomials to powers}
+%\subsection{Matrix of Multiply then Split}
+%
+%
+%
+%\subsection{Matrix Multiplication}
+%
+%Magma benchmarks were done by taking the average of 3 runs,
+%Julia benchmarks were taken using @benchmark
+% size & magma CPU & magma GPU & Oscar/Flint 
+%       & Naive Julia CPU & Naive Julia GPU & Our fallback implementation
+% 
+%\subsubsection{A note on Benchmarking on GPUs}
+%
+%Both CUDA.jl and MAGMA 
+%claim to
+%use the CUBLAS library for their
+%matrix multiplication, so one might expect them to
+%give similar performance.
+%However, we see above that the naive Julia matmul implementation
+%beats MAGMA by about one order of magnitude. 
+%There are two likely causes of this discrepancy. 
+%Firstly, as mentioned in the CUDA.jl documentation (citation), 
+%naive benchmarking on the GPU may not be robust. 
+%We use the 
+%\texttt{BenchmarkTools}
+%library for robust measurments. 
+%If we use a less robust method like the \texttt{CUDA.@time} macro,
+%sometimes we get a much larger time.
+%MAGMA benchmarks are taken using the \texttt{Realtime()}
+%function, which may be subject to such inconsistencies.
+%However, this cannot account for all of the discrepancy, 
+%because even using inconsistent benchmarks in Julia, 
+%the times are still often the same order of magnitude
+%as \texttt{BenchmarkTools}.
+%
+%Another possible source of discrepancy is copying data between
+%the CPU and the GPU. 
+%The authors are not familiar with the implementation of MAGMA's 
+%GPU multiplication, but based on some simple GPU profiling,
+%MAGMA seems to be copying memory between the CPU's and GPU's memory.
+%Perhaps the input matrices are copied to the GPU, or the result
+%is copied back to the CPU, or both.
+%When running Julia benchmarks that include copying the data back and forth
+%between the CPU and GPU, one gets times that are on the
+%order of magnitude of the MAGMA times. 
+%In such Julia benchmarks, the time spent copying dominates the time spent 
+%multiplying.
+%
+%Also note: Julia, Oscar/FLINT, and (probably) MAGMA use the same
+%BLAS library on the CPU in this case, just Julia has multithreading enabled
+%by default
+%
+%* MAGMA seems to be slower

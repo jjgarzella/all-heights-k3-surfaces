@@ -16,49 +16,139 @@
 % section 5.4 can be one sentence at the end of the paragraph that section 5.3 will become, it can just say that we implement a heuristic algorithm in the package
 % section 5.5 can move to “computations”
 
-\subsection{Maximum Operations under mod p}
+%\subsection{Maximum Operations under mod p}
 
-We start by defining notation. Let $A$ be $m \times n$ and $B$ $n \times k$, and $N$ the modulus. One problem with matrix multiplication is the magnitude of each entry in the result $C$, which is at most $n L^2$, where $L$ is the largest entry in $A$ and $B$. When dealing matrices of size $m,n,k \geq 5000$, and large $L$, $n L^2$ may be larger than the numerical datatype used, and thus larger datatypes are necessary. 
 
-In matrix multiplication mod $N$, the maximum size of any element in $C$ is $n (N-1)^2$, which is often smaller than the integer limit of Float32, the most common datatype used in CUDA programming. We take a moment to remark that by IEEE standards, integer multiplication (that only uses the mantissa) is guaranteed to be exact even in Float32 types. As such, it is often preferrable to use Float32 or Float64 datatypes since these are often more optimized than their Int counterparts due to [CITE]. EXPLAIN THE IMPLIED BIT.
 
-Thus, we wish to find the maximum number of operations $o$ before our datatype overflows, namely one less than the value $o'$ such that $o' \cdot (N^2 - 2N - 1)$ is larger than the integer limit $I$. Thus
+
+%Let $A$ be $m \times n$ and $B$ $n \times k$, and $N$ the modulus. 
+%One problem with matrix multiplication is the magnitude of each entry in the result $C$, which is at most $n L^2$, where $L$ is the largest entry in $A$ and $B$. When dealing matrices of size $m,n,k \geq 5000$, and large $L$, $n L^2$ may be larger than the numerical datatype used, and thus larger datatypes are necessary. 
+
+%Since we use fixed-size integers rather than arbitrary precision, we must consider the possibility of overflow.
+%Moreover, 
+In the last few years, a lot of work has gone into optimizing matrix multiplication,
+especially with floating-point data types
+(for example, \cite{nvidia-2024-cublas}, \cite{openblas-2024-openblas}). 
+Today, floating point types are faster than
+integer data types.
+For example, on Nvidia devices, Float32 multiplication
+is twice as fast as Int32 multiplication, and Float64
+multiplication is supported in hardware while Int64 multiplication
+is not.
+Moreover, the IEEE standards guarentee that integer multiplication (i.e. only use the mantissa) 
+is guaranteed to be exact even in floating point types. 
+Thus, we can freely treat floating points as an integer type of smaller size.
+This trick has been utilized many times in the literature (e.g. see \cite{bglm-2024-matmul-modp}).
+Here, we implement a simple version of using this trick in Julia,
+which suffices for our purposes.
+
+%In matrix multiplication mod $N$, the maximum size of any element in $C$ is $n (N-1)^2$, 
+%which is often smaller than \(2^{24}\), the integer limit of Float32.
+
+Let \(\ell\) be the largest possible value of an integer for our data type.
+Each entry ranges from \(0\) to \(N-1\).
+Thus, the maximum number of operations $o$ before our datatype overflows is one less than the value $o'$ such that 
+$o' \cdot (N^2 - 2N - 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integer limit $\ell$. Thus
 \begin{align*}
-    o = \left\lfloor \frac{I}{(N^2 - 2N - 1)} \right\rfloor - 1
+    o = \left\lfloor \frac{\ell}{(N^2 - 2N - 1)} \right\rfloor - 1
 \end{align*}
 
-We list common values of $o$ for the standard Julia datatypes and a selection of values for $N$:
+For Nvidia GPUs, we wish to use the Float32 type, for the primes
+\(p \in \{3,5,7,11,13\}\).
+Respectively, for each of these values we have
+\(o = 8,388,607, 1,198,371, 493,446, 171,195, 118,148\).
+Furthermore The sizes of the matrices in question are 
+(respectively)
+ \(165, 969, 2925, 12341,\) and \(20825\).
+Thus, we see that for \(p \leq 11\), we can use a fully floating-point
+library like CUBLAS naively. 
+\footnote{
+    Note that we use OpenBLAS and CUBLAS, 
+    we are really using Julia wrappers
+    provided by libraries such as Oscar, 
+    CUDA.jl, or the Julia standard library.
+    Note that MAGMA also provides
+    a mod p matrix multiplication implementation,
+    which (according to its documentation) wraps CUBLAS for 
+    for p=11 and
+    p=13. 
+}
+For \(p=13\), we implement a 
+simple GPU-based fallback implementaiton of matrix multiplication using CUDA.jl
+based on \cite{mao-2024-matmul}
+which reduces mod \(p\) every 32 entries.
+Our implementation is provided in GPUFiniteFieldMatrices.jl.
+While it doesn't come close to CUBLAS, and is in fact slower
+than a OpenBLAS when using CPU multithreading, it gives exact
+computations for arbitrarily large
+matrices (as long as \(32 < o\))
+and is good enough that
+matrix multiplication isn't the bottleneck in the 
+computation of quasi-\(F\)-split heights over \(\mathbb{F}_{13}\).
 
+To illustrate the performance difference between CPU and GPU, we timed
+multiplying matrices of various sizes on the CPU and GPU in 
+characteristic 11:
+
+\begin{figure}[h]
 \begin{center}
-\begin{tabular}{llrrrrr}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-\textbf{Datatype} & \multicolumn{1}{l}{\textbf{Largest Int}} & \textbf{3} & \textbf{11} & \textbf{101} & \textbf{8191} & \textbf{9765625} \\ \hline
-Float16           & 1.02E+03                                     & 510        & 9           & -1           & -1            & -1               \\
-Float32           & 8.39E+06                                     & 4.19E+06   & 8.56E+04    & 838          & -1            & -1               \\
-Float64           & 4.50E+15                                     & 2.25E+15   & 4.60E+13    & 4.50E+11     & 6.71E+07      & 46               \\
-Int16             & $2^{15}-1$                                     & 16382      & 333         & 2            & -1            & -1               \\
-Int32             & $2^{31}-1$                                     & 1.07E+09   & 2.19E+07    & 2.15E+05     & 31            & -1               \\
-Int64             & $2^{63}-1$                                     & 4.61E+18   & 9.41E+16    & 9.23E+14     & 1.38E+11      & 96713            \\
-UInt16            & $2^16-1$                                     & 32766      & 667         & 5            & -1            & -1               \\
-UInt32            & $2^{32}-1$                                     & 2.15E+09   & 4.38E+07    & 4.30E+05     & 63            & -1               \\
-UInt64            & $2^{64}-1$                                     & 9.22E+18   & 1.88E+17    & 1.85E+15     & 2.75E+11      & 1.93E+05         \\ \hline
-\end{tabular} \bigskip\\
-\textbf{Table 1:} Maximum Number of Additions Before Overflow
+    Size & CPU single-threaded & CPU multi-threaded & CUBLAS & Fallback implementation \\
+\hline
+    5,000  & 2.47   & 1.18  & 0.02 & 1.78   \\
+\hline
+    10,000 & 18.72  & 8.03  & 0.13 & 15.00  \\
+\hline
+    15,000 & 62.90  & 25.30 & 0.43 & 54.95  \\
+\hline
+    20,000 & 150.76 & 58.83 & 3.66 & 114.72 \\
+\hline
+\end{tabular}
+\caption{Matrix multiplication times (in seconds) for various sizes of matrices}
 \end{center}
+\end{figure}
+
+%We list common values of $o$ for some standard datatypes and a selection of values for $N$:
+%
+%\begin{center}
+%\begin{tabular}{llrrrrr}
+%\hline
+%\textbf{Datatype} & \multicolumn{1}{l}{\textbf{Largest Int}} & \textbf{3} & \textbf{11} & \textbf{101} & \textbf{8191} & \textbf{9765625} \\ \hline
+%Float16           & \(2^{11}-1\)                                    & \( 510        \) & \( 9           \) & \( -           \) & \( -            \) & \( -               \) \\
+%Float32           & \(2^{24}-1\)                                    & \( 4.19\cdot 10^{6}   \) & \( 8.56\cdot 10^{4}    \) & \( 838          \) & \( -            \) & \( -               \) \\
+%Float64           & \(2^{53}-1\)                                    & \( 2.25\cdot 10^{15}   \) & \( 4.60\cdot 10^{13}    \) & \( 4.50\cdot 10^{11}     \) & \( 6.71\cdot 10^{7}      \) & \( 46               \) \\
+%%Int16             & $2^{15}-1$                                   \) & \( 16382      \) & \( 333         \) & \( 2            \) & \( -            \) & \( -               \) \\
+%%Int32             & $2^{31}-1$                                   \) & \( 1.07\cdot 10^{9}   \) & \( 2.19\cdot 10^{7}    \) & \( 2.15\cdot 10^{5}     \) & \( 31            \) & \( -               \) \\
+%%Int64             & $2^{63}-1$                                   \) & \( 4.61\cdot 10^{18}   \) & \( 9.41\cdot 10^{16}    \) & \( 9.23\cdot 10^{14}     \) & \( 1.38\cdot 10^{11}      \) & \( 96713            \) \\
+%UInt16            & $2^{16}-1$                                    & \( 32766      \) & \( 667         \) & \( 5            \) & \( -            \) & \( -               \) \\
+%UInt32            & $2^{32}-1$                                    & \( 2.15\cdot 10^{9}   \) & \( 4.38\cdot 10^{7}    \) & \( 4.30\cdot 10^{5}     \) & \( 63            \) & \( -               \) \\
+%UInt64            & $2^{64}-1$                                    & \( 9.22\cdot 10^{18}  \) & \( 1.88\cdot 10^{17}    \) & \( 1.85\cdot 10^{15}     \) & \( 2.75\cdot 10^{11}      \) & \( 1.93\cdot 10^{5}        \) \\ \hline
+%\end{tabular} \bigskip\\
+%\textbf{Table 1:} Maximum Number of Additions Before Overflow
+%\end{center}
 %
 
-Knowing $o$ helps us choose the smallest datatype such that matrix multiplication without overflow. In larger cases, we may need to reduce the current result before adding more elements. This common technique allows us to use considerably smaller datatypes, though it comes with cost of needing to reduce the result every so often.
+%Knowing $o$ helps us choose the smallest datatype such that matrix multiplication without overflow. 
+%If the length \(n\) of the dimension we are summing acroos is less than \(o\), then we may use a floating-point
+%library like CUBLAS (\cite{nvidia-2024-cublas}).
+%In larger cases, we need to reduce mod \(N\) in the middle of the computation, which isn't implemented
+%by standard GPU libraries.
+%Our implementation is much slower than CUBLAS but works on arbitrary \(N\) and sizes
+%of matrices.
+%We also implement a heuristic algorithm that uses CUBLAS if \(o\) is small
+%enough, and falls back to our gerenal but less performant implementation.
 
-\subsection{GPU and CUDA Considerations}
-
-As described in [CITE], there are many additional considerations when doing matrix multiplication on the gpu. First, one should minimize memory access by storing commonly used items in cache or shared memory. Second, computations should be parallelized across groups of 32 threads, the smallest warp or unit call in CUDA. Third, conditionals and other control flow statements should be avoided in GPU kernels, as these are costly on the GPU. However, from our testing, we find it is worth checking whether our output needs to be reduced rather than reducing at every addition. Then, based on the input size, we end up with four regimes:
-\begin{enumerate}
-    \item Matmul on the CPU, if the time to move to the GPU and back is larger than computing on the CPU.
-    \item CUBLAS's Matmul, if the matrix and modulus is small enough that we do not need to reduce partway.
-    \item Reducing after every block, which allows us to get rid of the costly if statement.
-    \item Reducing based on a conditional every addition, for extreme cases where $o < 32$.
-\end{enumerate}
-We implement this heuristic algorithm in the package.
+%\subsection{GPU and CUDA Considerations}
+%
+%As described in [CITE], there are many additional considerations when doing matrix multiplication on the gpu. First, one should minimize memory access by storing commonly used items in cache or shared memory. Second, computations should be parallelized across groups of 32 threads, the smallest warp or unit call in CUDA. Third, conditionals and other control flow statements should be avoided in GPU kernels, as these are costly on the GPU. However, from our testing, we find it is worth checking whether our output needs to be reduced rather than reducing at every addition. Then, based on the input size, we end up with four regimes:
+%\begin{enumerate}
+%    \item Matmul on the CPU, if the time to move to the GPU and back is larger than computing on the CPU.
+%    \item CUBLAS's Matmul, if the matrix and modulus is small enough that we do not need to reduce partway.
+%    \item Reducing after every block, which allows us to get rid of the costly if statement.
+%    \item Reducing based on a conditional every addition, for extreme cases where $o < 32$.
+%\end{enumerate}
+%We implement this heuristic algorithm in the package.
 
 % \subsection{Benchmarks and Comparisons}
 

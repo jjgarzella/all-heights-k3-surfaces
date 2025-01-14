@@ -262,6 +262,63 @@ It would be interesting to have a GPU-accelerated version of
 multimodular FFT.
 The authors expect one could get a big improvement in the sparse case.
 
+\section{Evaluation}
 
+To demonstrate the power of using the GPU for mathematical computations, 
+we compare our implementation
+with two existing computational mathematics libraries, FLINT
+and MAGMA.
+We take a homogeneous polynomial of degree 16 in the integers,
+whose coefficients are randomly chosen in the set 
+\(\{0, \ldots, 4\}\), and raise it to successive powers \(n\),
+starting at \(n=5\).
+Raising such a polynomial to the 5th power is a similar 
+computation to the bottleneck in the calculation of the
+quasi-\(F\)-split height of a quartic surface over \(\mathbb{F}_{5}\).
+
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    \(n\) & MAGMA & FLINT & GPUPolynomials.jl \\
+    \hline
+    5 & 2.10 &    0.87 &  0.03 \\
+    \hline
+    6 & 5.82 &    1.76 &  0.04 \\
+    \hline
+    7 & 12.03 &   3.82 &  0.12 \\
+    \hline
+    8 & 21.64 &   6.50 &  0.20 \\
+    \hline
+    9 & 38.78 &   12.32 & 0.40 \\
+    \hline
+    10 & 63.22 &  18.99 & 0.47 \\
+    \hline
+    11 & 95.48 &  26.58 & 0.89 \\
+    \hline
+    12 & 137.61 & 35.70 & 1.14 \\
+    \hline
+    13 & 194.73 & 46.50 & 2.07 \\
+    \hline
+    14 & 267.57 & 60.07 & 2.55 \\
+    \hline
+    15 & 359.22 & 76.46 & 2.77 \\
+    \hline
+\end{tabular}
+\caption{Polynomial powering times (in seconds) for various powers}
+\end{center}
+\end{figure}
+
+Note that the above numbers are really the GPU beating the CPU.
+Our FFT algorithm is a dense algorithm, while FLINT uses a sparse algorithm.
+We do not know which algorithm MAGMA uses for polynomial powering
+in the integers.
+In theory, especially for higher powers, such a sparse algorithm should
+be much more efficient. 
+However, the parallelism of the GPU is so much better that the
+GPU crushes the CPU, even with a worse algorithm.
+The authors hope that these numbers can inspire others who
+rely on fundamental algorithms such as those in FLINT to 
+consider re-implementing them on the GPU.
 
 

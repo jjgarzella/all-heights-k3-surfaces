@@ -1,10 +1,7 @@
 % Move these to main.tex eventually maybe
-\newcommand{\triv}{\texttt{TRIV}}
-\newcommand{\merge}{\texttt{MERGE}}
-\newcommand{\wics}{\texttt{WICS}}
 
 To find the matrix of ``multiply then split''
-in the algorithm for the quasi-\(F\)-split height
+in the Algorithm for the quasi-\(F\)-split height
 of a Calabi-Yau hypersurface, 
 we must first multiply all possible 
 monomials by \(\Delta_{1}(f)\) 
@@ -384,3 +381,36 @@ However, if many matrices need to be created, caching the hashtable allows the G
 \merge ~should be parallelizable by implementing a modified parallel merge and using a parallel sort. 
 However, we expect the sorting bottleneck to mean that such a parallel algorithm wouldn't beat GPU-parallel \wics,
 so we don't bother developing the modified parallel merge.
+
+Below in Figure \ref{fig:momts:compare}, we compare running times 
+for all the \(p\) which we consider. 
+\wics ends up being the fastest practically, both on the CPU and the
+GPU.
+We did not try running the tests for the trivial algorithm on the 
+CPU for \(p=11,13\) because we do not expect it to finish in a reasonable
+amount of time.
+
+\begin{figure}[h]
+\label{fig:momts:compare}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    p & \triv - CPU & \triv - GPU & \merge   & \wics - CPU & \wics - GPU \\
+    \hline
+    3 & 0.009    & 0.020    & 0.001   & 0.001    & 0.001  \\
+    \hline
+    5 & 1.504    & 0.084    & 0.050   & 0.029    & 0.030  \\
+    \hline
+    7 & 40.901   & 0.325    & 0.654   & 0.273    & 0.005  \\
+    \hline
+    11 &    -     & 6.466    & 24.860  & 5.266    & 0.915  \\
+    \hline
+    13 &    -     & 33.047   & 96.822  & 16.919   & 2.494  \\
+    \hline
+\end{tabular}
+\caption{Comparison of timings for various algorithms that calculate
+the matrix of ``multiply then split''. 
+Times are in seconds
+and are an average of 10 different trials.}
+\end{center}
+\end{figure}
