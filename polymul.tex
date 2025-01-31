@@ -103,43 +103,40 @@ quartic K3 surfaces being one of them.
 
 \subsubsection{NTT Implementation}
 
-We use the 4-step FFT \cite{bailey-1989-fft} with Barrett Modular 
-Reduction, for our NTT algorithm.
-State-of-the-art implementations often involve pre-computing 
-a table of twiddle factors to avoid an expensive powermod. 
-We choose to omit this, since having tables of twiddle factors 
-for both the forward NTT and inverse NTT effectively triples 
-the required GPU memory, which becomes the bottleneck for very large 
-problems.
+We use the Merge-NTT with Barrett modular reduction from \cite{ozcan-2023-fft}, ported over to Julia, for our NTT implementation. 
+Because of this, our NTT length $L$ is always a power of $2$. 
 
-For ease of implementation, our 
-NTT length $L$ is always a power of $2$. 
-For each NTT we perform, we search for primes $p$ that satisfy $p \equiv 1 \mod L$, compute primitive $L$th roots of unity for each $p$, and $L^{-1} \mod p$. 
+For each NTT we perform, we search for primes $p$ that satisfy 
+$p \equiv 1 \mod 2L$, compute primitive $L$th roots of unity 
+for each $p$, and $L^{-1} \mod p$. 
 These are cached, so that they can be used again for problems with the same shape 
 (i.e. the degree of \(f\), the exponent \(k\), and the characteristic are the same).
 
-Additionally, we used fixed-width integers, as opposed to arbitrary-precision integers 
-such as in the GNU Multiple Precision library (GMP) \cite{gnu-2024-gmp}. The decision
-to use fixed-width integers is primarily practical. 
-Arbitrary size fixed-width integers
-on the GPU are provided by the BitIntegers.jl package 
-\cite{fourquet-2024-bitintegers-jl}.
-On the other hand, Julia's CUDA functionality currently does not provide
-aribtrary-precision integers:
-libraries like GMP only support the CPU, while 
-Nvidia-made alternatives have not yet been ported to Julia.
-On the CPU, fixed-width integers of 256, 512, or 1024 bits
-can outperform arbitrary-precision libraries like GMP 
-since fixed-width integers don't require allocations.
-It would be interesting to compare the performance of both
-approaches on the GPU.
+% Additionally, we used fixed-width integers, as opposed to arbitrary-precision integers 
+% such as in the GNU Multiple Precision library (GMP) \cite{gnu-2024-gmp}. The decision
+% to use fixed-width integers is primarily practical. 
+% Arbitrary size fixed-width integers
+% on the GPU are provided by the BitIntegers.jl package 
+% \cite{fourquet-2024-bitintegers-jl}.
+% On the other hand, Julia's CUDA functionality currently does not provide
+% aribtrary-precision integers:
+% libraries like GMP only support the CPU, while 
+% Nvidia-made alternatives have not yet been ported to Julia.
+% On the CPU, fixed-width integers of 256, 512, or 1024 bits
+% can outperform arbitrary-precision libraries like GMP 
+% since fixed-width integers don't require allocations.
+% It would be interesting to compare the performance of both
+% approaches on the GPU.
 
 Our algorithm also has fallbacks when the memory required becomes too large for the 
 GPU's on-device memory.
-When the problem becomes too big to fit the vectors corresponding to all of the primes
-in device memory at once, we move the vectors
-the GPU one by one, applying the FFT, and move them back to the CPU where 
-the chinese remainder theorem recovery is performed.
+When the problem becomes too big to fit the twiddle factors for 
+all of the NTTs
+in device memory at once, we move the twiddle factors to GPU memory and 
+back to RAM for each NTT. Because we suddenly are forced to move a lot 
+of memory around for each NTT, we see a large drop-off in 
+performance when this 
+NTT size threshold is reached. 
 
 
 \subsubsection{Prime Selection}
@@ -147,15 +144,15 @@ In order for the NTT to simulate polynomial powering over $\mathbb{Z}$,
 we need to obtain an upper bound $M$ on the resulting coefficients, then 
 choose primes $p_1 \dots p_k$ such that $p_1 \cdot p_2 \cdot ... \cdot p_k > M$
 
-Experimentally, NTTs with 32-bit integers are slightly over double 
-the speed of NTTs with 64-bit integers. Thus, for prime selection, 
-we ideally choose primes satisfying $p \equiv 1 \mod L$ that fit 
-within 32 bits. 
-
-When the upper bound $M$ for the resulting coefficients is too high, and 
-the NTT size is too large, we start to run out of distinct 32-bit NTT primes.
-In this case, we switch to 64-bit integers, which hold enough primes for any 
-reasonably computable NTT on the GPU.
+Experimentally, modular multiplication with 32-bit integers 
+is slightly over double the speed of modular 
+multiplication with 64-bit integers. 
+However, the kernels and parameters from Merge-NTT are more 
+optimized for 64-bit integers, making them just over half the
+speed of naively using the same implementation with 32-bit 
+integers. Thus, for prime selection, 
+we choose primes satisfying $p \equiv 1 \mod 2L$ that fit 
+within 62 bits, because of the precision of Barrett Reduction.
 
 \subsubsection{Bound Finding}
 %This poses the question of finding the maximum coefficient of our result $M$. 
@@ -164,7 +161,7 @@ to compute NTTs in. In this section, we present a quick way to compute an
 upper bound on the resulting coefficients of raising a polynomial to a power.
 
 \begin{defn}
-    Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, where $I_i$ are distinct degree sequences of equal length, the \textbf{maximum polynomial} is $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, where $m$ is a non-inclusive upper bound on the coefficients.
+    Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, where $I_i$ are distinct degree sequences of equal length, the maximum polynomial is $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, where $m$ is a non-inclusive upper bound on the coefficients.
 \end{defn}
 
 This is effectively just saying to consider the worst-case polynomial 
@@ -199,7 +196,7 @@ by bounding the number of terms in the power.
 To apply this formula to computing $\Delta_1(f^{p - 1})$ for K3 
 quartic surfaces over $\mathbb{F}_p$, we plug in $h = 4p$, $m = p$, 
 and $k = p$ to obtain $M = \left((p - 1) \cdot \binom{4p + 3}{3}\right)^ k$
-for an upper bound. To get the optimal upper bound, we can plug in the
+for an upper bound. To obtain the optimal upper bound, we can plug in the
 maximal polynomial into a multimodular NTT with primes multiplying to over $M$,
 and retrieve the maximum coefficient of that result.
 
@@ -235,19 +232,12 @@ On the GPU, all of these are bottlenecked by sorting, just like
 and then combines like terms with a sort. 
 Unlike the previous four algorithms, it is not bottlenecked by the sort;
 instead, it is bottlenecked by the memory required to store the table of
-multinomial coefficients. 
-The amount of memory theoretically required to compute 
-$\delta_1(f ^ {p - 1})$ when \(p=5\) 
-would be something like 742 GB.\footnote{
-	That is, raising 
-    $969$ terms to the $5$th power
-	in the integers.
-}
-However, \textbf{MNE} is competetive for small problems.
+multinomial coefficients. However, \textbf{MNE} is 
+competitive for small problems
 
 \textbf{SUMS} and \textbf{FPS} have dense and sparse versions which are described in 
-\cite{monagan-2012-sparse-powering}, including parallel versions.
-In particualr, \textbf{FPS} is implemented in FLINT, and is called by our
+\cite{monagan-2012-sparse-powering}.
+In particular, \textbf{FPS} is implemented in FLINT, and is called by our
 code when we need powering on the CPU.
 They can be parallelized, as discussed in \cite{monagan-2012-sparse-powering},
 but this requires the use of locks and a heap data structure,
@@ -305,11 +295,11 @@ quasi-\(F\)-split height of a quartic surface over \(\mathbb{F}_{5}\).
 \end{figure}
 
 Note that the above numbers are really the GPU beating the CPU.
-Our FFT algorithm is a dense algorithm, while FLINT uses a sparse algorithm.
+The FFT is a dense algorithm, while FLINT uses a sparse algorithm.
 We do not know which algorithm MAGMA uses for polynomial powering
 in the integers.
-In theory, especially for higher powers, such a sparse algorithm should
-be much more efficient. 
+In theory, such a sparse algorithm should
+be much more efficient.
 However, the parallelism of the GPU is so much better that the
 GPU crushes the CPU, even with a worse algorithm.
 The authors hope that these numbers can inspire others who
