@@ -24,13 +24,15 @@ the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
 is cut out by a single section in 
 \(M_{i-1}\).
 If we apply both of these facts,
-with \(Y\) the 
+with \(Y\) being the 
 moduli space\footnote{
 	say, the course moduli space of polarized K3 surfaces,
 	though one should be able to make a similar statement
 	for the moduli stack
 } of quartic K3 surfaces,
 we can conclude that the locus 
+% FEEDBACK should this be "in the locus" or something
+% or should "that the locus" just removed
 the probability of a random point 
 in the moduli space being in the locus
 \(M_{2}\) is about \(1 / p\). 
@@ -55,16 +57,10 @@ of homogeneous polynomials, which is isomorphic to
 To obtain the moduli space \(M\) of quartic K3 surfaces, 
 we must projectivize and take the quotient by the action of 
 \(PGL_{4}\) which acts by changes of variables. 
+% FEEDBACK \(PGL_{4}\) looks weird
 Thus, there may be two sources of deviation from the expected
-probability--the group quoteint and the actual 
+probability--the group quotient and the actual 
 error term in the estimate.
- 
-For \(p = 7\) and above, we restrict 
-that may appear in the random polynomial (to speed up the FFT),
-so this likely further effect the probability of getting
-a surface of height \(h\).
-
-
 
 \subsection{Computations}
 
@@ -80,9 +76,9 @@ Similarly, over \(\mathbb{F}_{7}\) we found that
 the probabilities very closely matched \(1 / 7^{h}\) 
 for low heights, with a more variance at higher heights.
 
-For \(p=5\), the algorithm throughput was about
-40 surfaces per second on 
-Nvidia 1080Ti and 2080Ti GPUs provided by the 
+For \(p=5\), the algorithm throughput is about
+1400 surfaces per second on 
+Nvidia 2080Ti GPUs provided by the 
 UCSD research cluster.
 Since much less time is taken for height \(1\) examples
 (since the classical Fedder's criterion suffices), 
@@ -90,20 +86,24 @@ for the purposes of estimating the time to compute a
 high height example we may ignore them.
 Thus,
 the expected compute time necessary to find a height = \(10\) 
-example is about  \(5^{9} / 40 \approx 48000\) seconds, or about 
-\(12\)-\(13\) compute hours.
-For \(p=7\), the throughput was about 10 surfaces
+example is about  \(5^{9} / 1400 \approx 1395\) seconds, or about 
+23 compute minutes.
+For \(p=7\), the throughput is about 185 surfaces
 per second.
 Thus, the expected compute time to compute
 a height = \(10\) example is 
-\(7^{9} / 10 \approx \) 4 million seconds, or a little
-more than 45 compute days.
-The actual times to find the examples roughly
-matched these numbers, though the \(p=5\) 
-computation was carried out using the \(\merge\) 
-algorithm for ``multiply then split''
-because the authors had not yet discovered \(\wics\),
-so that computation took a few days.
+\(7^{9} / 185 \approx \) 218,127 seconds, or about 
+60 hours.
+The actual times to find the examples was much 
+longer than this, because the authors were using a 
+less-optimized NTT and had not yet discovered \(\wics\) 
+and were using \(\merge\) instead.
+
+For $p = 11$ and $p = 13$, the threshold for the NTT where 
+GPU memory becomes a bottleneck is reached, and the algorithm 
+faces a sharp drop in speed. The examples below are from a 12
+hour run on the aforementioned 2080 TI's.
+% FEEDBACK I swear I will do this soon
 
 \begin{figure}[h]
 	\begin{center}

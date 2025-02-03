@@ -35,7 +35,7 @@ For example, on Nvidia devices, Float32 multiplication
 is twice as fast as Int32 multiplication, and Float64
 multiplication is supported in hardware while Int64 multiplication
 is not.
-Moreover, the IEEE standards guarentee that integer multiplication (i.e. only use the mantissa) 
+Moreover, the IEEE standards guarantee that integer multiplication (i.e. only use the mantissa) 
 is guaranteed to be exact even in floating point types. 
 Thus, we can freely treat floating points as an integer type of smaller size.
 This trick has been utilized many times in the literature (e.g. see \cite{bglm-2024-matmul-modp}).
@@ -56,10 +56,10 @@ $o' \cdot (N^2 - 2N - 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integ
 For Nvidia GPUs, we wish to use the Float32 type, for the primes
 \(p \in \{3,5,7,11,13\}\).
 Respectively, for each of these values we have
-\(o = 8,388,607, 1,198,371, 493,446, 171,195, 118,148\).
-Furthermore The sizes of the matrices in question are 
-(respectively)
- \(165, 969, 2925, 12341,\) and \(20825\).
+\(o = 8388607, 1198371, 493446, 171195, 118148\).
+Furthermore, the sizes of the matrices in question are 
+respectively
+ \(165, 969, 2925, 12341, 20825\).
 Thus, we see that for \(p \leq 11\), we can use a fully floating-point
 library like CUBLAS naively. 
 \footnote{
@@ -74,7 +74,7 @@ library like CUBLAS naively.
     p=13. 
 }
 For \(p=13\), we implement a 
-simple GPU-based fallback implementaiton of matrix multiplication using CUDA.jl
+simple GPU-based fallback implementation of matrix multiplication using CUDA.jl
 based on \cite{mao-2024-matmul}
 which reduces mod \(p\) every 32 entries.
 Our implementation is provided in GPUFiniteFieldMatrices.jl.

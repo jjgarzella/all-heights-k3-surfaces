@@ -1,20 +1,19 @@
-
 Given a variety \(X\) over a field of characteristic \(p\),
-Artin and Mazur in \ref{artin-mazur-1977-height}
+Artin and Mazur in \cite{artin-mazur-1977-height}
 define height \(h(X) \in \mathbb{N} \cup \{\infty\}\) 
 (sometimes written \(h\) if \(X\) is obvious from the context)
 to be the height 
-of a certian formal group \(\Phi\) associated to \(X\).
+of a certain formal group \(\Phi\) associated to \(X\).
 The height is in some sense a measure of the
-``arithmetic complexity'' of a variety in some sense,
+``arithmetic complexity'' of a variety,
 with higher heights indicating ``more complexity''.
 For example, consider the case when \(X\) is a 
 K3 surface (i.e. a surface for which \(\omega_{X} \isom \mathcal{O}_{X} \) 
 and \(H^{1}(X,\mathcal{O}_{X} ) = 0\)).
-In this case, \(h\) determines the \textit{newton polygon}
-of \(X\), which it turn gives partial information about the 
+In this case, \(h\) determines the \textit{Newton polygon}
+of \(X\), which in turn gives partial information about the 
 point counts of \(X\).
-In this case, the newton polygon equals the hodge polygon
+In this case, the Newton polygon equals the Hodge polygon
 (i.e. the variety is ordinary) if and only if \(h=1\),
 and the Newton polygon is supersingular if and only if 
 \(h = \infty\).
@@ -29,13 +28,19 @@ Given a field \(k\) of characteristic \(p\), one may ask
 In the case that \(X\) is a K3 surface, it is known from the 
 original work of Artin and Mazur
 that either \(1 \leq h(X) \leq 10\) or \(h = \infty\).
-A naive guess is that all such \(h\) should occur.
+% FEEDBACK
+% Replaced this line with the uncommented line 
+% A naive guess is that all such \(h\) should occur.
+They conjectured that all such $h$ are taken on by K3 surfaces
+in characteristic $p$.
+% (corollary 7.7 from the artin paper)
 In \cite{taelman-2016-k3-given-l-function}, 
 Taelman showed that
 this is the case
-for some sufficiently big finite field \(\mathbb{F}_{q}\).
+for some sufficiently big finite field \(\mathbb{F}_{q}\). 
 By base change, this implies the result for extensions
 thereof.
+
 However, this argument is not constructive,
 and there is no known bound on how big \(q\) must be to guarentee
 existence of surfaces of any height.
@@ -46,10 +51,9 @@ that there exist quartic K3 surfaces
 (i.e. quartic surfaces in \(\mathbb{P}^{3}\))
 of all possible heights over \(\mathbb{F}_{2}\).
 More recently,
-Kawakami, Takamatsu, and Yoshikawa 
+Kawakami, Takamatsu, and Yoshikawa in \cite{kty-2022-fedder}
 have given examples of quartic K3 surfaces
-of all possible heights in 
-\cite{kty-2022-fedder} over \(\mathbb{F}_{3}\).
+of all possible heights over \(\mathbb{F}_{3}\).
 
 The method of Kawakami, Takamatsu, and Yoshikawa is
 to consider, instead of the Artin-Mazur height,
@@ -57,13 +61,13 @@ a different quantity called the
 \textit{quasi-\(F\)-split height} 
 (see Section 2 for a definition),
 which is known to be the same as the Artin-Mazur height
-for Calabi-Yau varieties (and thus K3 surfaces).
+for Calabi-Yau varieties, and thus K3 surfaces.
 The theory of the quasi-\(F\)-split height has its
 roots in the theory of \(F\)-singularites and commutative
 algebra/birational geometry in characteristic \(p\).
 In particular, one theorem which has been fundamental
 to the development of the theory of \(F\)-singularities
-is Fedder's criterion (see Theorem 2.12 REF HERE), 
+is Fedder's criterion (Theorem \ref{thm:fedder:criterion}), 
 which gives a very concrete and computable way to check
 whether or not a variety has height \(1\).
 The main theorem of Kawakami, Takamatsu, and Yoshikawa
@@ -73,11 +77,12 @@ to higher heights which gives a
 computable way to check whether a variety has height \(h\).
 Moreover, they provide a simpler version
 (\cite[Theorem~C]{kty-2022-fedder})
-in the case when \(x\) is a Calabi-Yau hypersurface
+in the case when \(X\) is a Calabi-Yau hypersurface
 (and thus also for quartic K3 surfaces).
 However, the algorithm used to actually compute the examples
 in \cite{kty-2022-fedder} is not especially practical
 as it requires multiplying many large polynomials
+% FEEDBACK this thing
 (cite private correspondence here),
 limiting the computation 
 to characteristic \(3\).
@@ -104,9 +109,9 @@ including some that can be implemented on the GPU.
 The remaining algorithm is bottlenecked by the operation
 of raising a polynomial to a large power, 
 so we implement this on the GPU as well using 
-a Fast Fourier Transform approach.
+a Fast Fourier Transform (FFT) approach.
 Our algorithms and implementations lead to a high throughput
-of K3 surfaces per second over \(\mathbb{F}_{5}\) and
+of heights of K3 surfaces per second over \(\mathbb{F}_{5}\) and
 \(\mathbb{F}_{7}\).
 Our implementations can also handle \(\mathbb{F}_{11}\) 
 and \(\mathbb{F}_{13}\), though
@@ -115,6 +120,7 @@ calculating the Newton polygon.
 
 All of our algorithms are implemented in Julia, and
 make use of the OSCAR computer algebra system.
+% FEEDBACK does oscar need a citation?
 Code from this work is open source and available online 
 in various
 Julia packages: MMPSingularities.jl,
@@ -128,9 +134,8 @@ In Section 3, we describe the naive implementation of
 our modification.
 In Section 4, we describe our algorithms for calculating the matrix
 of the key linear operator which we term ``multiplying then splitting''.
-In Section 5, we describe our GPU implementation of the Number-Theoretic
-Transform (NTT), which is a finite field variant of the Fast
-Fourier Transform.
+In Section 5, we describe our GPU implementation of the Number Theoretic
+Transform, which is a finite field variant of the FFT.
 In Section 6, we describe the considerations we need to keep in mind
 to use CUBLAS.
 In Section 7, we describe the computation of surfaces of all possible
@@ -139,7 +144,7 @@ heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
 Throughout the paper, we do various timing tests to compare various
 approaches for each computational step.
-All timign tests were done with 
+All timing tests were performed with 
 an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.
 
 \subsection{Acknowledgements}

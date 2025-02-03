@@ -1,18 +1,17 @@
-%In this section, we explore algorithms for raising multivariate homogeneous polynomials to powers. Specifically, we consider the benefits mass parallelization using the GPU gives.
-
-%\subsection{Kronecker Substitution and Homogeneity}
-
-%In multivariate polynomial arithmetic, it is commonplace to map a multivariate polynomial to a univariate 
-%polynomial. This is because a comparison between two exponent tuples $(d_1, \dots , d_n)$ of monomials 
-%$x_1^{d_1} \dots x_n^{d_n}$ is $n$ times slower than comparing two integers. This also allows us to use the vast majority of polynomial powering algorithms, which take in univariate polynomials. One method of mapping a multivariate polynomial to a sparse univariate polynomial is the Kronecker Substitution:
-
-
-In this section, we give an overview of how Algorithm \ref{alg:calc:delta1} is computed. Specifically, we focus on Step 3, \(D \gets \tilde{f}^{p}\), which turns out to be the main bottleneck. We first explain our implementation of polynomial powering using the number theoretic transform (NTT), then explore other known polynomial powering algorithms and their ability to be sped up through mass parallelization.
+In this section, we describe how Algorithm \ref{alg:calc:delta1} 
+is computed. Specifically, we focus on Step 3, 
+\(D \gets \tilde{f}^{p}\), which is the main 
+bottleneck. We first explain our implementation 
+of polynomial powering using the Number Theoretic 
+Transform (NTT), then explore other known polynomial 
+powering algorithms and their ability to be sped up 
+through mass parallelization.
 
 \subsection{Multi-modular NTT}
 
 \subsubsection{Kronecker Substitution}
-We reduce the problem of multivariate polynomial powering to univariate
+We reduce the problem of multivariate 
+polynomial powering to univariate polynomial powering
 by the Kronecker substitution.
 Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
 $f \in R[x_1, \dots, x_n]$. 
@@ -38,67 +37,42 @@ so we may recover the product in
 the product in the ring \(R[z]\).
 
 \begin{rmk}
-    In FLINT, exponent tuples are bitpacked into unsigned integers. The process of bitpacking an array is a Kronecker Substitution with $M$ being a power of 2.
+    In FLINT, exponent tuples are bitpacked into unsigned 
+    integers. The process of bitpacking an array is a 
+    Kronecker Substitution with $M$ being a power of 2.
 \end{rmk}
 
 In the case where our polynomial is homogeneous, 
-we can simply ignore one variable in all of our operations between monomials of the same degree. 
+we can simply ignore one variable in all of our 
+operations between monomials of the same degree. 
 As above, algebraically this is applying the evaluation
 homomorphism \(x_{n} \mapsto 1\).
 This map is of course not injective, but it is injective on homogeneous elements.
 This effectively decreases the number of variables of our polynomial by 1, 
 which greatly lowers the degree of the univariate result of the
 Kronecker Substitution.
-This improvement is essential for dense algorithms like the FFT.
+This improvement is essential for dense algorithms like the NTT.
 
-%\subsection{NTT}
-
-%The FFT is a very well-known algorithm, with one of its many applications being raising dense univariate polynomials to powers.
-%Because we are working with integers, we use the Number Theoretic Transform (NTT), its finite field counterpart. We also refer to the NTT with ``multi-modular FFT''.
-%
-%To begin, we first define the length of an NTT:
-%
-%\begin{defn}
-%    Given a NTT from $\mathbb{F}_p^L \rightarrow \mathbb{F}_p^L$, the \textbf{length} of the NTT is $L$.
-%\end{defn}
-%
-%A quick overview of the NTT algorithm for polynomial powering is given:
-%
-%\begin{algorithm}[H]
-%    \caption{NTT Algorithm for polynomial powering}
-%    \label{nttpowalg}
-%    \begin{algorithmic}[1]
-%    \State \textbf{Inputs}: $f$: a dense representation of a polynomial, $p$: a NTT prime, $pow$: an integer
-%    \State \textbf{Output}: dense representation of $f ^ p$
-%	\State $finalDegree \gets degree(f) * pow$
-%    \State $L \gets d + 1$
-%    \State $f \gets padToL(f)$ \Comment{Append $0$'s to the end of $f$ until $f$ has length $L$}
-%    \State $f' \gets NTT(f, p)$
-%    \State $f \gets f$ .\textasciicircum $pow$ \Comment{Raise each index of $f$ to $pow$}
-%    \State $f \gets INTT(f, p)$
-%    \State \Return $f$
-%    \end{algorithmic}
-%\end{algorithm}
-
-%To raise univariate polynomials to powers, we implement a GPU-accelerated
-%multimodular NTT algorithm.
 \subsubsection{Polynomial Powering using NTTs}
 The \(k\)-th power of a univariate polynomial \(f\)
-may be computed mod \(p\) by taking the number theoretic transform 
+may be computed mod \(p\) by taking the NTT 
 of a tuple containing the coefficients of \(f\),
 raising the components to the \(k\),
-and then computing the inverse number theoretic transform.
+and then computing the Inverse Number Theoretic Transform (INTT).
 The multimodular algorithm 
 computes \(f^{k}\) in the integers by
 choosing many primes \(p_{i}\), 
 and combining the results using the Chinese remainder theorem.
-In practice, one uses the fast Fourier transform (FFT),
 Thus, our algorithm is known as the 
 multi-modular NTT approach to raising polynomials to powers.
 
-In many cases, using the Kronecker Substitution to map a multivariate polynomial to a univariate polynomial results in 
-a sparse univariate polynomial. As a result, dense algorithms like the NTT become inefficient in both time and memory complexity when compared to sparse algorithms.
-However, the massive throughput of GPUs allows the NTT to be competitive for many cases, 
+In many cases, using the Kronecker Substitution to 
+map a multivariate polynomial to a univariate polynomial results in 
+a sparse univariate polynomial. As a result, dense 
+algorithms like the NTT become inefficient in both 
+time and memory complexity when compared to sparse algorithms.
+However, the massive throughput of GPUs allows the 
+NTT to be competitive for many cases, 
 quartic K3 surfaces being one of them.
 
 \subsubsection{NTT Implementation}
@@ -130,19 +104,20 @@ These are cached, so that they can be used again for problems with the same shap
 
 Our algorithm also has fallbacks when the memory required becomes too large for the 
 GPU's on-device memory.
-When the problem becomes too big to fit the twiddle factors for 
-all of the NTTs
-in device memory at once, we move the twiddle factors to GPU memory and 
+When the problem becomes too big to fit the twiddle factors and 
+inputs for all of the NTTs in device memory at once, 
+we move the twiddle factors to GPU memory and 
 back to RAM for each NTT. Because we suddenly are forced to move a lot 
 of memory around for each NTT, we see a large drop-off in 
-performance when this 
-NTT size threshold is reached. 
+performance when this NTT size threshold is reached. 
 
 
 \subsubsection{Prime Selection}
 In order for the NTT to simulate polynomial powering over $\mathbb{Z}$, 
-we need to obtain an upper bound $M$ on the resulting coefficients, then 
-choose primes $p_1 \dots p_k$ such that $p_1 \cdot p_2 \cdot ... \cdot p_k > M$
+we need to obtain an upper bound $M$ 
+on the resulting coefficients, then 
+choose primes $p_1 \dots p_k$ such 
+that $p_1 \cdot p_2 \cdot ... \cdot p_k > M$.
 
 Experimentally, modular multiplication with 32-bit integers 
 is slightly over double the speed of modular 
@@ -157,27 +132,37 @@ within 62 bits, because of the precision of Barrett Reduction.
 \subsubsection{Bound Finding}
 %This poses the question of finding the maximum coefficient of our result $M$. 
 The multimodular NTT requires an upper bound $M$ in order to select primes 
-to compute NTTs in. In this section, we present a quick way to compute an 
-upper bound on the resulting coefficients of raising a polynomial to a power.
+to compute NTTs in. In this section, we present a quick way to compute a 
+relatively tight upper bound on the resulting 
+coefficients of raising a homogeneous polynomial to a power, which
+will allow for easier application of the NTT in polynomial powering
+problems.
 
 \begin{defn}
     Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, where $I_i$ are distinct degree sequences of equal length, the maximum polynomial is $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, where $m$ is a non-inclusive upper bound on the coefficients.
 \end{defn}
 
-This is effectively just saying to consider the worst-case polynomial 
+This is essentially just saying to consider the ``worst-case'' polynomial 
 for our bound-finding computations.
 
-For small problems, we can simply plug the maximum polynomial $g$ into FLINT, compute $g ^ p$, and 
+For small problems, we can simply plug the maximum 
+polynomial $g$ into FLINT, compute $g ^ p$, and 
 iterate through the resulting terms to obtain an upper bound.
 We know this computation will be correct because FLINT uses GMP,
 and it also must be the optimal bound on the coefficients. 
-However, for larger problems, like bound finding for quartic K3 surfaces over $\mathbb{F}_{11}$ or $\mathbb{F}_{13}$, FLINT does not finish the computation in a reasonable amount of time.
-If one only cares about a single shape of the problem (i.e. the same degree, \(k\), and charachteristic),
+However, for larger problems, like bound finding for 
+quartic K3 surfaces over $\mathbb{F}_{11}$ or $\mathbb{F}_{13}$, 
+FLINT does not finish the computation in a reasonable amount of time.
+If one only cares about a single shape of the problem 
+(i.e. the same degree, \(k\), and charachteristic),
 this might be acceptable.
-However, for a single computation, it completely removes the advantage of using the GPU,
-since we must perform an expensive CPU mutliplication to set up the algorithm.
+However, for a single computation, it completely removes 
+the advantage of using the GPU, since we must perform an 
+expensive CPU mutliplication to set up the algorithm.
 
-Alternatively, we can obtain a relatively tight upper bound for the case of raising a homogeneous multivariate polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power
+Alternatively, we can obtain a relatively tight upper 
+bound for the case of raising a homogeneous multivariate 
+polynomial over $\mathbb{F}_p[x_1, \dots , x_k]$ to a power
 by bounding the number of terms in the power. 
 
 \begin{thm}
@@ -295,7 +280,7 @@ quasi-\(F\)-split height of a quartic surface over \(\mathbb{F}_{5}\).
 \end{figure}
 
 Note that the above numbers are really the GPU beating the CPU.
-The FFT is a dense algorithm, while FLINT uses a sparse algorithm.
+The NTT is a dense algorithm, while FLINT uses a sparse algorithm.
 We do not know which algorithm MAGMA uses for polynomial powering
 in the integers.
 In theory, such a sparse algorithm should
@@ -311,5 +296,6 @@ improvements for every polynomial powering
 problem. Generally, the NTT is powerful when the resulting 
 coefficients are small, and the polynomial is reasonably dense. 
 In more sparse problems, as discussed before in section \ref{sec:poly:other}, 
-the algorithms benefit less from parallelization, making them more 
+the NTT is less effective, and other algorithms benefit less 
+from parallelization, making them more 
 suited for the CPU instead.
