@@ -81,7 +81,7 @@ We use the Merge-NTT with Barrett modular reduction from \cite{ozcan-2023-fft}, 
 Because of this, our NTT length $L$ is always a power of $2$. 
 
 For each NTT we perform, we search for primes $p$ that satisfy 
-$p \equiv 1 \mod 2L$, compute primitive $L$th roots of unity 
+$p \equiv 1 \mod L$, compute primitive $L$th roots of unity 
 for each $p$, and $L^{-1} \mod p$. 
 These are cached, so that they can be used again for problems with the same shape 
 (i.e. the degree of \(f\), the exponent \(k\), and the characteristic are the same).
@@ -106,9 +106,12 @@ Our algorithm also has fallbacks when the memory required becomes too large for 
 GPU's on-device memory.
 When the problem becomes too big to fit the twiddle factors and 
 inputs for all of the NTTs in device memory at once, 
-we move the twiddle factors to GPU memory and 
-back to RAM for each NTT. Because we suddenly are forced to move a lot 
-of memory around for each NTT, we see a large drop-off in 
+we move the inputs to GPU memory and 
+back to RAM for each NTT, and don't cache
+twiddle factors. Because we suddenly are forced to move a lot 
+of memory around for each NTT, and run $\log_2(L)$ modular 
+exponentiations in each thread,
+we see a large drop-off in 
 performance when this NTT size threshold is reached. 
 
 
@@ -126,7 +129,7 @@ However, the kernels and parameters from Merge-NTT are more
 optimized for 64-bit integers, making them just over half the
 speed of naively using the same implementation with 32-bit 
 integers. Thus, for prime selection, 
-we choose primes satisfying $p \equiv 1 \mod 2L$ that fit 
+we choose primes satisfying $p \equiv 1 \mod L$ that fit 
 within 62 bits, because of the precision of Barrett Reduction.
 
 \subsubsection{Bound Finding}
