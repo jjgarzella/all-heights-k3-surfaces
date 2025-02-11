@@ -41,7 +41,7 @@ the map is zero.
 Our first observation is that naively 
 multiplying and then applying \(u\) 
 as in Algorithm \ref{alg:naive:u}
-does a lot of unnecessary work.
+does plenty of unnecessary work.
 In particular, any term in the 
 product \(\Delta g\) with exponents 
 not congruent to 
@@ -49,7 +49,7 @@ not congruent to
 is not needed. 
 Even if \(g\) is a monomial, giving a linear
 algorithm for multiplication, using naive
-multiplication stores a lot of unnecessary terms
+multiplication stores a large amount of unnecessary terms
 in memory.
 Both of the our improved algorithms ignore
 all of these unnecessary terms.
@@ -111,7 +111,7 @@ of the monomial basis of \(S_{\ell}\).
     and $L_{\Delta} = length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
     In the case of the quasi-F-split height of a K3 surface, 
     $L_{d} = \binom{n(p - 1) + n - 1}{n - 1} = \binom{np - 1}{n - 1}$, 
-    and $L_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$
+    and $L_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$.
 \end{rmk}
 
 %\begin{cxt}
@@ -140,7 +140,7 @@ of the monomial basis of \(S_{\ell}\).
 	not killed by \(u\).
 \end{defn}
 
-Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$
+Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
 
 %We now present our first algorithm.
 % Notes for complexity calculations:
@@ -403,7 +403,7 @@ the following algorithm, which we call \wics:
     \end{algorithmic}
 \end{algorithm}
 
-Again, letting $L_{d} = length(M_d)$ and 
+Letting $L_{d} = length(M_d)$ and 
 $L_{\Delta} = length(\Delta)$, this algorithm 
 generates the matrix in 
 $O \left( L_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.

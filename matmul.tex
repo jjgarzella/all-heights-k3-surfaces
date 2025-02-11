@@ -35,7 +35,7 @@ For example, on Nvidia devices, Float32 multiplication
 is twice as fast as Int32 multiplication, and Float64
 multiplication is supported in hardware while Int64 multiplication
 is not.
-Moreover, the IEEE standards guarantee that integer multiplication (i.e. only use the mantissa) 
+Moreover, the IEEE standards guarantee that integer multiplication (i.e. those that only use the mantissa) 
 is guaranteed to be exact even in floating point types. 
 Thus, we can freely treat floating points as an integer type of smaller size.
 This trick has been utilized many times in the literature (e.g. see \cite{bglm-2024-matmul-modp}).
@@ -63,12 +63,12 @@ respectively
 Thus, we see that for \(p \leq 11\), we can use a fully floating-point
 library like CUBLAS naively. 
 \footnote{
-    Note that we use OpenBLAS and CUBLAS, 
+    Note that we use OpenBLAS and CUBLAS; 
     we are really using Julia wrappers
     provided by libraries such as Oscar, 
     CUDA.jl, or the Julia standard library.
     Note that MAGMA also provides
-    a mod p matrix multiplication implementation,
+    a mod $p$ matrix multiplication implementation,
     which (according to its documentation) wraps CUBLAS for 
     for p=11 and
     p=13. 

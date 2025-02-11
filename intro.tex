@@ -55,9 +55,8 @@ Kawakami, Takamatsu, and Yoshikawa in \cite{kty-2022-fedder}
 have given examples of quartic K3 surfaces
 of all possible heights over \(\mathbb{F}_{3}\).
 
-The method of Kawakami, Takamatsu, and Yoshikawa is
-to consider, instead of the Artin-Mazur height,
-a different quantity called the
+The method of Kawakami, Takamatsu, and Yoshikawa considers, 
+instead of the Artin-Mazur height, a different quantity called the
 \textit{quasi-\(F\)-split height} 
 (see Section 2 for a definition),
 which is known to be the same as the Artin-Mazur height
@@ -65,7 +64,7 @@ for Calabi-Yau varieties, and thus K3 surfaces.
 The theory of the quasi-\(F\)-split height has its
 roots in the theory of \(F\)-singularites and commutative
 algebra/birational geometry in characteristic \(p\).
-In particular, one theorem which has been fundamental
+In particular, one theorem fundamental
 to the development of the theory of \(F\)-singularities
 is Fedder's criterion (Theorem \ref{thm:fedder:criterion}), 
 which gives a very concrete and computable way to check
@@ -97,7 +96,7 @@ Our main insight is that one can one of the main
 bottlenecks of the problem into many repeated matrix-vector
 multiplications, for a square matrix of size 
 \(\binom{4p-1}{3}\).
-That way, we can use Nvidia's CUBLAS library 
+Because of this, we can use Nvidia's CUBLAS library 
 \cite{nvidia-2024-cublas}
 to perform the matrix multiplications
 on the GPU, making such computations
@@ -114,9 +113,8 @@ Our algorithms and implementations lead to a high throughput
 of heights of K3 surfaces per second over \(\mathbb{F}_{5}\) and
 \(\mathbb{F}_{7}\).
 Our implementations can also handle \(\mathbb{F}_{11}\) 
-and \(\mathbb{F}_{13}\), though
-they don't turn out to be faster than known methods of
-calculating the Newton polygon.
+and \(\mathbb{F}_{13}\), though they are slower than known methods
+of calculating the Newton polygon.
 
 All of our algorithms are implemented in Julia, and
 make use of the OSCAR computer algebra system.
@@ -142,7 +140,7 @@ In Section 7, we describe the computation of surfaces of all possible
 heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
 
-Throughout the paper, we do various timing tests to compare various
+Throughout the paper, we do various time tests to compare various
 approaches for each computational step.
 All timing tests were performed with 
 an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.

@@ -68,7 +68,7 @@ multi-modular NTT approach to raising polynomials to powers.
 
 In many cases, using the Kronecker Substitution to 
 map a multivariate polynomial to a univariate polynomial results in 
-a sparse univariate polynomial. As a result, dense 
+a sparse univariate polynomial. As such, dense 
 algorithms like the NTT become inefficient in both 
 time and memory complexity when compared to sparse algorithms.
 However, the massive throughput of GPUs allows the 
@@ -107,10 +107,9 @@ GPU's on-device memory.
 When the problem becomes too big to fit the twiddle factors and 
 inputs for all of the NTTs in device memory at once, 
 we move the inputs to GPU memory and 
-back to RAM for each NTT, and don't cache
-twiddle factors. Because we suddenly are forced to move a lot 
-of memory around for each NTT, and run $\log_2(L)$ modular 
-exponentiations in each thread,
+back to RAM for each NTT, not caching the twiddle factors. 
+Because we are forced to move a lot of memory around for each NTT, 
+and run $\log_2(L)$ modular exponentiations in each thread,
 we see a large drop-off in 
 performance when this NTT size threshold is reached. 
 
@@ -145,7 +144,7 @@ problems.
     Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, where $I_i$ are distinct degree sequences of equal length, the maximum polynomial is $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, where $m$ is a non-inclusive upper bound on the coefficients.
 \end{defn}
 
-This is essentially just saying to consider the ``worst-case'' polynomial 
+This is saying we should consider the ``worst-case'' polynomial 
 for our bound-finding computations.
 
 For small problems, we can simply plug the maximum 
