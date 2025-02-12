@@ -1,6 +1,6 @@
 Given a variety \(X\) over a field of characteristic \(p\),
 Artin and Mazur in \cite{artin-mazur-1977-height}
-define height \(h(X) \in \mathbb{N} \cup \{\infty\}\) 
+define the height \(h(X) \in \mathbb{N} \cup \{\infty\}\) 
 (sometimes written \(h\) if \(X\) is obvious from the context)
 to be the height 
 of a certain formal group \(\Phi\) associated to \(X\).
@@ -119,8 +119,9 @@ of raising a polynomial to a large power,
 so we implement this on the GPU as well using 
 a Fast Fourier Transform (FFT) approach.
 Our algorithms and implementations lead to a high throughput
-of heights of K3 surfaces per second over \(\mathbb{F}_{5}\) and
-\(\mathbb{F}_{7}\).
+of heights of K3 surfaces: 
+about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
+about 180 surfaces per second over \(\mathbb{F}_{7}\).
 Our implementations can also handle \(\mathbb{F}_{11}\) 
 and \(\mathbb{F}_{13}\), though they are slower than known methods
 of calculating the Newton polygon (e.g. 

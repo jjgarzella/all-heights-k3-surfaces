@@ -77,7 +77,8 @@ quartic K3 surfaces being one of them.
 
 \subsubsection{NTT Implementation}
 
-We use the Merge-NTT with Barrett modular reduction from \cite{ozcan-2023-fft}, ported over to Julia, for our NTT implementation. 
+We use the Merge-NTT with Barrett modular reduction from \cite{ozcan-2023-fft}, 
+ported to Julia, for our NTT implementation. 
 Because of this, our NTT length $L$ is always a power of $2$. 
 
 For each NTT we perform, we search for primes $p$ that satisfy 
@@ -272,9 +273,9 @@ quasi-\(F\)-split height of a quartic surface over \(\mathbb{F}_{5}\).
     \hline                      
     13 & 194.73 & 46.50 & 0.096 \\
     \hline                          
-    14 & 267.57 & 60.07 & 2.55 0.102\\
+    14 & 267.57 & 60.07 & 0.102\\
     \hline                          
-    15 & 359.22 & 76.46 & 2.77 0.109\\
+    15 & 359.22 & 76.46 & 0.109\\
     \hline
 \end{tabular}
 \caption{Polynomial powering times (in seconds) for various powers}

@@ -48,9 +48,9 @@ which suffices for our purposes.
 Let \(\ell\) be the largest possible value of an integer for our data type.
 Each entry ranges from \(0\) to \(N-1\).
 Thus, the maximum number of operations $o$ before our datatype overflows is one less than the value $o'$ such that 
-$o' \cdot (N^2 - 2N - 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integer limit $\ell$. Thus
+$o' \cdot (N^2 - 2N + 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integer limit $\ell$. Thus
 \begin{align*}
-    o = \left\lfloor \frac{\ell}{(N^2 - 2N - 1)} \right\rfloor - 1
+    o = \left\lfloor \frac{\ell}{(N^2 - 2N + 1)} \right\rfloor - 1
 \end{align*}
 
 For Nvidia GPUs, we wish to use the Float32 type, for the primes

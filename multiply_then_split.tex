@@ -78,8 +78,9 @@ sometimes use this term.
     \(d_{1} + \ldots + d_{n} = k\).
 \end{defn}
 
-For example,
-$wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$.
+\begin{ex}
+    $wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$.
+\end{ex}
 
 Thus, $wics(d, n)$ generates the exponent tuples of the 
 monomial basis of the vector space of $d$-homogeneous 
@@ -284,7 +285,7 @@ which we call \merge:
 
 Note that the inner while loops account for the fact that
 after modding by \(p\), one does not expect 
-either array to have unique keys.
+either array to have unique elements.
 The algorithm is justified by the previous corollaries.
 
 In practice, instead of sorting the arrays in place, 
@@ -310,6 +311,11 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
     \]
     where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}
 \end{lem}
+
+\begin{proof}
+    Direct computation from the defintions of weak integer compositions and matching terms.
+\end{proof}
+
 
 Because this expression is quite convoluted, we 
 provide an example of a computation 
@@ -379,8 +385,7 @@ the following algorithm, which we call \wics:
 		    \State $c \gets indexof(m,M_{d})$
 			\State res $\gets (exps(\delta) + exps(m) - (p-1, \ldots, p-1)) / p$
 			\State $r \gets indexof(\text{res},M_{d^{\prime}})$
-            % FEEDBACK I'm pretty sure this is a = instead of +=
-            \State $\text{mat}[r, c] += coeff(\delta)$
+            \State $\text{mat}[r, c] = coeff(\delta)$
         \EndFor
     \EndFor
     \State \Return mat
