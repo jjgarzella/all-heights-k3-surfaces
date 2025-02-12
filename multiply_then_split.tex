@@ -1,4 +1,3 @@
-% Move these to main.tex eventually maybe
 
 To find the matrix of ``multiply then split''
 in the Algorithm for the quasi-\(F\)-split height
@@ -9,6 +8,8 @@ and then apply the map \(u\).
 Here, we consider a slightly more general problem.
 As usual, let \(S = k[x_{1}, \ldots, x_{n}]\).
 Let $S_\ell$ denote the vector space of homogeneous degree $\ell$ polynomials in \(S\).
+We let \(M_{\ell}\) denote a lexographically-ordered list
+of the monomial basis of \(S_{\ell}\).
 Fix some \(D \in \mathbb{N}\), and let \(\Delta \in S_D\).
 In algorithms, we will sometimes conflate \(\Delta\) 
 with a list containing all its terms.
@@ -98,8 +99,6 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
 %    This gives $\binom{n + k - 1}{k - 1}$.
 \end{proof}
 
-We let \(M_{\ell}\) denote a lexographically-ordered list
-of the monomial basis of \(S_{\ell}\).
 
 \begin{rmk}
     The number of terms of \(\Delta\) is bounded 
@@ -127,14 +126,7 @@ of the monomial basis of \(S_{\ell}\).
 
 \begin{defn}
 	Let \(m\) be a monomial in \(S\). 
-	Then we say that \(m\) \textbf{matches}
-    % FEEDBACK We should figure out which definitions
-    % to bold terms in. I'm thinking of 3 options:
-    % 1. Bold the "main words" of all definitions
-    % 2. Bold the "main words" of the definitions where 
-    % we introduce our own terminology. (matches, exponent tuples)
-    % 3. No bolding
-    % I'm split between 1 and 2
+	Then we say that \(m\) \textit{matches}
 	with another monomial \(m^{\prime}\) 
 	if the monomial \(mm^{\prime}\) is
 	not killed by \(u\).
@@ -152,9 +144,6 @@ Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p 
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    % FEEDBACK the meaning of M_d' took me some finding in the beginning of 
-    % the section, maybe we need a \begin{notation} or something before this
-    % to make the pseudocode easier to read through
     \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
 	matrix representing $\theta$
     \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
@@ -205,8 +194,6 @@ performed in checking whether two terms match.
 	Let \(A = (a_{1}, \ldots, a_{n}),
 	B = (b_{1}, \ldots, b_{n})\)
 	be in \(\{0, \ldots, p-1\}^{n} \ins \mathbb{Z}^{n}\).
-% FEEDBACK maybe we can have some notation for (p-1, ..., p-1)? 
-% it shows up enough that things can seem a lot cleaner without it
 	Then \(A + B = 
 	(p-1, \ldots, p-1) \mod p\)
 	if and only if 
@@ -245,8 +232,7 @@ match mod \(p\).
 	lexographical ordering.
 	If \(A \leq_{lex} B\),
 	then 
-	\(m(A) \leq_{lex} m(B)\)
-    % FEEDBACK shouldn't this be the other way around
+	\(m(B) \leq_{lex} m(A)\)
 \end{cor}
 
 \begin{proof}
@@ -263,9 +249,7 @@ which we call \merge:
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
 \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
-	matrix representing $\theta$
-    % FEEDBACK If we are deciding to call this theta, then we should go back
-    % and replace a lot of "multiply then split"'s with theta.
+	matrix representing ``multiply then split''
 \State mat \(\gets zeros(length(M_{d}), length(M_{d^{\prime}}))\) 
 \State $L \gets [exps(\delta) \% p ~|~ \delta \in \Delta]$
 \State $R \gets [exps(m) \% p ~|~ m \in M_{d}]$
@@ -396,7 +380,7 @@ the following algorithm, which we call \wics:
 			\State res $\gets (exps(\delta) + exps(m) - (p-1, \ldots, p-1)) / p$
 			\State $r \gets indexof(\text{res},M_{d^{\prime}})$
             % FEEDBACK I'm pretty sure this is a = instead of +=
-            \State $\text{mat}[r, c] = coeff(\delta)$
+            \State $\text{mat}[r, c] += coeff(\delta)$
         \EndFor
     \EndFor
     \State \Return mat
@@ -413,9 +397,6 @@ by Corollary \ref{cor:num:matches}, which is
 effectively constant for all reasonably computable $n$ and $p$
 
 \subsection{Implementation}
-% FEEDBACK I think it should be specified somewhere that all of 
-% algorithms give huge improvements for when there are a lot of terms, like
-% our algorithms are probably slower for finding h(x^4 + y^4 + z^4 + w^4 + x^2y^2)
 
 In the implementation of \triv, \merge, and \wics, there are a 
 few optimizations and considerations common to all the implementations.
@@ -456,7 +437,7 @@ so we don't bother developing the modified parallel merge.
 
 Below in Figure \ref{fig:momts:compare}, we compare running times 
 for all the \(p\) which we consider. 
-\wics ends up being the fastest practically, 
+\wics \, ends up being the fastest practically, 
 both on the CPU and the GPU.
 We did not try running the tests for the 
 trivial algorithm on the 
@@ -483,7 +464,7 @@ amount of time.
     \hline
 \end{tabular}
 \caption{Comparison of timings for various algorithms that calculate
-the matrix of $\theta$. 
+the matrix of ``multiply then split''. 
 Times are in seconds
 and are an average of 10 different trials.}
 \end{center}

@@ -12,7 +12,7 @@ K3 surface (i.e. a surface for which \(\omega_{X} \isom \mathcal{O}_{X} \)
 and \(H^{1}(X,\mathcal{O}_{X} ) = 0\)).
 In this case, \(h\) determines the \textit{Newton polygon}
 of \(X\), which in turn gives partial information about the 
-point counts of \(X\).
+point counts of \(X\) over finite fields.
 In this case, the Newton polygon equals the Hodge polygon
 (i.e. the variety is ordinary) if and only if \(h=1\),
 and the Newton polygon is supersingular if and only if 
@@ -28,22 +28,27 @@ Given a field \(k\) of characteristic \(p\), one may ask
 In the case that \(X\) is a K3 surface, it is known from the 
 original work of Artin and Mazur
 that either \(1 \leq h(X) \leq 10\) or \(h = \infty\).
-% FEEDBACK
-% Replaced this line with the uncommented line 
-% A naive guess is that all such \(h\) should occur.
-They conjectured that all such $h$ are taken on by K3 surfaces
+One expects that such $h$ are taken on by K3 surfaces
 in characteristic $p$.
-% (corollary 7.7 from the artin paper)
+For example, in \cite{artin-1974-k3-surfaces},
+Artin shows\footnote{
+    Artin showed this conditionally, dependent on flat
+    duality for surfaces, which was later proved
+    by Milne in \cite{milne-1976-flat-duality}.
+}
+that this holds over an algebraically
+closed field \(k\) of characteristic \(p\) in the
+case that \(p = 3 \mod 4\).
 In \cite{taelman-2016-k3-given-l-function}, 
-Taelman showed that
-this is the case
-for some sufficiently big finite field \(\mathbb{F}_{q}\). 
+Taelman shows that
+all possible \(h\) are realized
+over some sufficiently big finite field \(\mathbb{F}_{q}\). 
 By base change, this implies the result for extensions
-thereof.
-
-However, this argument is not constructive,
+thereof (e.g. algebraically closed fields).
+However, Taelman's argument is not constructive,
 and there is no known bound on how big \(q\) must be to guarentee
 existence of surfaces of any height.
+
 More concretely, it follows from the work of
 Kedlaya and Sutherland in 
 \cite{kedlaya-sutherland-2016-census-k3-f2}
@@ -55,7 +60,7 @@ Kawakami, Takamatsu, and Yoshikawa in \cite{kty-2022-fedder}
 have given examples of quartic K3 surfaces
 of all possible heights over \(\mathbb{F}_{3}\).
 
-The method of Kawakami, Takamatsu, and Yoshikawa considers, 
+Kawakami, Takamatsu, and Yoshikawa consider, 
 instead of the Artin-Mazur height, a different quantity called the
 \textit{quasi-\(F\)-split height} 
 (see Section 2 for a definition),
@@ -78,13 +83,17 @@ Moreover, they provide a simpler version
 (\cite[Theorem~C]{kty-2022-fedder})
 in the case when \(X\) is a Calabi-Yau hypersurface
 (and thus also for quartic K3 surfaces).
-However, the algorithm used to actually compute the examples
-in \cite{kty-2022-fedder} is not especially practical
+The forthcoming work 
+\cite{fgmq-2025-witt-vectors-macaulay2} 
+provides an implementation of Theorem A.
+However, this algorithm (and the ones used to compute
+the examples
+in \cite{kty-2022-fedder}) is not especially practical
 as it requires multiplying many large polynomials
-% FEEDBACK this thing
-(cite private correspondence here),
-limiting the computation 
-to characteristic \(3\).
+(\cite{takamatsu-2024-algorithm}, 
+\cite{fgmq-2025-witt-vectors-macaulay2}),
+limiting the computation to
+very low characteristic.
 
 In this work, we push the method of Kawakami,
 Takamatsu, and Yoshikawa to the limits of readily
@@ -114,16 +123,20 @@ of heights of K3 surfaces per second over \(\mathbb{F}_{5}\) and
 \(\mathbb{F}_{7}\).
 Our implementations can also handle \(\mathbb{F}_{11}\) 
 and \(\mathbb{F}_{13}\), though they are slower than known methods
-of calculating the Newton polygon.
+of calculating the Newton polygon (e.g. 
+\cite{chk-2019-toric-controlled-reduction}).
 
-All of our algorithms are implemented in Julia, and
-make use of the OSCAR computer algebra system.
-% FEEDBACK does oscar need a citation?
+All of our algorithms are implemented in Julia 
+\cite{julia-2017}, and
+make use of the OSCAR computer algebra system 
+\cite{OSCAR-book}.
 Code from this work is open source and available online 
 in various
-Julia packages: MMPSingularities.jl,
-GPUFiniteFieldMatrices.jl, GPUPolynomials.jl,
-and NTTs.jl.
+Julia packages: 
+MMPSingularities.jl \cite{mmpsingularities-jl},
+GPUFiniteFieldMatrices.jl \cite{gpuffmatrices-jl}, 
+GPUPolynomials.jl \cite{gpupolynomials-jl},
+and CudaNTTs.jl \cite{cudantts-jl}.
 
 In Section 2, we give background on the quasi-\(F\)-split height
 and Fedder's criterion.
@@ -139,7 +152,6 @@ to use CUBLAS.
 In Section 7, we describe the computation of surfaces of all possible
 heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
-
 Throughout the paper, we do various time tests to compare various
 approaches for each computational step.
 All timing tests were performed with 
@@ -147,5 +159,18 @@ an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.
 
 \subsection{Acknowledgements}
 
-TO BE WRITTEN
+The authors thank the maintainers and support staff 
+of the UCSD research cluster for use of their devices,
+and Wilson Cheung for much helpful tech support.
+Furthermore, they thank the authors of 
+\cite{kty-2022-fedder} and \cite{fgmq-2025-witt-vectors-macaulay2}
+for providing preliminary implementations of their
+implementations of Theorem C and Theorem A of 
+\cite{kty-2022-fedder}.
+The second author thanks Jakub Witaszek, Kiran S. Kedlaya,
+Steve Huang, and Karl Schwede for helpful discussions.
+The second author was partially supported by the 
+National Science Foundation Graduate Research
+Fellowship Program under Grant No. 2038238, and a fellowship
+from the Sloan Foundation.
 

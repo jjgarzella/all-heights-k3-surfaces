@@ -30,9 +30,7 @@ moduli space\footnote{
 	though one should be able to make a similar statement
 	for the moduli stack
 } of quartic K3 surfaces,
-we can conclude that the locus 
-% FEEDBACK should this be "in the locus" or something
-% or should "that the locus" just removed
+we can conclude 
 the probability of a random point 
 in the moduli space being in the locus
 \(M_{2}\) is about \(1 / p\). 
@@ -56,8 +54,7 @@ of homogeneous polynomials, which is isomorphic to
 \(\mathbb{F}_{p}^{35}\).
 To obtain the moduli space \(M\) of quartic K3 surfaces, 
 we must projectivize and take the quotient by the action of 
-\(PGL_{4}\) which acts by changes of variables. 
-% FEEDBACK \(PGL_{4}\) looks weird
+\(\text{PGL}_{4}(\mathbb{F}_{p})\) which acts by changes of variables. 
 Thus, there may be two sources of deviation from the expected
 probability--the group quotient and the actual 
 error term in the estimate.
@@ -93,7 +90,7 @@ per second.
 Thus, the expected compute time to compute
 a height = \(10\) example is 
 \(7^{9} / 185 \approx \) 218,127 seconds, or about 
-60 hours.
+60 compute hours.
 The actual times to find the examples were much 
 longer than this, because the authors were using a 
 less-optimized NTT and had not yet discovered \(\wics\) 
@@ -101,9 +98,8 @@ and were using \(\merge\) instead.
 
 For $p = 11$ and $p = 13$, the threshold for the NTT where 
 GPU memory becomes a bottleneck is reached, and the algorithm 
-faces a sharp drop in speed. The examples below are from a 12
-hour run on the aforementioned 2080 TI's.
-% FEEDBACK I swear I will do this soon
+faces a sharp drop in speed. The examples took about 12 compute hours
+on the aforementioned 2080 TI's.
 
 \begin{figure}[htbp]
 	\begin{center}
