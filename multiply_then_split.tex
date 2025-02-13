@@ -15,7 +15,7 @@ In algorithms, we will sometimes conflate \(\Delta\)
 with a list containing all its terms.
 Furthermore, fix \(d \in \mathbb{N}\).
 We consider the problem of finding the matrix of 
-\(g \mapsto u(\Delta g)\)
+\(g \mapsto u(\Delta * g)\)
 on the space \(S_{d}\).
 The target of this map is
 \(S_{d^{\prime}}\), where
@@ -65,7 +65,7 @@ Use of arbitrary componentwise operations is called
 sometimes use this term.
 
 \begin{defn}
-    The exponent tuple of a monomial 
+    The \textit{exponent tuple} of a monomial 
     $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
 	We will denote it $exps(m)$, and we also 
     define $coeff(m) \colonequals a$
@@ -105,7 +105,7 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
     The number of terms of \(\Delta\) is bounded 
     above by \(\binom{D+n-1}{n-1}\) by Lemma \ref{lem:wics:size}.
     Likewise, the number of elements of 
-    \(M_{d}\) is \(\binom{d+n-1}{n-1}\)
+    \(M_{d}\) is \(\binom{d+n-1}{n-1}\).
     For all of our time complexity calculations, 
     we let $L_{d} = length(M_{d}) = \binom{n + d - 1}{n - 1}$, 
     and $L_{\Delta} = length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
@@ -141,12 +141,13 @@ Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p 
 \subsection{The Trivial Algorithm}
 
 \begin{algorithm}[H]
-    \caption{Matrix of $\theta$: Trivial Algorithm}
+    \caption{Matrix of Multiply then Split: trivial algorithm}
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
     \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
-	matrix representing $\theta$
+	matrix representing ``multiply then split''
+    % CHANGED \theta to multiply then split
     \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
     \For{$m \in M_{d}$}
 	    \State $c \gets indexof(m, M _{d})$
@@ -221,8 +222,8 @@ performed in checking whether two terms match.
 \end{proof}
 
 Essentially, this corollary says that
-when we consider exponent tuples mod $p$ of 
-arbitrary monomials \(M\),
+when we consider the exponent tuple mod $p$ of 
+an arbitrary monomial of \(M\),
 it has a unique
 match mod \(p\).
 % However, we have even more:
@@ -245,7 +246,7 @@ Using these two corollaries, we have the following algorithm,
 which we call \merge:
 
 \begin{algorithm}[H]
-\caption{Matrix of $\theta$: merge-based algorithm}
+\caption{Matrix of Multiply then Split: merge-based algorithm}
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
@@ -373,11 +374,11 @@ by $generateMatchingMonomials(\delta, p, M_d)$, we have
 the following algorithm, which we call \wics:
 
 \begin{algorithm}[H]
-    \caption{Matrix of $\theta$: WICS Algorithm}
+    \caption{Matrix of Multiply then Split: WICS algorithm}
     \label{alg:matrix:WICS}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ matrix representing $\theta$
+    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ matrix representing ``multiply then split''
     \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
     \For{$\delta \in \Delta$}
         \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$

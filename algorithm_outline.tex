@@ -305,7 +305,7 @@ The quasi-\(F\)-split height also gives a generalization
 of Theorem \ref{thm:fsplit:ordinary}:
 
 \begin{thm}
-	If \(f \in S\) is homogenous of degree \(n\),
+	If \(f \in S\) is homogeneous of degree \(n\),
 	then the Artin-Mazur height of \(Z(f)\)
 	is equal to the quasi-\(F\)-split height
 	of \(f\).
@@ -329,6 +329,8 @@ found in \cite{kty-2022-fedder}.
 For the following discussion, 
 let \(k\) be a perfect field of characteristic \(p\) and 
 let \(S := k[x_{1}, \ldots, x_{n}]\).
+% CHANGED all f's to g's in this delta1 section, since f is 
+% the K3 input
 Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{defn}
@@ -340,7 +342,7 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 \end{defn}
 
 The following proposition demonstrates how we can calculate 
-\(\Delta_{1}(f)\) algorithmically.
+\(\Delta_{1}(g)\) algorithmically.
 
 \begin{prop}
 	\label{prop:delta1:formula}
@@ -375,6 +377,8 @@ for calculating the term \(\Delta_{1}(f)\):
 	\label{alg:calc:delta1}
     \begin{algorithmic}[1]
 		\State \textbf{Input:} \(f \in \mathbb{F}_{p}[x_{1}, \ldots, x_{n}]\) 
+		\State \textbf{Output:} $\Delta_1(f)$
+		% CHANGED added output
 		\State \(\tilde{f} \gets \text{lift}(f)\) 
 		\State \(D \gets \tilde{f}^{p}\) 
 		\For{\(t \in \text{terms}(\tilde{f})\) }
@@ -427,7 +431,7 @@ exponents.
 \caption{Splitting of Frobenius}
 \label{alg:naive:u}
 \begin{algorithmic}[1]
-\State \textbf{Input:} \(f\) 
+\State \textbf{Input:} \(f \in S\) 
 \State \textbf{Output:} \(u(f)\) considered as an element of \(S\).
 \State Discard all terms of \(f\) whose exponents are not congruent to
 	\((p-1, \ldots, p-1)\) mod p.
@@ -455,23 +459,26 @@ algorithm to calculate the quasi-F-split height.
 \caption{Quasi-\(F\)-Split Height: naive algorithm}
 \label{alg:qfs:naive}
 \begin{algorithmic}[1]
-\State Inputs: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
+\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
 	polynomial of degree \(n\) in \(S\).
+% CHANGED added output
+\State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
 \If{\(g \not\in \mathfrak{m}^{p}\) }
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(n \gets 2\) 
+% CHANGED renamed n to h, since n is the degree of the polynomial
+\State \(h \gets 2\) 
 \While{true}
-    \If{\(b < n\)}
+    \If{\(b < h\)}
         \State \Return \(\infty\)
     \EndIf
     \State \(g \gets u(\Delta * g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
     \If{\(g \notin \mathfrak{m}^{p}\)}
-        \State \Return \(n\) 
+        \State \Return \(h\) 
     \EndIf
-    \State \(n \gets n + 1\)
+    \State \(h \gets h + 1\)
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
@@ -520,9 +527,9 @@ The bottleneck ends up being polynomial multiplication,
 in two places:
 \begin{enumerate}[(1)]
     \item raising \(g = f^{p-1}\) to the \(p\)-th power in the integers
-        (in line 3 of Algorithm \ref{alg:calc:delta1})
+        (in line 4 of Algorithm \ref{alg:calc:delta1})
     \item multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
-        (in line 9 of Algorithm \ref{alg:qfs:naive})
+        (in line 13 of Algorithm \ref{alg:qfs:naive})
 \end{enumerate}
 
 \noindent For a quartic K3 surface of characteristic \(5\),
@@ -550,13 +557,14 @@ is \(np(p - 1)\).
 Thus, \(\Delta_{1}(f^{p-1})g\) has degree
 \(n(p^{2} - 1)\); however, the effect 
 of \(u\) on any polynomial is subtracting \(p-1\)
-from and dividing by \(p\) 
-% FEEDBACK Is something missing after "from"
+from the exponents of the terms and dividing by \(p\) 
+% CHANGED subtracting p-1 from and dividing by p ->
+% subtracting p-1 from the exponents of the terms and dividing by p
 (see Algorithm \ref{alg:naive:u}).
 Thus, the map 
 \(g \mapsto u(\Delta_{1}(f^{p-1}) g)\) 
 is a linear map from 
-the space of homogenous polynomials of degree \(n(p-1)\) 
+the space of homogeneous polynomials of degree \(n(p-1)\) 
 to itself.
 As a consequence of this observation,
 if we can efficiently compute the matrix of 
@@ -565,7 +573,7 @@ we can repeatedly apply matrix-vector multiplication.
 
 Furthermore, when \(g\) is written as a vector 
 in the basis of homogeneous monomials of degree
-\(n*(p-1)\), we can test if \(g \notin \mathfrak{m}^{[p]}\) 
+\(n(p-1)\), we can test if \(g \notin \mathfrak{m}^{[p]}\) 
 in an especially simple way: the only 
 monomial that is not in \(\mathfrak{m}^{[p]}\) is
 \(x_{1}^{p-1}\cdots x_{n}^{p-1}\), 
@@ -579,26 +587,28 @@ The algorithm for Fedder's criterion then becomes:
 \caption{Quasi-\(F\)-Split Height: matrix-based algorithm}
 \label{alg:qfs:matrix}
 \begin{algorithmic}[1]
-\State Inputs: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
+\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
 	polynomial of degree \(n\) in \(S\).
+% CHANGED same edits as previous algorithm
+\State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
 \If{\(g \not\in \mathfrak{m}^{p}\) }
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
 \State \(M \gets\) the matrix of  \(g^{\prime} \mapsto u(\Delta * g^{\prime})\)
-\State \(n \gets 2\) 
+\State \(h \gets 2\) 
 \State \(g_{v} \gets\) the representation of \(g\) as a vector
 \State \(i \gets \) the index of the monomial \(x_{1}^{p-1}\cdots x_{n}^{p-1}\)
 \While{true}
-    \If{\(b < n\)}
+    \If{\(b < h\)}
         \State \Return \(\infty\)
     \EndIf
     \State \(g_{v} \gets M * g_{v}\) 
     \If{\(g[i] \neq 0\)}
-        \State \Return \(n\) 
+        \State \Return \(h\) 
     \EndIf
-    \State \(n \gets n + 1\)
+    \State \(h \gets h + 1\)
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
