@@ -73,7 +73,7 @@ library like CUBLAS naively.
     for p=11 and
     p=13. 
 }
-For larger primes, we implement a 
+To support larger primes, we implement a 
 simple GPU-based fallback implementation of matrix multiplication using CUDA.jl
 based on \cite{mao-2024-matmul}
 which reduces mod \(p\) every 32 entries.
@@ -83,8 +83,8 @@ than a OpenBLAS when using CPU multithreading, it gives exact
 computations for arbitrarily large
 matrices (as long as \(32 < o\))
 and is good enough that
-matrix multiplication isn't the bottleneck in the 
-computation of quasi-\(F\)-split heights over \(\mathbb{F}_{13}\).
+matrix multiplication won't be a bottleneck in 
+Fedder type criterion calculations.
 
 To illustrate the performance difference between CPU and GPU, we timed
 multiplying matrices of various sizes on the CPU and GPU in 
