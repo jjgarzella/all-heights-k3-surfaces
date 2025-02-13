@@ -87,28 +87,12 @@ for each $p$, and $L^{-1} \mod p$.
 These are cached, so that they can be used again for problems with the same shape 
 (i.e. the degree of \(f\), the exponent \(k\), and the characteristic are the same).
 
-% Additionally, we used fixed-width integers, as opposed to arbitrary-precision integers 
-% such as in the GNU Multiple Precision library (GMP) \cite{gnu-2024-gmp}. The decision
-% to use fixed-width integers is primarily practical. 
-% Arbitrary size fixed-width integers
-% on the GPU are provided by the BitIntegers.jl package 
-% \cite{fourquet-2024-bitintegers-jl}.
-% On the other hand, Julia's CUDA functionality currently does not provide
-% aribtrary-precision integers:
-% libraries like GMP only support the CPU, while 
-% Nvidia-made alternatives have not yet been ported to Julia.
-% On the CPU, fixed-width integers of 256, 512, or 1024 bits
-% can outperform arbitrary-precision libraries like GMP 
-% since fixed-width integers don't require allocations.
-% It would be interesting to compare the performance of both
-% approaches on the GPU.
-
 Our algorithm also has fallbacks when the memory required becomes too large for the 
 GPU's on-device memory.
 When the problem becomes too big to fit the twiddle factors and 
 inputs for all of the NTTs in device memory at once, 
 we move the inputs to GPU memory and 
-back to RAM for each NTT, not caching the twiddle factors. 
+back to RAM for each NTT, and don't cache the twiddle factors. 
 Because we are forced to move a lot of memory around for each NTT, 
 and run $\log_2(L)$ modular exponentiations in each thread,
 we see a large drop-off in 
@@ -125,7 +109,7 @@ that $p_1 \cdot p_2 \cdot ... \cdot p_k > M$.
 Experimentally, modular multiplication with 32-bit integers 
 is slightly over double the speed of modular 
 multiplication with 64-bit integers. 
-However, the kernels and parameters from Merge-NTT are more 
+However, the kernels and parameters from \cite{ozcan-2023-fft} are more 
 optimized for 64-bit integers, making them just over half the
 speed of naively using the same implementation with 32-bit 
 integers. Thus, for prime selection, 
@@ -142,7 +126,11 @@ will allow for easier application of the NTT in polynomial powering
 problems.
 
 \begin{defn}
-    Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, where $I_i$ are distinct degree sequences of equal length, the maximum polynomial is $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, where $m$ is a non-inclusive upper bound on the coefficients.
+    Given a basis $(\mathbf{x}^{I_1}, \dots, \mathbf{x}^{I_n})$, 
+    where $I_i$ are distinct degree sequences of equal 
+    length, the \textit{maximal polynomial} is 
+    $(m - 1)(\mathbf{x}^{I_1} + \cdots + \mathbf{x}^{I_n})$, 
+    where $m$ is a non-inclusive upper bound on the coefficients.
 \end{defn}
 
 This is saying we should consider the ``worst-case'' polynomial 
@@ -154,10 +142,11 @@ iterate through the resulting terms to obtain an upper bound.
 We know this computation will be correct because FLINT uses GMP,
 and it also must be the optimal bound on the coefficients. 
 However, for larger problems, like bound finding for 
+$\Delta_1$ (Algorithm \ref{alg:calc:delta1}) of
 quartic K3 surfaces over $\mathbb{F}_{11}$ or $\mathbb{F}_{13}$, 
 FLINT does not finish the computation in a reasonable amount of time.
 If one only cares about a single shape of the problem 
-(i.e. the same degree, \(k\), and charachteristic),
+(i.e. the same degree, \(k\), and characteristic),
 this might be acceptable.
 However, for a single computation, it completely removes 
 the advantage of using the GPU, since we must perform an 
@@ -173,12 +162,33 @@ by bounding the number of terms in the power.
 \end{thm}
 
 \begin{proof}
-    We induct on $k$. The maximum coefficient of $f^0$ is $1$, which is bounded above by 
+    We induct on $k$. The maximum coefficient 
+    of $f^0$ is $1$, which is bounded above by 
     
     \noindent$\left((m - 1) \cdot \binom{h + n - 1}{n - 1}\right)^ 0 = 1$.
-    Let $(d_1, \dots , d_n)$ denote the exponent tuple of a term of $f^k$, let $(d'_1, \dots , d'_n)$ denote the exponent tuple of a term of $f^{k + 1}$, and let $(a_1, \dots , a_n)$ denote the exponent tuple of a term of $f$.
+    Let $(d_1, \dots , d_n)$ denote the exponent 
+    tuple of a term of $f^k$, let $(d'_1, \dots , d'_n)$ 
+    denote the exponent tuple of a term of 
+    $f^{k + 1}$, and let $(a_1, \dots , a_n)$ 
+    denote the exponent tuple of a term of $f$.
 
-    Consider an arbitrary term of $f^{k + 1}$. To find all terms in the unreduced expansion of $f^k \cdot g$ that contribute to that term, we look at terms of $f^k$ with degree sequences of the form $(d'_1 - a_1, \dots , d'_n - a_n)$. The number of these terms of $f^k$ is bounded above by $|wics(h, n)|$, or $\binom{h + n - 1}{n - 1}$ by Lemma \ref{lem:wics:size}. Using our inductive assumption, the maximum coefficient of $f^k$ is bounded above by $\left((m - 1) \cdot \binom{h + n - 1}{n - 1}\right)^ k$, so multiplying each of these by coefficients of $f$, which have a maximum value of $m - 1$, and adding up $\binom{h + n - 1}{n - 1}$ copies of these gives $\left((m - 1) \cdot \binom{h + n - 1}{n - 1}\right)^{k + 1}$.
+    Consider an arbitrary term of $f^{k + 1}$. 
+    To find all terms in the unreduced 
+    expansion of $f^k \cdot g$ that contribute 
+    to that term, we look at 
+    terms of $f^k$ with degree sequences of 
+    the form $(d'_1 - a_1, \dots , d'_n - a_n)$. 
+    The number of these terms of $f^k$ is bounded 
+    above by $|wics(h, n)|$, or $\binom{h + n - 1}{n - 1}$ 
+    by Lemma \ref{lem:wics:size}. Using our 
+    inductive assumption, the maximum coefficient 
+    of $f^k$ is bounded above by 
+    $\left((m - 1) \cdot \binom{h + n - 1}{n - 1}\right)^ k$, 
+    so multiplying each of these by coefficients 
+    of $f$, which have a maximum value of 
+    $m - 1$, and adding up $\binom{h + n - 1}{n - 1}$ 
+    copies of these gives 
+    $\left((m - 1) \cdot \binom{h + n - 1}{n - 1}\right)^{k + 1}$.
 \end{proof}
 
 To apply this formula to computing $\Delta_1(f^{p - 1})$ for K3 
@@ -220,8 +230,8 @@ On the GPU, all of these are bottlenecked by sorting, just like
 and then combines like terms with a sort. 
 Unlike the previous four algorithms, it is not bottlenecked by the sort;
 instead, it is bottlenecked by the memory required to store the table of
-multinomial coefficients. However, \textbf{MNE} is 
-competitive for small problems
+multinomial coefficients. Do note that \textbf{MNE} is 
+competitive for small problems.
 
 \textbf{SUMS} and \textbf{FPS} have dense and sparse versions which are described in 
 \cite{monagan-2012-sparse-powering}.
@@ -231,7 +241,7 @@ They can be parallelized, as discussed in \cite{monagan-2012-sparse-powering},
 but this requires the use of locks and a heap data structure,
 which are more challenging to implement on the GPU.
 It would be interesting to have a GPU-accelerated version of
-\textbf{FPS} and compare it's performance with 
+\textbf{FPS} and compare its performance with 
 multimodular FFT.
 The authors expect one could get a big improvement in the sparse case.
 
@@ -288,7 +298,7 @@ We do not know which algorithm MAGMA uses for polynomial powering
 in the integers.
 In theory, such a sparse algorithm should
 be much more efficient.
-However, the parallelism of the GPU is so much better that the
+However, the throughput of the GPU is so much better that the
 GPU crushes the CPU, even with a worse algorithm.
 The authors hope that these numbers can inspire others who
 rely on fundamental algorithms such as those in FLINT to 
