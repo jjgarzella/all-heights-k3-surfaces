@@ -58,10 +58,10 @@ The \(k\)-th power of a univariate polynomial \(f\)
 may be computed mod \(p\) by taking the NTT 
 of a tuple containing the coefficients of \(f\),
 raising the components to the \(k\),
-and then computing the Inverse Number Theoretic Transform (INTT).
+and then computing the Inverse Number Theoretic Transform.
 The multimodular algorithm 
 computes \(f^{k}\) in the integers by
-choosing many primes \(p_{i}\), 
+choosing primes \(p_{i}\), 
 and combining the results using the Chinese remainder theorem.
 Thus, our algorithm is known as the 
 multi-modular NTT approach to raising polynomials to powers.
@@ -73,13 +73,15 @@ algorithms like the NTT become inefficient in both
 time and memory complexity when compared to sparse algorithms.
 However, the massive throughput of GPUs allows the 
 NTT to be competitive for many cases, 
-quartic K3 surfaces being one of them.
+quasi-F-split heights of quartic K3 surfaces being 
+one of them.
 
 \subsubsection{NTT Implementation}
 
-We use the Merge-NTT with Barrett modular reduction from \cite{ozcan-2023-fft}, 
-ported to Julia, for our NTT implementation. 
-Because of this, our NTT length $L$ is always a power of $2$. 
+We use the Merge-NTT algorithm with Barrett modular 
+reduction from \cite{ozcan-2023-fft} 
+ported to Julia for our NTT implementation. 
+So, our NTT length $L$ is always a power of $2$. 
 
 For each NTT we perform, we search for primes $p$ that satisfy 
 $p \equiv 1 \mod L$, compute primitive $L$th roots of unity 
