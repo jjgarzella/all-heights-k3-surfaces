@@ -346,14 +346,14 @@ The following proposition demonstrates how we can calculate
 
 \begin{prop}
 	\label{prop:delta1:formula}
-	Let \([f]\) be a lift of \(f\) to the integers,
+	Let \(\tilde{f}\) be a lift of \(f\) to the integers,
 	i.e.
 	\(f = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
 	If \(k = \mathbb{F}_{p}\),
 	we can compute \(\Delta_{1}(f)\) by 
 	taking the reduction of
 	\[
-		\frac{[f]^{p} - \sum_{I}^{} ([a_{I}]x^{I})^{p} }{p}
+		\frac{\tilde{f}^{p} - \sum_{I}^{} ([a_{I}]x^{I})^{p} }{p}
 	\] 
 	mod \(p\).
 \end{prop}
@@ -361,7 +361,7 @@ The following proposition demonstrates how we can calculate
 \begin{proof}
 	Iteratively apply the formula of the first
 	Witt polynomial \(S_{1}\) 
-	to the monomials of \(f\).
+	to the monomials of \(\tilde{f}\).
 \end{proof}
 
 \begin{rmk}
@@ -561,7 +561,7 @@ from the exponents of the terms and dividing by \(p\)
 % CHANGED subtracting p-1 from and dividing by p ->
 % subtracting p-1 from the exponents of the terms and dividing by p
 (see Algorithm \ref{alg:naive:u}).
-Thus, the map 
+Thus, the ``multiply then split'' map 
 \(g \mapsto u(\Delta_{1}(f^{p-1}) g)\) 
 is a linear map from 
 the space of homogeneous polynomials of degree \(n(p-1)\) 
