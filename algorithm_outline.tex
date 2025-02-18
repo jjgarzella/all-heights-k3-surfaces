@@ -85,7 +85,6 @@ It is well known that \(W(\mathbb{F}_{p}) = \mathbb{Z}_{p}\),
 giving an alternative construction of the \(p\)-adic numbers.
 
 \begin{warn}
-    %However, we caution the reader that 
 	If one takes a
     naive \(p\)-adic expansion 
     \(\sum_{n = 0}^{\infty} c_{n}p^{n} \in \mathbb{Z}_{p}\)
@@ -157,9 +156,6 @@ in the coordinates of the Witt vectors.
 	Thus we see that addition in \(W_{2}(R)\) involves raising 
 	things in \(R\) (i.e. the first component) to the \(p\)-th
 	power in a lift of \(R\) to characteristic 0.
-	%This is the first place that raising polynomials
-	%to the \(p\)-th power comes into the picture 
-	%algorithmically.
 \end{rmk}
 
 \subsection{Splittings of Frobenius}
@@ -244,14 +240,6 @@ is defined to be \((x_{1}^{m}, \ldots, x_{n}^{m})\)
 	See \cite[Theorem~2.5]{ma-polstra-2021-F-sing-comm-alg}
 \end{proof}
 
-%\begin{rmk}
-%	Fedder's criterion is the second place where raising
-%	homogeneous polynomials to powers enters the picture
-%	algorithmically.
-%	This time, unlike Remark \ref{rmk:polyraise:w2},
-%	the raising to a power happens in characteristic \(p\).
-%\end{rmk}
-
 Of particular interest is the case when \(f\) is 
 homogeneous of degree \(n\), which geometrically
 corresponds to a \textit{Calabi-Yau} hypersurface.
@@ -282,8 +270,6 @@ quasi-\(F\)-splitness, which generalizes \(F\)-splitness.
 	\end{tikzcd}
 	,\]
 	where the vertical map is the \(1\)-st Witt vector truncation.
-    % FEEDBACK I think this looks a bit weirdly formatted, 
-    % maybe last 2 lines should be un-italicized outside the defn?
 \end{defn}
 
 We further define the \textit{quasi-\(F\)-split height} of \(R\) as the smallest \(n\) 
@@ -329,8 +315,6 @@ found in \cite{kty-2022-fedder}.
 For the following discussion, 
 let \(k\) be a perfect field of characteristic \(p\) and 
 let \(S := k[x_{1}, \ldots, x_{n}]\).
-% CHANGED all f's to g's in this delta1 section, since f is 
-% the K3 input
 Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{defn}
@@ -378,7 +362,6 @@ for calculating the term \(\Delta_{1}(f)\):
     \begin{algorithmic}[1]
 		\State \textbf{Input:} \(f \in \mathbb{F}_{p}[x_{1}, \ldots, x_{n}]\) 
 		\State \textbf{Output:} $\Delta_1(f)$
-		% CHANGED added output
 		\State \(\tilde{f} \gets \text{lift}(f)\) 
 		\State \(D \gets \tilde{f}^{p}\) 
 		\For{\(t \in \text{terms}(\tilde{f})\) }
@@ -461,14 +444,12 @@ algorithm to calculate the quasi-F-split height.
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
 	polynomial of degree \(n\) in \(S\).
-% CHANGED added output
 \State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
 \If{\(g \not\in \mathfrak{m}^{p}\) }
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-% CHANGED renamed n to h, since n is the degree of the polynomial
 \State \(h \gets 2\) 
 \While{true}
     \If{\(b < h\)}
@@ -482,23 +463,6 @@ algorithm to calculate the quasi-F-split height.
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
-
-%\begin{alg}
-%	\label{alg:qfs:outline}
-%
-%	\begin{enumerate}[(1)]
-%		\item Compute \(f^{p-1}\)
-%		\item If \(f^{p-1} \notin \mathfrak{m}^{p}\), return \(1\). 
-%		\item Compute \(\Delta_{1}(f^{p-1})\) via Proposition \ref{prop:delta1:formula}.
-%		\item Set \(n = 2\) and \(g = f^{p-1}\)
-%		\item Loop
-%			\begin{enumerate}[(1)]
-%				\item \(g := \theta(g)\) (using the output of Step 3)
-%				\item If \(g \notin \mathfrak{m}^{p},\) return \(n\).
-%				\item If \(n < b\), return \(\infty\)	
-%			\end{enumerate}
-%	\end{enumerate}
-%\end{alg}
 
 \begin{thm}
 	[\cite{kty-2022-fedder}, Theorem C]
@@ -536,17 +500,6 @@ in two places:
 for example, each step takes about 1 second 
 using FLINT. 
 
-%With that, we may define \(\theta\) as it appears
-%in \cite{kty-2022-fedder}:
-%
-%\begin{defn}
-%	[See the introduction of \cite{kty-2022-fedder}]
-%	The map \(\theta = \theta_{f}\) is defined by 
-%	\(\theta_{f}(g) = u(\Delta_{1}(f^{p-1}) \cdot g)\).
-%	We generally omit the dependence on \(f\) from
-%	the notation.
-%\end{defn}
-
 We now explain how to overcome the second
 bottleneck. Since \(Z(f)\) is Calabi-Yau
 (i.e. \(\deg f = n\)), we have that \(f^{p-1}\) has degree
@@ -558,8 +511,6 @@ Thus, \(\Delta_{1}(f^{p-1})g\) has degree
 \(n(p^{2} - 1)\); however, the effect 
 of \(u\) on any polynomial is subtracting \(p-1\)
 from the exponents of the terms and dividing by \(p\) 
-% CHANGED subtracting p-1 from and dividing by p ->
-% subtracting p-1 from the exponents of the terms and dividing by p
 (see Algorithm \ref{alg:naive:u}).
 Thus, the ``multiply then split'' map 
 \(g \mapsto u(\Delta_{1}(f^{p-1}) g)\) 
@@ -589,7 +540,6 @@ The algorithm for Fedder's criterion then becomes:
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
 	polynomial of degree \(n\) in \(S\).
-% CHANGED same edits as previous algorithm
 \State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
 \If{\(g \not\in \mathfrak{m}^{p}\) }
@@ -615,25 +565,3 @@ The algorithm for Fedder's criterion then becomes:
 
 Thus, we have reduced our problem (algorithmically, at least)
 to finding the matrix of a ``mulitply then split'' operation.
-%In the following section, we give three such algorithms.
-%One is a naive algorithm, which is only 
-%reasonably fast if used with GPU hardware. 
-%The second algorithm is suitable for use on CPUs,
-%though isn't easily massively parallel.
-%Finally, the third algorithm 
-%outperforms the first two on the CPU, and can be fully 
-%parallelized on the GPU. However, the GPU implementation 
-%requires some data to be cached, making it less viable for 
-%one-off computations, but ideal for repeated computations.
-%
-% FEEDBACK deleting this paragraph, already mention the bottleneck
-% in the start of 3.4
-% 
-% In practice, Algorithm \ref{alg:qfs:matrix} is bottlenecked
-% by the polynomial multiplication in the calculation of 
-% \(\Delta_{1}(f^{p-1})\), as noted above. 
-% In order to get enough performance for our computations,
-% we implement GPU-accelerated versions of
-% matrix multiplication mod p and polynomial multiplication
-% over \(\mathbb{Z}\).
-

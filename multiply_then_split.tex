@@ -23,15 +23,8 @@ The target of this map is
 Note that if \(d^{\prime}\) is not an integer,
 there are no terms which survive \(u\) and
 the map is zero.
-%In the case of calculating the quasi-\(F\)-split height of a Calabi-Yau
-%hypersurface,
-%we have \(d = n(p-1)\) and \(D = np(p-1)\),
-%so that \(d^{\prime} = d\).
 
 \begin{rmk}
-	%Note that if  \(d^{\prime} = \frac{d+D-p(n-1)}{p}\)
-	%is not an integer, \(\theta\) is the zero map
-	%and there is nothing more to do. 
     If \(\Delta = \Delta_{1}(f^{p-1})\) and \(d = n(p-1)\),
 	as in the case of calculating the quasi-\(F\)-split
 	height of a Calabi-Yau hypersurface, 
@@ -55,7 +48,6 @@ in memory.
 Both of the our improved algorithms ignore
 all of these unnecessary terms.
 
-%To begin, we introduce some notation.
 In what follows, 
 when we apply arithmetic operations to arrays, 
 particularly \(\star\), \(+\), and \(\%\),
@@ -96,8 +88,6 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
 	This is a classical argument which goes by the 
     name ``sticks and stones'', ``stars and bars'', or 
     ``dots and dividers''.
-%    Using a stars and bars argument, there are $n$ stars and $k - 1$ bars. There are $n + k - 1$ slots to place the stars and bars in, of which we need to choose $k - 1$ to be bars.
-%    This gives $\binom{n + k - 1}{k - 1}$.
 \end{proof}
 
 
@@ -114,17 +104,6 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
     and $L_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$.
 \end{rmk}
 
-%\begin{cxt}
-%	%\label{cxt:mult:split}
-%	Let \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
-%	We wish to have an algorithm that calculates the matrix of
-%	the linear operator
-%	\begin{align*}
-%		\theta : S_{d} &\longrightarrow S_{d^{\prime}} \\
-%		g &\longmapsto u(\Delta g)
-%	.\end{align*}
-%\end{cxt}
-
 \begin{defn}
 	Let \(m\) be a monomial in \(S\). 
 	Then we say that \(m\) \textit{matches}
@@ -135,9 +114,6 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
 
 Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
 
-%We now present our first algorithm.
-% Notes for complexity calculations:
-
 \subsection{The Trivial Algorithm}
 
 \begin{algorithm}[H]
@@ -147,7 +123,6 @@ Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p 
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
     \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
 	matrix representing ``multiply then split''
-    % CHANGED \theta to multiply then split
     \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
     \For{$m \in M_{d}$}
 	    \State $c \gets indexof(m, M _{d})$
@@ -226,7 +201,6 @@ when we consider the exponent tuple mod $p$ of
 an arbitrary monomial of \(M\),
 it has a unique
 match mod \(p\).
-% However, we have even more:
 
 \begin{cor}
 	\label{cor:match:order}
@@ -305,7 +279,6 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
 
 \begin{lem}
     \label{lem:generate:matching}
-    %Let $M$ be a set containing the basis monomials of a $n$-variate, $d$-homogeneous polynomial vector space.
     The set of exponent tuples of \(M_{d}\) that match with $\delta$ is given by 
     \[
         \left\{ m(exps(\delta) \% p) + w *p ~\Big|~ w \in wics \left(\frac{d - sum(m(exps(\delta) \% p))}{p}, n \right) \right\}
