@@ -11,8 +11,6 @@ Let $S_\ell$ denote the vector space of homogeneous degree $\ell$ polynomials in
 We let \(M_{\ell}\) denote a lexographically-ordered list
 of the monomial basis of \(S_{\ell}\).
 Fix some \(D \in \mathbb{N}\), and let \(\Delta \in S_D\).
-In algorithms, we will sometimes conflate \(\Delta\) 
-with a list containing all its terms.
 Furthermore, fix \(d \in \mathbb{N}\).
 We consider the problem of finding the matrix of 
 \(g \mapsto u(\Delta g)\)
@@ -57,6 +55,12 @@ we mean componentwise application of these operations.
 Use of arbitrary componentwise operations is called
 \textit{broadcasting} in Julia, and we will
 sometimes use this term.
+Homogenoeus polynomials are reprented in computer 
+memory as a list of their terms. 
+This is reflected in our notation, 
+thus the meaning of ``for \(\delta \in \Delta\)''
+is a for loop though all the monomials
+of \(\Delta\).
 
 \begin{defn}
     The \textit{exponent tuple} of a monomial 
@@ -116,10 +120,10 @@ It follows that the dimension of the vector space is $|\wics(k, n)|$.
 
 Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
 
-\subsection{The Trivial Algorithm}
+\subsection{The trivial algorithm}
 
 \begin{algorithm}[H]
-    \caption{Matrix of Multiply then Split: trivial algorithm}
+    \caption{Matrix of multiply then split: trivial algorithm}
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
@@ -161,7 +165,7 @@ However, we emphasize that this algorithm, if
 implemented in parallel on the GPU, is indeed
 fast enough to not be a bottleneck in practice.
 
-\subsection{Modified Merge-based Algorithm}
+\subsection{Modified merge-based algorithm}
 
 We now introduce an algorithm that utilizes 
 properties of monomial ordering to reduce the 
@@ -222,7 +226,7 @@ Using these two corollaries, we have the following algorithm,
 which we call \merge:
 
 \begin{algorithm}[H]
-\caption{Matrix of Multiply then Split: merge-based algorithm}
+\caption{Matrix of multiply then split: merge-based algorithm}
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
@@ -277,7 +281,7 @@ $O(\max(L_{d} \log L_{d}, L_{\Delta} \log L_{\Delta}))$.
 In practice (for Calabi-Yau hypersurfaces), 
 the $L_{\Delta} \log L_{\Delta}$ usually dominates.
 
-\subsection{Weak Integer Compositions-based Algorithm}
+\subsection{Weak integer compositions-based algorithm}
 
 \begin{lem}
     \label{lem:generate:matching}
@@ -349,7 +353,7 @@ by $generateMatchingMonomials(\delta, p, M_d)$, we have
 the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
-    \caption{Matrix of Multiply then Split: WICS algorithm}
+    \caption{Matrix of multiply then split: WICS algorithm}
     \label{alg:matrix:WICS}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$

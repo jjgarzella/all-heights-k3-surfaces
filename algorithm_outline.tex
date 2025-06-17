@@ -1,5 +1,5 @@
 
-\subsection{Witt Vectors}
+\subsection{Witt vectors}
 
 We begin by defining the ring of Witt vectors. 
 Since the theory of Witt vectors is a vast and active topic of research,
@@ -87,7 +87,7 @@ The lemma then shows that \(\Phi\) is a homomorphism
 \[
 	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R 
 .\] 
-Moreover, the fact that the polynomials do not depend on the base
+The fact that the polynomials \(S_{n}\) and \(Ps_{n}\) do not depend on the base
 ring \(R\) means that the construction is functorial; that is,
 for a map of rings \(R \xrightarrow{} R^{\prime} \), we get a 
 map \(W(R) \xrightarrow{} W(R^{\prime})\).
@@ -180,6 +180,21 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
     somewhat useful.
 \end{rmk}
 
+\begin{nota}
+    We have a map (of sets) 
+    \(R \xrightarrow{} W(R)\) 
+    given by 
+    \(c \mapsto (c, 0, \ldots)\).
+    The element \((c, 0, \ldots)\) is denoted
+    \([c]\).
+    The map \(c \mapsto [c]\) is multiplicative
+    but not additive (see \cite[Section~1]{kim-2017-witt-vec}).
+    We have analogous maps \(R \xrightarrow{} W_{n}(R)\).
+    By abuse of notation, we denote 
+    the image of \(c\) by \([c]\).
+\end{nota}
+
+
 \begin{rmk}
 	\label{rmk:polyraise:w2}
     Our computations will end up primarily involving
@@ -229,7 +244,7 @@ the Frobenius which will be useful later.
 			\(r \cdot x = F(r)x = r^{p}x\).
 			Then we view the Frobenius as a map
 			\(R \xrightarrow{} F_{\star}R\).
-			In this description, \(F\) is a module 
+			In this description, \(F\) is an \(R\)-module 
 			homomorphism as well. 
 			The module \(F_{\star}R\) corresponds to the
 			pushforward construction from geometry
@@ -346,7 +361,7 @@ of Theorem \ref{thm:fsplit:ordinary}:
 	\cite[Theorem~4.5]{yobuko-2019-qfs-calabi-yau}.
 \end{proof}
 
-\section{Fedder's Criterion for Quasi-\(F\)-Splitness: an Algorithmic Perspective}
+\section{Fedder's criterion for quasi-\(F\)-splitness: an algorithmic perspective}
 
 We now describe how the ring of Witt vectors can be used to calculate the 
 quasi-\(F\)-split height (equivalently, Artin--Mazur height) of a Calabi-Yau 
@@ -370,13 +385,13 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 \end{defn}
 
 The following proposition demonstrates how we can calculate 
-\(\Delta_{1}(g)\) algorithmically.
+\(\Delta_{1}(f)\) algorithmically.
 
 \begin{prop}
 	\label{prop:delta1:formula}
 	Let \(\tilde{f}\) be a lift of \(f\) to \(W(k)\),
 	i.e.
-	\(f = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
+	\(\tilde{f} = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
 	If \(k = \mathbb{F}_{p}\),
 	we can compute \(\Delta_{1}(f)\) by 
 	taking the reduction of
@@ -446,7 +461,7 @@ for calculating the term \(\Delta_{1}(f)\):
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Splittings of Frobenius from a Computational Perspective}
+\subsection{Splittings of frobenius from a computational perspective}
 
 Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
 We will use perspective (3) from
@@ -504,7 +519,7 @@ exponents.
 \end{algorithm}
 
 
-\subsection{The Naive Algorithm}
+\subsection{The naive algorithm}
 
 Let \(f\) be a homogeneous polynomial of degree \(n\) 
 in \(S\), 
@@ -513,7 +528,7 @@ Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
-\caption{Quasi-\(F\)-Split Height: naive algorithm}
+\caption{Quasi-\(F\)-split height: naive algorithm}
 \label{alg:qfs:naive}
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
@@ -609,7 +624,7 @@ Thus, we can check if a single element of the vector representing
 The algorithm for Fedder's criterion then becomes:
 
 \begin{algorithm}[H]
-\caption{Quasi-\(F\)-Split Height: matrix-based algorithm}
+\caption{Quasi-\(F\)-split height: matrix-based algorithm}
 \label{alg:qfs:matrix}
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous

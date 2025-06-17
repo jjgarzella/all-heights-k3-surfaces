@@ -9,7 +9,7 @@ through mass parallelization.
 
 \subsection{Multi-modular NTT}
 
-\subsubsection{Kronecker Substitution}
+\subsubsection{Kronecker substitution}
 We reduce the problem of multivariate 
 polynomial powering to univariate polynomial powering
 by the Kronecker substitution.
@@ -53,7 +53,7 @@ which greatly lowers the degree of the univariate result of the
 Kronecker Substitution.
 This improvement is essential for dense algorithms like the NTT.
 
-\subsubsection{Polynomial Powering using NTTs}
+\subsubsection{Polynomial powering using NTTs}
 The \(k\)-th power of a univariate polynomial \(f\)
 may be computed mod \(p\) by taking the NTT 
 of a tuple containing the coefficients of \(f\),
@@ -76,7 +76,7 @@ NTT to be competitive for many cases,
 quasi-\(F\)-split heights of quartic K3 surfaces being 
 one of them.
 
-\subsubsection{NTT Implementation}
+\subsubsection{NTT implementation}
 
 We use the Merge-NTT algorithm with Barrett modular 
 reduction from \cite{ozcan-2023-fft} 
@@ -101,7 +101,7 @@ we see a large drop-off in
 performance when this NTT size threshold is reached. 
 
 
-\subsubsection{Prime Selection}
+\subsubsection{Prime selection}
 In order for the NTT to simulate polynomial powering over $\mathbb{Z}$, 
 we need to obtain an upper bound $M$ 
 on the resulting coefficients, then 
@@ -118,7 +118,7 @@ integers. Thus, for prime selection,
 we choose primes satisfying $p \equiv 1 \mod L$ that fit 
 within 62 bits, because of the precision of Barrett Reduction.
 
-\subsubsection{Bound Finding}
+\subsubsection{Bound finding}
 The multimodular NTT requires an upper bound $M$ in order to select primes 
 to compute NTTs in. In this section, we present a quick way to compute a 
 relatively tight upper bound on the resulting 
