@@ -1,38 +1,51 @@
 
-\subsection{The Witt Vectors}
+\subsection{Witt Vectors}
 
-We begin by defining the Witt vectors. 
+We begin by defining the ring of Witt vectors. 
 Since the theory of Witt vectors is a vast and active topic of research,
 we recall the bare minimum 
-required for the quasi-F-split Fedder's criterion algorithm.
-For a more complete introduction to the Witt vectors with proofs, 
+required for the quasi-\(F\)-split Fedder's criterion algorithm.
+For a more complete introduction to the ring of Witt vectors with proofs, 
 see \cite{rabinoff-2014-witt-vec}.
-For an intuitive introduction or derivation of the Witt vectors, see
+For an intuitive introduction or derivation of the ring of Witt vectors, see
 \cite{kim-2017-witt-vec}.
 There are many other perspectives on Witt vectors. 
 For example:
-\cite[Chapter~17]{hazewinkel-1978-formal-groups} covers the Witt vectors
+\cite[Chapter~17]{hazewinkel-1978-formal-groups} covers the ring of Witt vectors
 and its relationship with formal groups; 
-\cite{kedlaya-2021-prismatic} gives a categorical perspective on Witt vectors
+\cite{kedlaya-2021-prismatic} gives a categorical perspective on the ring of Witt vectors
 that relates to lifts of the Frobenius; and
 \cite[Chapter~1]{schneider-2017-galois-rep-phi-gamma} defines a generalization
-known as the \textit{ramified Witt vectors} in detail.
+known as the ring of \textit{ramified Witt vectors} in detail.
 
 \begin{defn}
 	The \textit{\(n\)-th Witt Polynomial} \(\omega_{n}\) is defined as
 	\[
 		\omega_{n}(X_{0}, \ldots, X_{n}) = X_{0}^{p^{n}} + pX_{1}^{p^{n-1}} + \ldots + p^{n}X_{n}
+        \in \mathbb{Z}[X_{0}, \ldots, X_{n}]
 	\] 
+    
 \end{defn}
 
 \noindent Now let \(R\) be a ring of characteristic \(p\).
 We define the map \(\Phi\) to be the map 
-\[
-	\prod_{n \in \mathbb{N}}^{} R 
-	\xrightarrow{(\omega_{n})_{n}} 
-	\prod_{n \in \mathbb{N}}^{} R  
-\] 
+% \[
+% 	\prod_{n \in \mathbb{N}}^{} R 
+% 	\xrightarrow{(\omega_{n})_{n}} 
+% 	\prod_{n \in \mathbb{N}}^{} R  
+% \] 
+\begin{align*}
+    \Phi : \prod_{n \in \mathbb{N}}^{R} R  
+    &\xlongrightarrow{(\omega_{n})_{n}} \prod_{n \in \mathbb{N}}^{R} R \\
+    (r_{0}, r_{1}, \ldots, r_{n}, \ldots) &\longmapsto 
+    (\omega_{0}(r_{0}), \omega_{1}(r_{0}, r_{1}), 
+    \ldots, \omega_{n}(r_{0}, \ldots, r_{n}), \ldots)
+.\end{align*}
+
 defined as \(\omega_{n}\) for the \(n\)-th component.
+That is, \(\omega_{n}\) is considered as a 
+map (of sets) \(R^{n} \xrightarrow{} R\) by
+evaluation.
 
 \begin{lem}
 	There exist integer polynomials 
@@ -96,7 +109,6 @@ giving an alternative construction of the \(p\)-adic numbers.
     This motivates the following: 
 \end{warn}
 
-
 \begin{defn}
 	There exists a homomorphism \(F \colon W(R) \xrightarrow{} W(R)\),
 	called the \textit{Frobenius},
@@ -116,7 +128,24 @@ giving an alternative construction of the \(p\)-adic numbers.
 	.\] 
 \end{defn}
 
+We see that \(W(R) / VW(R) \isom R\).
+This is sometimes called the first \textit{truncated}
+Witt vectors.
+We also have higher truncated variants.
+
+\begin{defn}
+	The \(n\)-th truncated Witt vectors
+	\(W_{n}(R)\) are defined as
+	\(W(R) / V^{n}W(R)\).
+\end{defn}
+
+We may regard the \(n\)-th truncated Witt Vectors as consisting
+of elements \((c_{0}, \ldots, c_{n-1})\) with addition
+and multiplication by the \(S_{i}\) and \(P_{i}\).
+Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
+
 \begin{lem}
+    \label{lem:frob:versch}
 	The composition \(F \circ V = V \circ F\) is the multiplication by
 	\(p\) map on \(W(R)\).
 \end{lem}
@@ -125,19 +154,31 @@ giving an alternative construction of the \(p\)-adic numbers.
 	\cite[Proposition~5]{kim-2017-witt-vec}
 \end{proof}
 
-Thus, we see that \(W(R) / pW(R) \isom R\).
-This is sometimes called the first \textit{truncated}
-Witt vectors.
-We also have higher truncated variants.
+\begin{lem}
+    \label{lem:perfect:witt}
+    Let \(R\) be a \textit{perfect} ring,
+    that is, a ring for which \(F\) is an isomorphism.
+    Then \(W_{n}(R) = W(R) / p^{n}W(R)\).
+\end{lem}
 
-\begin{defn}
-	The \(n\)-truncated Witt vectors
-	\(W_{n}(R)\) are defined as
-	\(W(R) / p^{n}W(R)\).
-\end{defn}
+\begin{proof}
+    Since \(F\) is an isomorphism, this follows from 
+    Lemma \ref{lem:frob:versch}
+\end{proof}
 
-By the above lemma, this translates to an actual truncation
-in the coordinates of the Witt vectors.
+\begin{rmk}
+    If we take \(R = \mathbb{F}_{p}\), then
+    Lemma \ref{lem:perfect:witt}
+    shows that \(W_{n}(\mathbb{F}_{p}) = \mathbb{Z} / p^{n}\mathbb{Z}\).
+    One common intuition for \(W_{n}(R)\)
+    for more general \(R\) is an analogy:
+    \(\mathbb{Z} / p^{n}\mathbb{Z}\) 
+    is to \(\mathbb{F}_{p}\) 
+    as \(W_{n}(R)\) is to \(R\).
+    For rings that are not perfect,
+    this intuition is less precise but still
+    somewhat useful.
+\end{rmk}
 
 \begin{rmk}
 	\label{rmk:polyraise:w2}
@@ -154,8 +195,11 @@ in the coordinates of the Witt vectors.
 		\frac{(X_{0} + Y_{0})^{p} - X_{0}^{p} - Y_{0}^{p}}{p}
 	.\] 
 	Thus we see that addition in \(W_{2}(R)\) involves raising 
-	things in \(R\) (i.e. the first component) to the \(p\)-th
+	elements in \(R\) (i.e. the first component) to the \(p\)-th
 	power in a lift of \(R\) to characteristic 0.
+    Thus, the bottleneck for most computations with Witt vectors,
+    including the present work, tends to be raising
+    integer polynonmials to powers.
 \end{rmk}
 
 \subsection{Splittings of Frobenius}
@@ -224,20 +268,20 @@ First, we introduce some notation.
 If \(I = (x_{1}, \ldots, x_{n})\) is a finitely generated 
 ideal of some ring \(R\), 
 then \(I^{[m]}\)
-is defined to be \((x_{1}^{m}, \ldots, x_{n}^{m})\)
+is defined to be \((x_{1}^{m}, \ldots, x_{n}^{m})\).
 
 \begin{thm}
-    \label{thm:fedder:criterion}
 	[Fedder's Criterion]
+    \label{thm:fedder:criterion}
 	Let \(f \in S = k[x_{1}, \ldots, x_{n}]\).
 	Let \(\mathfrak{m} = (x_{1}, \ldots, x_{n})\) 
 	be the ideal generated by the variables.
 	Then \(f\) is \(F\)-split if and only if 
-	\(f^{p-1} \notin \mathfrak{m}^{[p]}\)
+	\(f^{p-1} \notin \mathfrak{m}^{[p]}\).
 \end{thm}
 
 \begin{proof}
-	See \cite[Theorem~2.5]{ma-polstra-2021-F-sing-comm-alg}
+	See \cite[Theorem~2.5]{ma-polstra-2021-F-sing-comm-alg}.
 \end{proof}
 
 Of particular interest is the case when \(f\) is 
@@ -250,9 +294,9 @@ In this case, we have
 	If \(f \in S\) 
 	homogeneous of degree \(n\) 
 	is \(F\)-split,
-	then the Artin-Mazur height 
+	then the Artin--Mazur height 
 	of \(Z(f) = \Proj (S / (f))\) 
-	is 1, i.e. \(Z(f)\) is weakly ordinary.
+	is 1. That is, \(Z(f)\) is weakly ordinary.
 \end{thm}
 
 Recently, in \cite{yobuko-2019-qfs-calabi-yau}
@@ -264,12 +308,12 @@ quasi-\(F\)-splitness, which generalizes \(F\)-splitness.
 	a map \(\phi \colon W_{n}(R) \xrightarrow{} R\) such that
 	\[
 	\begin{tikzcd}
-		W(R) \arrow{r}{F} \arrow{d}[swap]{} &
-		F_{\star}W(R) \arrow{ld}{\phi} \\
+		W_{n}(R) \arrow{r}{F} \arrow{d}[swap]{} &
+		F_{\star}W_{n}(R) \arrow{ld}{\phi} \\
 	R 
 	\end{tikzcd}
 	,\]
-	where the vertical map is the \(1\)-st Witt vector truncation.
+	where the vertical map is the first Witt vector truncation.
 \end{defn}
 
 We further define the \textit{quasi-\(F\)-split height} of \(R\) as the smallest \(n\) 
@@ -292,7 +336,7 @@ of Theorem \ref{thm:fsplit:ordinary}:
 
 \begin{thm}
 	If \(f \in S\) is homogeneous of degree \(n\),
-	then the Artin-Mazur height of \(Z(f)\)
+	then the Artin--Mazur height of \(Z(f)\)
 	is equal to the quasi-\(F\)-split height
 	of \(f\).
 \end{thm}
@@ -302,12 +346,12 @@ of Theorem \ref{thm:fsplit:ordinary}:
 	\cite[Theorem~4.5]{yobuko-2019-qfs-calabi-yau}.
 \end{proof}
 
-\section{Fedder's criterion for quasi-F-splitness: an algorithmic perspective}
+\section{Fedder's Criterion for Quasi-\(F\)-Splitness: an Algorithmic Perspective}
 
-We now describe how the Witt Vectors can be used to calculate the 
-quasi-F-split height / Artin-Mazur height of a Calabi-Yau 
+We now describe how the ring of Witt vectors can be used to calculate the 
+quasi-\(F\)-split height (equivalently, Artin--Mazur height) of a Calabi-Yau 
 hypersurface, using the version of Fedder's criterion in \cite{kty-2022-fedder}.
-We will describe the algorithm in more detail, and proofs can be
+We will describe the algorithm in more detail. Proofs can be
 found in \cite{kty-2022-fedder}.
 
 \subsection{The computation of \(\Delta_{1}\)}
@@ -319,7 +363,7 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{defn}
 	Let \(\Delta_{1}(f)\)
-	be defined by the following equation in \(W_{2}(S)\) :
+	be defined by the following equation in \(W_{2}(S)\):
 	\[
 		(0, \Delta_{1}(f)) = (f,0) - \sum_{I}^{} (a_{I}\mathbf{x}^{I}, 0) 
 	.\] 
@@ -330,7 +374,7 @@ The following proposition demonstrates how we can calculate
 
 \begin{prop}
 	\label{prop:delta1:formula}
-	Let \(\tilde{f}\) be a lift of \(f\) to the integers,
+	Let \(\tilde{f}\) be a lift of \(f\) to \(W(k)\),
 	i.e.
 	\(f = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
 	If \(k = \mathbb{F}_{p}\),
@@ -353,7 +397,37 @@ The following proposition demonstrates how we can calculate
 	then \(\Delta_{1}(f)\) is a polynomial of degree \(pd\).
 \end{rmk}
 
-Proposition \ref{prop:delta1:formula} gives an obvious algorithm
+\begin{rmk}
+    \label{rmk:lift:roi}
+    Note that if \(k = \mathbb{F}_{p}\), we can always choose a lift
+    of \(f\) with coefficients in \(\mathbb{Z}\), 
+    not just \(W(k) = \mathbb{Z}_{p}\).
+    In practice, we must choose a lift to the integers
+    so we can represent it computationally.
+
+    A similar fact holds for \(k = \mathbb{F}_{q}\) with 
+    \(q \neq p\), replacing \(\mathbb{Z}\) with
+    \(\mathbb{Z}[\zeta_{q-1}]\).
+    This could be used to calculate the quasi-\(F\)-split 
+    heights for surfaces not defined over \(\mathbb{F}_{p}\),
+    though we have not attempted this.
+    More generally, if \(q = p^{e}\), one may take
+    any abelian extension \(K\) of degree \(e\) over \(\mathbb{Q}\) such that
+    \(p\) is an inert prime in \(K\).
+    Then, there is a unique prime \(\mathfrak{p}\) lying over \(p\) 
+    such that \(\mathcal{O}_{K} / \mathfrak{p} \isom k\).
+    Furthermore, \(\mathcal{O}_{K} \ins W(k)\)
+    and so we may lift \(f\) to \(\mathcal{O}_{K}\) 
+    and do arithmetic there. 
+    Doing arithmetic in a degree \(e\) extension will have
+    better complexity then in the cyclotomic extension, which
+    has degree \(\phi(q) = \phi(p^{e}) = p^{e-1}(p-1)\), where
+    \(\phi\) is the Euler totient function.
+    We do not implement the calculation of quasi-\(F\)-split
+    heights for \(q \neq p\).
+\end{rmk}
+
+Proposition \ref{prop:delta1:formula} gives a natural algorithm
 for calculating the term \(\Delta_{1}(f)\): 
 
 \begin{algorithm}[H]
@@ -372,7 +446,7 @@ for calculating the term \(\Delta_{1}(f)\):
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Splittings of Frobenius from a computational perspective}
+\subsection{Splittings of Frobenius from a Computational Perspective}
 
 Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
 We will use perspective (3) from
@@ -385,14 +459,14 @@ by counting degrees
 that we have a generating set for \(S\) as an
 \(S^{p}\)-module given by
 all monomials
-\(x_{1}^{i_{1}}\ldots x_{n}^{i_{n}}\)
+\(x_{1}^{i_{1}}\cdots x_{n}^{i_{n}}\)
 where \(0 \leq i_{j} \leq p-1\) for all \(j\).
 Moreover, since \(S\) is a polynomial ring, 
 there are no (module-theoretic) relations
 and
 \(S\) is the free \(S^{p}\)-module generated by 
 these monomials, i.e.  \[
-S = \bigoplus_{1 \leq j \leq n,~ 0 \leq i_{j} \leq p-1}^{} x_{1}^{i_{1}}\ldots x_{n}^{i_{n}} S^{p}
+S = \bigoplus_{1 \leq j \leq n,~ 0 \leq i_{j} \leq p-1}^{} x_{1}^{i_{1}}\cdots x_{n}^{i_{n}} S^{p}
 .\] 
 Then the projection of \(S\) to any of the direct sum components
 is an element of \(\Hom(S,S^{p})\), which is a
@@ -417,7 +491,7 @@ exponents.
 \State \textbf{Input:} \(f \in S\) 
 \State \textbf{Output:} \(u(f)\) considered as an element of \(S\).
 \State Discard all terms of \(f\) whose exponents are not congruent to
-	\((p-1, \ldots, p-1)\) mod p.
+	\((p-1, \ldots, p-1)\) mod \(p\).
 \State result \(\gets 0\)	
 \For{\(t \in \text{terms}(f)\) }
     \State subtract \(p-1\) from all exponents of \(t\)
@@ -430,13 +504,13 @@ exponents.
 \end{algorithm}
 
 
-\subsection{The naive algorithm}
+\subsection{The Naive Algorithm}
 
 Let \(f\) be a homogeneous polynomial of degree \(n\) 
 in \(S\), 
 so that \(Z(f)\) is a Calabi-Yau hypersurface.
 Following \cite{kty-2022-fedder}, we have the following
-algorithm to calculate the quasi-F-split height.
+algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
 \caption{Quasi-\(F\)-Split Height: naive algorithm}
@@ -455,7 +529,7 @@ algorithm to calculate the quasi-F-split height.
     \If{\(b < h\)}
         \State \Return \(\infty\)
     \EndIf
-    \State \(g \gets u(\Delta * g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
+    \State \(g \gets u(\Delta \cdot g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
     \If{\(g \notin \mathfrak{m}^{p}\)}
         \State \Return \(h\) 
     \EndIf
@@ -467,7 +541,7 @@ algorithm to calculate the quasi-F-split height.
 \begin{thm}
 	[\cite{kty-2022-fedder}, Theorem C]
 	Assume that
-	\(Z(f)\) has quasi-F-split height \(h < b\).
+	\(Z(f)\) has quasi-\(F\)-split height \(h < b\).
 	Then Algorithm \ref{alg:qfs:naive} terminates
 	and returns \(h\).
 \end{thm}
@@ -490,7 +564,7 @@ is provided in MMPSingularities.jl.
 The bottleneck ends up being polynomial multiplication, 
 in two places:
 \begin{enumerate}[(1)]
-    \item raising \(g = f^{p-1}\) to the \(p\)-th power in the integers
+    \item raising (a lift of) \(g = f^{p-1}\) to the \(p\)-th power 
         (in line 4 of Algorithm \ref{alg:calc:delta1})
     \item multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
         (in line 13 of Algorithm \ref{alg:qfs:naive})
@@ -498,7 +572,7 @@ in two places:
 
 \noindent For a quartic K3 surface of characteristic \(5\),
 for example, each step takes about 1 second 
-using FLINT. 
+using FLINT \cite{flint-2023-flint}. 
 
 We now explain how to overcome the second
 bottleneck. Since \(Z(f)\) is Calabi-Yau
@@ -546,7 +620,7 @@ The algorithm for Fedder's criterion then becomes:
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(M \gets\) the matrix of  \(g^{\prime} \mapsto u(\Delta * g^{\prime})\)
+\State \(M \gets\) the matrix of  \(g^{\prime} \mapsto u(\Delta g^{\prime})\)
 \State \(h \gets 2\) 
 \State \(g_{v} \gets\) the representation of \(g\) as a vector
 \State \(i \gets \) the index of the monomial \(x_{1}^{p-1}\cdots x_{n}^{p-1}\)
@@ -554,7 +628,7 @@ The algorithm for Fedder's criterion then becomes:
     \If{\(b < h\)}
         \State \Return \(\infty\)
     \EndIf
-    \State \(g_{v} \gets M * g_{v}\) 
+    \State \(g_{v} \gets M g_{v}\) 
     \If{\(g[i] \neq 0\)}
         \State \Return \(h\) 
     \EndIf

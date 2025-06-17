@@ -15,14 +15,16 @@ In algorithms, we will sometimes conflate \(\Delta\)
 with a list containing all its terms.
 Furthermore, fix \(d \in \mathbb{N}\).
 We consider the problem of finding the matrix of 
-\(g \mapsto u(\Delta * g)\)
+\(g \mapsto u(\Delta g)\)
 on the space \(S_{d}\).
 The target of this map is
 \(S_{d^{\prime}}\), where
 \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
-Note that if \(d^{\prime}\) is not an integer,
-there are no terms which survive \(u\) and
-the map is zero.
+By convention, if \(d^{\prime}\) is not an integer,
+we declare \(S_{d^{\prime}}\) to be zero.
+Note that in this case there are
+there are no terms which survive \(u\), so
+\(g \mapsto u(\Delta g)\) is indeed the zero map.
 
 \begin{rmk}
     If \(\Delta = \Delta_{1}(f^{p-1})\) and \(d = n(p-1)\),
@@ -45,12 +47,12 @@ Even if \(g\) is a monomial, giving a linear
 algorithm for multiplication, using naive
 multiplication stores a large amount of unnecessary terms
 in memory.
-Both of the our improved algorithms ignore
+Both of our improved algorithms ignore
 all of these unnecessary terms.
 
 In what follows, 
 when we apply arithmetic operations to arrays, 
-particularly \(\star\), \(+\), and \(\%\),
+(particularly addition, multiplication, and modulo)
 we mean componentwise application of these operations.
 Use of arbitrary componentwise operations is called
 \textit{broadcasting} in Julia, and we will
@@ -59,29 +61,29 @@ sometimes use this term.
 \begin{defn}
     The \textit{exponent tuple} of a monomial 
     $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
-	We will denote it $exps(m)$, and we also 
-    define $coeff(m) \colonequals a$
+	We will denote it $\exps(m)$, and we also 
+    define $\coeff(m) \colonequals a$
 \end{defn}
 
 \begin{defn}
     The weak integer compositions of $k$ into $n$ parts, 
-    denoted $wics(k, n)$, is the set of ordered tuples 
+    denoted $\wics(k, n)$, is the set of ordered tuples 
 	\((d_{1}, \ldots, d_{n})\) such that 
     \(d_{1} + \ldots + d_{n} = k\).
 \end{defn}
 
 \begin{ex}
-    $wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$.
+    $\wics(2, 3) = \lbrace (2, 0, 0), (0, 2, 0), (0, 0, 2), (1, 1, 0), (1, 0, 1), (0, 1, 1) \rbrace$.
 \end{ex}
 
-Thus, $wics(d, n)$ generates the exponent tuples of the 
+Thus, $\wics(d, n)$ generates the exponent tuples of the 
 monomial basis of the vector space of $d$-homogeneous 
 $n$-variate polynomials over a field $F$.
-It follows that the dimension of the vector space is $|wics(k, n)|$.
+It follows that the dimension of the vector space is $|\wics(k, n)|$.
 
 \begin{lem}
     \label{lem:wics:size}
-    $|wics(k, n)| = \binom{k + n - 1}{n - 1}$
+    $|\wics(k, n)| = \binom{k + n - 1}{n - 1}$
 \end{lem}
 
 \begin{proof}
@@ -97,9 +99,9 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
     Likewise, the number of elements of 
     \(M_{d}\) is \(\binom{d+n-1}{n-1}\).
     For all of our time complexity calculations, 
-    we let $L_{d} = length(M_{d}) = \binom{n + d - 1}{n - 1}$, 
-    and $L_{\Delta} = length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
-    In the case of the quasi-F-split height of a K3 surface, 
+    we let $L_{d} = \length(M_{d}) = \binom{n + d - 1}{n - 1}$, 
+    and $L_{\Delta} = \length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
+    In the case of the quasi-\(F\)-split height of a K3 surface, 
     $L_{d} = \binom{n(p - 1) + n - 1}{n - 1} = \binom{np - 1}{n - 1}$, 
     and $L_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$.
 \end{rmk}
@@ -112,7 +114,7 @@ It follows that the dimension of the vector space is $|wics(k, n)|$.
 	not killed by \(u\).
 \end{defn}
 
-Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
+Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
 
 \subsection{The Trivial Algorithm}
 
@@ -121,16 +123,16 @@ Concretely, this means that $exps(m) + exps(m^{\prime}) \equiv (p - 1, \dots, p 
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
+    \State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ 
 	matrix representing ``multiply then split''
-    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
+    \State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
     \For{$m \in M_{d}$}
 	    \State $c \gets indexof(m, M _{d})$
         \For{$\delta \in \Delta$}
-            \If{$(exps(\delta) + exps(m)) \% p = (p-1, \dots, p-1)$} \Comment{\textbf{if} $\delta$ matches with $m$}
-			\State res $\gets (exps(\delta) + exps(m) - (p-1, \ldots, p-1)) / p$ \Comment{Apply $u$ to $\delta m$}
+            \If{$(\exps(\delta) + \exps(m)) \% p = (p-1, \dots, p-1)$} \Comment{\textbf{if} $\delta$ matches with $m$}
+			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$ \Comment{Apply $u$ to $\delta m$}
 				\State $r \gets indexof(\text{res},M_{d^{\prime}})$
-                \State $\text{mat}[r, c] = coeff(\delta)$
+                \State $\text{mat}[r, c] = \coeff(\delta)$
             \EndIf
         \EndFor
     \EndFor
@@ -224,15 +226,15 @@ which we call \merge:
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
-\State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ 
+\State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ 
 	matrix representing ``multiply then split''
-\State mat \(\gets zeros(length(M_{d}), length(M_{d^{\prime}}))\) 
-\State $L \gets [exps(\delta) \% p ~|~ \delta \in \Delta]$
-\State $R \gets [exps(m) \% p ~|~ m \in M_{d}]$
+\State mat \(\gets zeros(\length(M_{d}), \length(M_{d^{\prime}}))\) 
+\State $L \gets [\exps(\delta) \% p ~|~ \delta \in \Delta]$
+\State $R \gets [\exps(m) \% p ~|~ m \in M_{d}]$
 \State sort both  \(L\) and \(R\) 
 \State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
-\State \(l \gets 1, r \gets length(R)\)
-\While{\(1 \leq r ~and~ l \leq length(L)\)}
+\State \(l \gets 1, r \gets \length(R)\)
+\While{\(1 \leq r ~and~ l \leq \length(L)\)}
 	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
 	\If{cmp < 0}
 	    \State \(l \gets l + 1\) 
@@ -243,8 +245,8 @@ which we call \merge:
         \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
         \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
 		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
-                \State res \(\gets (exps(\Delta^{\prime}[ll]) + exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\) 
-                \State coeff \(\gets coeff(\Delta^{\prime}[ll])\)
+                \State res \(\gets (\exps(\Delta^{\prime}[ll]) + \exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\) 
+                \State coeff \(\gets \coeff(\Delta^{\prime}[ll])\)
                 \State \(col \gets indexof(M^{\prime}[r],M_{d})\)
                 \State \(row \gets indexof(\text{res},M_{d^{\prime}})\)
                 \State \(\text{mat}[row,col] = coeff\) 
@@ -281,7 +283,7 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
     \label{lem:generate:matching}
     The set of exponent tuples of \(M_{d}\) that match with $\delta$ is given by 
     \[
-        \left\{ m(exps(\delta) \% p) + w *p ~\Big|~ w \in wics \left(\frac{d - sum(m(exps(\delta) \% p))}{p}, n \right) \right\}
+        \left\{ m(\exps(\delta) \% p) + w *p ~\Big|~ w \in \wics \left(\frac{d - sum(m(\exps(\delta) \% p))}{p}, n \right) \right\}
     \]
     where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}
 \end{lem}
@@ -293,7 +295,7 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
 
 Because this expression is quite convoluted, we 
 provide an example of a computation 
-that may come up in calculating the quasi-F-split 
+that may come up in calculating the quasi-\(F\)-split 
 height of a K3 quartic surface over $\mathbb{F}_5$.
 
 \begin{ex}
@@ -310,7 +312,7 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     to the degree, and to maintain congruence to 
     $(4, 4, 4, 4) \mod 5$, we need to add two $5$'s 
     to the elements of $(3, 0, 2, 1)$. This corresponds 
-    to $\{w * 5 ~|~ w \in wics(2, 4)\}$, which is:
+    to $\{w * 5 ~|~ w \in \wics(2, 4)\}$, which is:
     \begin{align*}
         \{&(10, 0, 0, 0), (5, 5, 0, 0), (5, 0, 5, 0), (5, 0, 0, 5), (0, 10, 0, 0), \\
         &(0, 5, 5, 0), (0, 5, 0, 5), (0, 0, 10, 0), (0, 0, 5, 5), (0, 0, 0, 10)\}
@@ -334,40 +336,40 @@ Because we need it later for our complexity computation, we have the corollary:
 
 \begin{proof}
     By Lemma \ref{lem:generate:matching}, there are 
-    $\Big |wics \left(\frac{d - sum(m(exps(\delta) \% p))}{p}, n \right) \Big |$ 
+    $\Big |\wics \left(\frac{d - sum(m(\exps(\delta) \% p))}{p}, n \right) \Big |$ 
     monomials that match with $\delta$.
     Because the division is exact, 
-    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(exps(\delta) \% p))}{p}$,
+    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(\exps(\delta) \% p))}{p}$,
     giving the upper bound 
-    $|wics(\lfloor \frac{d}{p} \rfloor, n)| = \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
+    $|\wics(\lfloor \frac{d}{p} \rfloor, n)| = \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
 \end{proof}
 
 Denoting the expression from Lemma \ref{lem:generate:matching} 
 by $generateMatchingMonomials(\delta, p, M_d)$, we have
-the following algorithm, which we call \wics:
+the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
     \caption{Matrix of Multiply then Split: WICS algorithm}
     \label{alg:matrix:WICS}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $length(M_{d^{\prime}}) \times length(M_{d})$ matrix representing ``multiply then split''
-    \State mat $\gets zeros(length(M_{d^{\prime}}), length(M_{d}))$
+    \State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ matrix representing ``multiply then split''
+    \State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
     \For{$\delta \in \Delta$}
         \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$
         \For{$m \in mons$}
 		    \State $c \gets indexof(m,M_{d})$
-			\State res $\gets (exps(\delta) + exps(m) - (p-1, \ldots, p-1)) / p$
+			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$
 			\State $r \gets indexof(\text{res},M_{d^{\prime}})$
-            \State $\text{mat}[r, c] = coeff(\delta)$
+            \State $\text{mat}[r, c] = \coeff(\delta)$
         \EndFor
     \EndFor
     \State \Return mat
     \end{algorithmic}
 \end{algorithm}
 
-Letting $L_{d} = length(M_d)$ and 
-$L_{\Delta} = length(\Delta)$, this algorithm 
+Letting $L_{d} = \length(M_d)$ and 
+$L_{\Delta} = \length(\Delta)$, this algorithm 
 generates the matrix in 
 $O \left( L_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.
 The number of matching monomials each term $\delta$ 
@@ -377,7 +379,7 @@ effectively constant for all reasonably computable $n$ and $p$
 
 \subsection{Implementation}
 
-In the implementation of \triv, \merge, and \wics, there are a 
+In the implementation of \triv, \merge, and \wicsalg, there are a 
 few optimizations and considerations common to all the implementations.
 First, all exponent tuples are bitpacked into 
 unsigned integers, improving memory efficiency 
@@ -393,7 +395,7 @@ All algorithms require the $indexof()$ function,
 which we implement using Julia's \texttt{Dict\{K,V\}}, 
 which is implemented as a hashtable.
 
-\triv ~and \wics ~are easily GPU-parallelizable by creating 
+\triv ~and \wicsalg ~are easily GPU-parallelizable by creating 
 a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
 This creates the problem of needing an $indexof()$ function, 
 since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
@@ -404,19 +406,19 @@ hashmap is quite slow.
 Another solution can be to perform a binary search 
 for the $indexof()$ function, since $M_d$ is lexicographically 
 sorted, but for one-off computations, users are better 
-off using non-parallelized \merge ~or \wics ~to avoid 
+off using non-parallelized \merge ~or \wicsalg ~to avoid 
 first-time GPU kernel compilation times.
 However, if many matrices need to be created, caching 
 the hashtable allows the GPU implementations to far outpace 
 the non-parallelized CPU implementations.
 
 \merge ~should be parallelizable by implementing a modified parallel merge and using a parallel sort. 
-However, we expect the sorting bottleneck to mean that such a parallel algorithm wouldn't beat GPU-parallel \wics,
+However, we expect the sorting bottleneck to mean that such a parallel algorithm wouldn't beat GPU-parallel \wicsalg,
 so we don't bother developing the modified parallel merge.
 
 Below in Figure \ref{fig:momts:compare}, we compare running times 
 for all the \(p\) which we consider. 
-\wics \, ends up being the fastest practically, 
+\wicsalg \, ends up being the fastest practically, 
 both on the CPU and the GPU.
 We did not try running the tests for the 
 trivial algorithm on the 
@@ -429,7 +431,7 @@ amount of time.
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
     \hline
-    p & \triv - CPU & \triv - GPU & \merge   & \wics - CPU & \wics - GPU \\
+    p & \triv - CPU & \triv - GPU & \merge   & \wicsalg - CPU & \wicsalg - GPU \\
     \hline
     3 & 0.01   & 0.0007  & 0.001  & 0.001   & 0.0002  \\
     \hline                                          

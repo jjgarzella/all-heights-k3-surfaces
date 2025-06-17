@@ -89,16 +89,22 @@
 
 \newcommand{\triv}{\texttt{TRIV}}
 \newcommand{\merge}{\texttt{MERGE}}
-\newcommand{\wics}{\texttt{WICS}}
+\newcommand{\wicsalg}{\texttt{WICS}}
 
 % custom ops here
+\newcommand{\exps}{\operatorname{exps}}
+\newcommand{\wics}{\operatorname{wics}}
+\newcommand{\coeff}{\operatorname{coeff}}
+\newcommand{\length}{\operatorname{length}}
+
+
 
 % custom commands here
 \newcommand\bsfrac[2]{\reflectbox{\nicefrac{\reflectbox{$#1$}}{\reflectbox{$#2$}}}}
 
-\title{K3 surfaces of any Artin-Mazur height over \(\mathbb{F}_{5}\) and 
+\title{K3 surfaces of any Artin--Mazur height over \(\mathbb{F}_{5}\) and 
     \(\mathbb{F}_{7}\) via 
-Quasi-F-split singularities and GPU acceleration}
+quasi-\(F\)-split singularities and GPU acceleration}
 \author{Ryan Batubara, Jack J. Garzella, Alex Pan}
 
 \begin{document}
@@ -109,7 +115,7 @@ Quasi-F-split singularities and GPU acceleration}
     We develop a fast algorithm to calculate the Artin-Mazur height (equivalently, the
     quasi-\(F\)-split height) of a Calabi-Yau hypersurface, building on the work in
     \cite{kty-2022-fedder}. 
-    We provide a implementation of our approach, and use it to show that there are quartic
+    We provide an implementation of our approach, and use it to show that there are quartic
     K3 surfaces of any Artin-Mazur height over \(\mathbb{F}_{5}\) and \(\mathbb{F}_7\).
 \end{abstract}
 
@@ -118,7 +124,7 @@ Quasi-F-split singularities and GPU acceleration}
 
 \input{intro.tex}
 
-\section{Preliminaries: the Quasi-F-Split Height and Fedder's Criterion}
+\section{Preliminaries: the Quasi-\(F\)-Split Height and Fedder's Criterion}
 
 \input{algorithm_outline.tex}
 

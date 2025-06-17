@@ -1,21 +1,25 @@
-Given a variety \(X\) over a field of characteristic \(p\),
+Given an algebraic variety \(X\) over a field of characteristic \(p\),
 Artin and Mazur in \cite{artin-mazur-1977-height}
 define the height \(h(X) \in \mathbb{N} \cup \{\infty\}\) 
 (sometimes written \(h\) if \(X\) is obvious from the context)
 to be the height 
-of a certain formal group \(\Phi\) associated to \(X\).
+of a certain formal group associated to \(X\).
 The height is in some sense a measure of the
 ``arithmetic complexity'' of a variety,
-with higher heights indicating ``more complexity''.
+with larger heights indicating ``more complexity''.
 For example, consider the case when \(X\) is a 
 K3 surface (i.e. a surface for which \(\omega_{X} \isom \mathcal{O}_{X} \) 
 and \(H^{1}(X,\mathcal{O}_{X} ) = 0\)).
 In this case, \(h\) determines the \textit{Newton polygon}
 of \(X\), which in turn gives partial information about the 
-point counts of \(X\) over finite fields.
-In this case, the Newton polygon equals the Hodge polygon
+point counts of \(X\) over finite fields,
+i.e. \(\#X(\mathbb{F}_{q})\) for \(q = p^{r}, r \in \mathbb{N}\).
+One may construct another polygon, the \textit{Hodge polygon},
+from the Hodge-theotric data associated to \(X\).
+For K3 surfaces (and in fact for any surfaces), 
+the Newton polygon equals the Hodge polygon
 (i.e. the variety is ordinary) if and only if \(h=1\),
-and the Newton polygon is supersingular if and only if 
+and the Newton polygon is \textit{supersingular} if and only if 
 \(h = \infty\).
 
 Given a field \(k\) of characteristic \(p\), one may ask
@@ -28,7 +32,7 @@ Given a field \(k\) of characteristic \(p\), one may ask
 In the case that \(X\) is a K3 surface, it is known from the 
 original work of Artin and Mazur
 that either \(1 \leq h(X) \leq 10\) or \(h = \infty\).
-One expects that all such $h$ are taken on by K3 surfaces
+One expects that all such $h$ are realized by K3 surfaces
 in characteristic $p$.
 For example, in \cite{artin-1974-k3-surfaces},
 Artin shows\footnote{
@@ -61,10 +65,10 @@ have given examples of quartic K3 surfaces
 of all possible heights over \(\mathbb{F}_{3}\).
 
 Kawakami, Takamatsu, and Yoshikawa consider, 
-instead of the Artin-Mazur height, a different quantity called the
+instead of the Artin--Mazur height, a different quantity called the
 \textit{quasi-\(F\)-split height} 
 (see Section 2 for a definition),
-which is known to be the same as the Artin-Mazur height
+which is known to be the same as the Artin--Mazur height
 for Calabi-Yau varieties, and thus K3 surfaces.
 The theory of the quasi-\(F\)-split height has its
 roots in the theory of \(F\)-singularites and commutative
@@ -86,9 +90,6 @@ in the case when \(X\) is a Calabi-Yau hypersurface
 The forthcoming work 
 \cite{fgmqt-2025-witt-vectors-macaulay2} 
 provides an implementation of Theorem A.
-However, this algorithm (and the ones used to compute
-the examples
-in \cite{kty-2022-fedder}) 
 However, the algorithm used to compute the examples in
 \cite{kty-2022-fedder}
 is not especially practical
@@ -104,7 +105,7 @@ In this work, we push the method of Kawakami,
 Takamatsu, and Yoshikawa to the limits of readily
 available hardware, 
 and produce examples of quartic K3 surfaces \(X\) with all
-possible quasi-\(F\)-split heights \(h\) 
+possible heights \(h\) 
 over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 Our main insight is that one of the main
 bottlenecks of the problem can be broken down 
@@ -114,7 +115,7 @@ multiplications for a square matrix of size
 Because of this, we can use Nvidia's CUBLAS library 
 \cite{nvidia-2024-cublas}
 to perform the matrix multiplications
-on the GPU, making such computations
+on a GPU, making such computations
 nearly instantaneous.
 To create this matrix, one must calculate the matrix of a
 certain linear operator.
@@ -159,7 +160,7 @@ to use CUBLAS.
 In Section 7, we describe the computation of surfaces of all possible
 heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
-Throughout the paper, we do various time tests to compare various
+Throughout the paper, we do various timing experiments to compare 
 approaches for each computational step.
 All timing tests were performed with 
 an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.
@@ -182,3 +183,4 @@ National Science Foundation Graduate Research
 Fellowship Program under Grant No. 2038238, and a fellowship
 from the Sloan Foundation.
 
+We also thank Tommy Hofmann for inspiring Remark \ref{rmk:lift:roi}
