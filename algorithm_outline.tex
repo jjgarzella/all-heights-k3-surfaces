@@ -218,6 +218,7 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \end{rmk}
 
 \subsection{Splittings of Frobenius}
+\label{subsec:split:frob}
 
 Let \(R\) be a ring of characteristic \(p\). 
 We have the Frobenius morphism 
@@ -442,6 +443,8 @@ The following proposition demonstrates how we can calculate
     heights for \(q \neq p\).
 \end{rmk}
 
+
+
 Proposition \ref{prop:delta1:formula} gives a natural algorithm
 for calculating the term \(\Delta_{1}(f)\): 
 
@@ -457,7 +460,7 @@ for calculating the term \(\Delta_{1}(f)\):
 		    \State \(D \gets D - t^{p}\) 
 		\EndFor
 		\State \(D \gets D / p\)
-		\State \Return \(D \% p\) 
+		\State \Return \(D \modp\) 
 	\end{algorithmic}
 \end{algorithm}
 
@@ -510,7 +513,7 @@ exponents.
 \State result \(\gets 0\)	
 \For{\(t \in \text{terms}(f)\) }
     \State subtract \(p-1\) from all exponents of \(t\)
-    \State Divide all exponents of \(t\) by \(p\).
+    \State divide all exponents of \(t\) by \(p\).
     \Comment This division is exact because of the previous step
     \State result \(\gets \text{result} + t\)
 \EndFor 
@@ -518,12 +521,14 @@ exponents.
 \end{algorithmic}
 \end{algorithm}
 
-
 \subsection{The naive algorithm}
 
 Let \(f\) be a homogeneous polynomial of degree \(n\) 
 in \(S\), 
 so that \(Z(f)\) is a Calabi-Yau hypersurface.
+Recall from Subsection \ref{subsec:split:frob} that
+\(\mathfrak{m}^{[p]} = (x_{1}^{p}, \ldots, x_{n}^{p})\)
+is the Frobenius power of the maximal ideal.
 Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
@@ -535,7 +540,7 @@ algorithm to calculate the quasi-\(F\)-split height.
 	polynomial of degree \(n\) in \(S\).
 \State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{p}\) }
+\If{\(g \not\in \mathfrak{m}^{[p]}\) }
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
@@ -544,8 +549,8 @@ algorithm to calculate the quasi-\(F\)-split height.
     \If{\(b < h\)}
         \State \Return \(\infty\)
     \EndIf
-    \State \(g \gets u(\Delta \cdot g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
-    \If{\(g \notin \mathfrak{m}^{p}\)}
+    \State \(g \gets u(\Delta g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
+    \If{\(g \notin \mathfrak{m}^{[p]}\)}
         \State \Return \(h\) 
     \EndIf
     \State \(h \gets h + 1\)
@@ -571,6 +576,40 @@ so we can deterministically recover the height.
 See also \cite[Theorem~0.1]{artin-1974-k3-surfaces},
 for the case of K3 surfaces.
 For a K3 surface, the height (if finite) is bounded by 10.
+
+\begin{ex}
+    Let \(p=3\), and let
+    \(f = x^4 + y^4 + z^4 + w^4 \in S = k[x,y,z,w]\).
+    Raising \(f\) to the \(p-1 = 2\) in \(\mathbb{F}_{3}\), we get
+    \[
+    g = x^8 + 2x^4y^4 + 2x^4z^4 + 2x^4w^4 + y^8 + 2y^4z^4 + 2y^4w^4 + z^8 + 2z^4w^4 + w^8
+    .\] 
+    The only monomial of degree \(8\) that is not contained
+    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, x^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
+    Call this monomial \(c\).
+    Since this coefficient of \(c\) in \(g\) is zero, we conclude
+    by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
+    that \(g\) is not \(F\)-split.
+    Next, we must calculate \(\Delta_{1}(g)\).
+    To do this, we take a lift of \(g\) by regarding the coefficients
+    as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
+    We raise \(g^3\) in the integers, and subract by every term of \(g\) 
+    cubed.
+
+    Then, we multiply by \(\Delta_{1}(g)\) getting a polynomial of degree 24.
+    We apply the splitting of frobenius, as described in Algorithm \ref{alg:naive:u}, 
+    obtaining another polynomial of degree \(8\). 
+    We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero, 
+    since this choice of f, all of the exponents for all quantities 
+    must be multiples of four\footnote{
+    In fact, this implies that the degree \(8\) polynomial is zero.
+    However, this phenomenon is quite rare.
+    }
+    We then continue, multiplying, applying the splitting, checking the coefficient, 
+    until we conclude that the height is greater than 10. 
+    Now, by Hodge theory, if the height is greater than 10, it must be infinity. 
+    So we conclude that the height is infinity.
+\end{ex}
 
 \subsection{The key idea: finding the matrix of the linear operator ``multiply then split''}
 
@@ -631,7 +670,7 @@ The algorithm for Fedder's criterion then becomes:
 	polynomial of degree \(n\) in \(S\).
 \State \textbf{Output:} $h(f)$
 \State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{p}\) }
+\If{\(g \not\in \mathfrak{m}^{[p]}\) }
     \State \Return \(1\) 
 \EndIf
 \State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}

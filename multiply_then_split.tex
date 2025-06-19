@@ -127,15 +127,17 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
     \label{alg:matrix:trivial}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ 
+    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
+    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
+    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
 	matrix representing ``multiply then split''
-    \State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
+    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
     \For{$m \in M_{d}$}
-	    \State $c \gets indexof(m, M _{d})$
+	    \State $c \gets \indexof(m, M _{d})$
         \For{$\delta \in \Delta$}
-            \If{$(\exps(\delta) + \exps(m)) \% p = (p-1, \dots, p-1)$} \Comment{\textbf{if} $\delta$ matches with $m$}
+            \If{$(\exps(\delta) + \exps(m)) \equiv (p-1, \dots, p-1)$ \(\mod p\)} \Comment{\textbf{if} $\delta$ matches with $m$}
 			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$ \Comment{Apply $u$ to $\delta m$}
-				\State $r \gets indexof(\text{res},M_{d^{\prime}})$
+				\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
                 \State $\text{mat}[r, c] = \coeff(\delta)$
             \EndIf
         \EndFor
@@ -230,15 +232,17 @@ which we call \merge:
 \label{alg:theta:merge}
 \begin{algorithmic}[1]
 \State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
-\State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ 
+\State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
+\(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
+\State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
 	matrix representing ``multiply then split''
-\State mat \(\gets zeros(\length(M_{d}), \length(M_{d^{\prime}}))\) 
-\State $L \gets [\exps(\delta) \% p ~|~ \delta \in \Delta]$
-\State $R \gets [\exps(m) \% p ~|~ m \in M_{d}]$
+\State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
+\State $L \gets [\exps(\delta) \modp ~|~ \delta \in \Delta]$
+\State $R \gets [\exps(m) \modp ~|~ m \in M_{d}]$
 \State sort both  \(L\) and \(R\) 
 \State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
 \State \(l \gets 1, r \gets \length(R)\)
-\While{\(1 \leq r ~and~ l \leq \length(L)\)}
+\While{\(1 \leq r ~\text{and}~ l \leq \length(L)\)}
 	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
 	\If{cmp < 0}
 	    \State \(l \gets l + 1\) 
@@ -251,9 +255,9 @@ which we call \merge:
 		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
                 \State res \(\gets (\exps(\Delta^{\prime}[ll]) + \exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\) 
                 \State coeff \(\gets \coeff(\Delta^{\prime}[ll])\)
-                \State \(col \gets indexof(M^{\prime}[r],M_{d})\)
-                \State \(row \gets indexof(\text{res},M_{d^{\prime}})\)
-                \State \(\text{mat}[row,col] = coeff\) 
+                \State \(\text{col} \gets \indexof(M^{\prime}[r],M_{d})\)
+                \State \(\text{row} \gets \indexof(\text{res},M_{d^{\prime}})\)
+                \State \(\text{mat}[\text{row},\text{col}] = \coeff\) 
             \EndFor
             \State \(r \gets r - 1\)
         \EndWhile     
@@ -287,7 +291,8 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
     \label{lem:generate:matching}
     The set of exponent tuples of \(M_{d}\) that match with $\delta$ is given by 
     \[
-        \left\{ m(\exps(\delta) \% p) + w *p ~\Big|~ w \in \wics \left(\frac{d - sum(m(\exps(\delta) \% p))}{p}, n \right) \right\}
+        \left\{ m(\exps(\delta) \mathmod p) + p\cdot w ~\Big|~ w \in \wics 
+        \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \right\}
     \]
     where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}
 \end{lem}
@@ -308,15 +313,15 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     Then $M_{16}$ is the monomial basis of 
     \(S_{16}\) (over $\mathbb{F}_5$). 
     To find the monomials of $M_{16}$ that match with 
-    $\delta$, we begin by reducing $(21, 19, 22, 18) \% 5 = (1, 4, 2, 3)$.
+    $\delta$, we begin by reducing $(21, 19, 22, 18) \mathmod 5 = (1, 4, 2, 3)$.
     This makes $m((1, 4, 2, 3)) = (3, 0, 2, 1)$ the 
     exponent tuple of a matching monomial mod \(p\).
     However, \((3, 0, 2, 1)\) isn't in $M_{16}$. 
     For it to be in $M_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     to the degree, and to maintain congruence to 
-    $(4, 4, 4, 4) \mod 5$, we need to add two $5$'s 
+    $(4, 4, 4, 4) \mathmod 5$, we need to add two $5$'s 
     to the elements of $(3, 0, 2, 1)$. This corresponds 
-    to $\{w * 5 ~|~ w \in \wics(2, 4)\}$, which is:
+    to $\{5w ~|~ w \in \wics(2, 4)\}$, which is:
     \begin{align*}
         \{&(10, 0, 0, 0), (5, 5, 0, 0), (5, 0, 5, 0), (5, 0, 0, 5), (0, 10, 0, 0), \\
         &(0, 5, 5, 0), (0, 5, 0, 5), (0, 0, 10, 0), (0, 0, 5, 5), (0, 0, 0, 10)\}
@@ -340,10 +345,10 @@ Because we need it later for our complexity computation, we have the corollary:
 
 \begin{proof}
     By Lemma \ref{lem:generate:matching}, there are 
-    $\Big |\wics \left(\frac{d - sum(m(\exps(\delta) \% p))}{p}, n \right) \Big |$ 
+    $\Big |\wics \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \Big |$ 
     monomials that match with $\delta$.
     Because the division is exact, 
-    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(\exps(\delta) \% p))}{p}$,
+    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(\exps(\delta) \mathmod p))}{p}$,
     giving the upper bound 
     $|\wics(\lfloor \frac{d}{p} \rfloor, n)| = \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
 \end{proof}
@@ -353,18 +358,23 @@ by $generateMatchingMonomials(\delta, p, M_d)$, we have
 the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
-    \caption{Matrix of multiply then split: WICS algorithm}
+    \caption{Matrix of multiply then split: weak integer compositions algorithm}
     \label{alg:matrix:WICS}
     \begin{algorithmic}[1]
     \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ matrix representing ``multiply then split''
-    \State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
+    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
+    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
+    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
+    	matrix representing ``multiply then split''
+    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
+    %\State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ matrix representing ``multiply then split''
+    %\State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
     \For{$\delta \in \Delta$}
         \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$
-        \For{$m \in mons$}
-		    \State $c \gets indexof(m,M_{d})$
+        \For{$m \in \text{mons}$}
+		    \State $c \gets \indexof(m,M_{d})$
 			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$
-			\State $r \gets indexof(\text{res},M_{d^{\prime}})$
+			\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
             \State $\text{mat}[r, c] = \coeff(\delta)$
         \EndFor
     \EndFor
