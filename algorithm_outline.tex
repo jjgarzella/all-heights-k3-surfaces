@@ -87,7 +87,7 @@ The lemma then shows that \(\Phi\) is a homomorphism
 \[
 	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R 
 .\] 
-The fact that the polynomials \(S_{n}\) and \(Ps_{n}\) do not depend on the base
+The fact that the polynomials \(S_{n}\) and \(P_{n}\) do not depend on the base
 ring \(R\) means that the construction is functorial; that is,
 for a map of rings \(R \xrightarrow{} R^{\prime} \), we get a 
 map \(W(R) \xrightarrow{} W(R^{\prime})\).
@@ -533,7 +533,8 @@ Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
-\caption{Quasi-\(F\)-split height: naive algorithm}
+% I think consistency of the term overrides title capitalization.
+\caption{quasi-\(F\)-split height: naive algorithm}
 \label{alg:qfs:naive}
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
@@ -596,11 +597,11 @@ For a K3 surface, the height (if finite) is bounded by 10.
     We raise \(g^3\) in the integers, and subract by every term of \(g\) 
     cubed.
 
-    Then, we multiply by \(\Delta_{1}(g)\) getting a polynomial of degree 24.
-    We apply the splitting of frobenius, as described in Algorithm \ref{alg:naive:u}, 
+    Then, we multiply \(g\) by \(\Delta_{1}(g)\), getting a polynomial of degree 24.
+    We apply the splitting of Frobenius, as described in Algorithm \ref{alg:naive:u}, 
     obtaining another polynomial of degree \(8\). 
-    We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero, 
-    since this choice of f, all of the exponents for all quantities 
+    We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero. 
+    For this choice of $f$, all of the exponents for all quantities 
     must be multiples of four\footnote{
     In fact, this implies that the degree \(8\) polynomial is zero.
     However, this phenomenon is quite rare.
@@ -663,7 +664,7 @@ Thus, we can check if a single element of the vector representing
 The algorithm for Fedder's criterion then becomes:
 
 \begin{algorithm}[H]
-\caption{Quasi-\(F\)-split height: matrix-based algorithm}
+\caption{quasi-\(F\)-split height: matrix-based algorithm}
 \label{alg:qfs:matrix}
 \begin{algorithmic}[1]
 \State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
@@ -692,4 +693,4 @@ The algorithm for Fedder's criterion then becomes:
 \end{algorithm}
 
 Thus, we have reduced our problem (algorithmically, at least)
-to finding the matrix of a ``mulitply then split'' operation.
+to finding the matrix of the ``mulitply then split'' operation.

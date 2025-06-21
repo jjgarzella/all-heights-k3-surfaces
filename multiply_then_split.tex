@@ -55,7 +55,7 @@ we mean componentwise application of these operations.
 Use of arbitrary componentwise operations is called
 \textit{broadcasting} in Julia, and we will
 sometimes use this term.
-Homogenoeus polynomials are reprented in computer 
+Homogenoeus polynomials are represented in computer 
 memory as a list of their terms. 
 This is reflected in our notation, 
 thus the meaning of ``for \(\delta \in \Delta\)''
@@ -416,7 +416,7 @@ since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
 The solution we implement is a static hashtable, with size 
 and hashing function decided at compiletime.
 Due to Julia's JIT compilation nature, creating this 
-hashmap is quite slow.
+hashtable is quite slow.
 Another solution can be to perform a binary search 
 for the $indexof()$ function, since $M_d$ is lexicographically 
 sorted, but for one-off computations, users are better 
