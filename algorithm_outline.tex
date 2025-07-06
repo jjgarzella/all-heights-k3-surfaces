@@ -448,23 +448,26 @@ The following proposition demonstrates how we can calculate
 Proposition \ref{prop:delta1:formula} gives a natural algorithm
 for calculating the term \(\Delta_{1}(f)\): 
 
+
 \begin{algorithm}[H]
+\label{alg:calc:delta1}
 \caption{Calculation of \(\Delta_{1}(f)\) }
-	\label{alg:calc:delta1}
-    \begin{algorithmic}[1]
-		\State \textbf{Input:} \(f \in \mathbb{F}_{p}[x_{1}, \ldots, x_{n}]\) 
-		\State \textbf{Output:} $\Delta_1(f)$
-		\State \(\tilde{f} \gets \text{lift}(f)\) 
-		\State \(D \gets \tilde{f}^{p}\) 
-		\For{\(t \in \text{terms}(\tilde{f})\) }
-		    \State \(D \gets D - t^{p}\) 
-		\EndFor
-		\State \(D \gets D / p\)
-		\State \Return \(D \modp\) 
-	\end{algorithmic}
+\KwInput{$f \in \mathbb{F}_p[x_1, \dots , x_n]$}
+\KwOutput{$\Delta_1(f)$}
+
+$\tilde{f} \gets \texttt{lift}(f)$\;
+$D \gets \tilde{f}^p$\;
+
+\For{$t \in \textnormal{\texttt{terms}} (\tilde{f})$}{
+	$D \gets D - t^p$
+}
+
+$D \gets D / p$
+
+\Return{D}
 \end{algorithm}
 
-\subsection{Splittings of frobenius from a computational perspective}
+\subsection{Splittings of Frobenius from a computational perspective}
 
 Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
 We will use perspective (3) from
@@ -502,23 +505,30 @@ Given \(f \in S\), we will first compute
 \(S^{p} \isom S\) by taking \(p\)-th roots of 
 exponents.
 
+\SetKwComment{Comment}{// }{}
+
 \begin{algorithm}[H]
 \caption{Splitting of Frobenius}
 \label{alg:naive:u}
-\begin{algorithmic}[1]
-\State \textbf{Input:} \(f \in S\) 
-\State \textbf{Output:} \(u(f)\) considered as an element of \(S\).
-\State Discard all terms of \(f\) whose exponents are not congruent to
-	\((p-1, \ldots, p-1)\) mod \(p\).
-\State result \(\gets 0\)	
-\For{\(t \in \text{terms}(f)\) }
-    \State subtract \(p-1\) from all exponents of \(t\)
-    \State divide all exponents of \(t\) by \(p\).
-    \Comment This division is exact because of the previous step
-    \State result \(\gets \text{result} + t\)
-\EndFor 
-\State \Return result
-\end{algorithmic}
+\KwInput{$f \in S$}
+\KwOutput{$u(f) \in S$}
+\Comment{Discard terms of $f$ with exponents not congruent to $(p-1, \dots, p-1) \mod p$}
+\For{$t \in \textnormal{\texttt{terms}} (f)$}{
+	\Comment{See Def \ref{def:poly:nota} for exps() notation}
+	\If{$\textnormal{\texttt{exps}} (t) \not\equiv (p-1, \dots, p-1) \mod p$}{
+		$f \gets f - t$
+	}
+}
+
+$r \gets 0$\;
+\For{$t \in \textnormal{\texttt{terms}} (f)$}{
+	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
+	\Comment{This division is exact because of the previous step}
+	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
+	$r \gets r + t$
+}
+
+\Return $r$
 \end{algorithm}
 
 \subsection{The naive algorithm}
@@ -533,30 +543,29 @@ Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
-% I think consistency of the term overrides title capitalization.
-\caption{quasi-\(F\)-split height: naive algorithm}
+\caption{Quasi-\(F\)-split height: naive algorithm}
 \label{alg:qfs:naive}
-\begin{algorithmic}[1]
-\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
-	polynomial of degree \(n\) in \(S\).
-\State \textbf{Output:} $h(f)$
-\State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{[p]}\) }
-    \State \Return \(1\) 
-\EndIf
-\State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(h \gets 2\) 
-\While{true}
-    \If{\(b < h\)}
-        \State \Return \(\infty\)
-    \EndIf
-    \State \(g \gets u(\Delta g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
-    \If{\(g \notin \mathfrak{m}^{[p]}\)}
-        \State \Return \(h\) 
-    \EndIf
-    \State \(h \gets h + 1\)
-\EndWhile
-\end{algorithmic}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p-1})$\;
+$h \gets 2$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g \gets u(\Delta g)$\;
+	\If{$g \notin \mathfrak{m}^{[p]}$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$\;
+}
 \end{algorithm}
 
 \begin{thm}
@@ -664,32 +673,32 @@ Thus, we can check if a single element of the vector representing
 The algorithm for Fedder's criterion then becomes:
 
 \begin{algorithm}[H]
-\caption{quasi-\(F\)-split height: matrix-based algorithm}
+\caption{Quasi-\(F\)-split height: matrix-based algorithm}
 \label{alg:qfs:matrix}
-\begin{algorithmic}[1]
-\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
-	polynomial of degree \(n\) in \(S\).
-\State \textbf{Output:} $h(f)$
-\State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{[p]}\) }
-    \State \Return \(1\) 
-\EndIf
-\State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(M \gets\) the matrix of  \(g^{\prime} \mapsto u(\Delta g^{\prime})\)
-\State \(h \gets 2\) 
-\State \(g_{v} \gets\) the representation of \(g\) as a vector
-\State \(i \gets \) the index of the monomial \(x_{1}^{p-1}\cdots x_{n}^{p-1}\)
-\While{true}
-    \If{\(b < h\)}
-        \State \Return \(\infty\)
-    \EndIf
-    \State \(g_{v} \gets M g_{v}\) 
-    \If{\(g[i] \neq 0\)}
-        \State \Return \(h\) 
-    \EndIf
-    \State \(h \gets h + 1\)
-\EndWhile
-\end{algorithmic}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p - 1})$\;
+$M \gets $ the matrix of $g^{\prime} \mapsto u(\Delta g^{\prime})$\;
+$h \gets 2$\;
+$g_v \gets $ the representation of $g$ as a vector\;
+$i \gets $ the index of the monomial $x_{1}^{p - 1} \dots x_{n}^{p - 1}$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g_v \gets Mg_v$\;
+	\If{$g_v[i] \neq 0$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$
+}
 \end{algorithm}
 
 Thus, we have reduced our problem (algorithmically, at least)

@@ -63,6 +63,7 @@ is a for loop though all the monomials
 of \(\Delta\).
 
 \begin{defn}
+    \label{def:poly:nota}
     The \textit{exponent tuple} of a monomial 
     $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
 	We will denote it $\exps(m)$, and we also 
@@ -123,27 +124,27 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
 \subsection{The trivial algorithm}
 
 \begin{algorithm}[H]
-    \caption{Matrix of multiply then split: trivial algorithm}
+    \caption{Matrix of multiply then split: \triv}
     \label{alg:matrix:trivial}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-	matrix representing ``multiply then split''
-    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-    \For{$m \in M_{d}$}
-	    \State $c \gets \indexof(m, M _{d})$
-        \For{$\delta \in \Delta$}
-            \If{$(\exps(\delta) + \exps(m)) \equiv (p-1, \dots, p-1)$ \(\mod p\)} \Comment{\textbf{if} $\delta$ matches with $m$}
-			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$ \Comment{Apply $u$ to $\delta m$}
-				\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
-                \State $\text{mat}[r, c] = \coeff(\delta)$
-            \EndIf
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
+    \KwInput{
+        $\Delta, M_d, M_{d^\prime}, p$
+    }
+    \KwNotation{Let $\ell_d = \textnormal{length}(M_d), \ell_{d^\prime} = \textnormal{length}(M_{d^\prime})$}
+    \KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
+    $\text{mat} \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+    \For{$m \in M_d$}{
+        $c \gets \code{indexof}(m, M_d)$\;
+        \For{$\delta \in \Delta$}{
+            \Comment{If $\delta$ matches with $m$}
+            \If{$\code{exps}(\delta) + \code{exps}(m) \equiv (p - 1, \dots, p - 1) \mod p$}{
+                \Comment{Apply $u$ to $\delta m$}
+                $\text{res} \gets (\code{exps}(\delta) + \code{exps}(m) - (p - 1, \dots, p - 1) / p$\;
+                $r \gets \code{indexof}(\text{res},M_{d^{\prime}})$\;
+                $\text{mat}[r, c] = \code{coeff}(\delta)$
+            }
+        }
+    }
+    \Return mat
 \end{algorithm}
 
 In this algorithm, which we call \triv, we iterate through 
@@ -228,44 +229,46 @@ Using these two corollaries, we have the following algorithm,
 which we call \merge:
 
 \begin{algorithm}[H]
-\caption{Matrix of multiply then split: merge-based algorithm}
+\caption{Matrix of multiply then split: \merge}
 \label{alg:theta:merge}
-\begin{algorithmic}[1]
-\State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
-\State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-\(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-\State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-	matrix representing ``multiply then split''
-\State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-\State $L \gets [\exps(\delta) \modp ~|~ \delta \in \Delta]$
-\State $R \gets [\exps(m) \modp ~|~ m \in M_{d}]$
-\State sort both  \(L\) and \(R\) 
-\State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
-\State \(l \gets 1, r \gets \length(R)\)
-\While{\(1 \leq r ~\text{and}~ l \leq \length(L)\)}
-	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
-	\If{cmp < 0}
-	    \State \(l \gets l + 1\) 
-	\ElsIf{0 < cmp}
-	    \State \(r \gets r - 1\)
-    \ElsIf{0 == cmp}
-        \State matchr \(\gets R[r]\) 
-        \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
-        \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
-		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
-                \State res \(\gets (\exps(\Delta^{\prime}[ll]) + \exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\) 
-                \State coeff \(\gets \coeff(\Delta^{\prime}[ll])\)
-                \State \(\text{col} \gets \indexof(M^{\prime}[r],M_{d})\)
-                \State \(\text{row} \gets \indexof(\text{res},M_{d^{\prime}})\)
-                \State \(\text{mat}[\text{row},\text{col}] = \coeff\) 
-            \EndFor
-            \State \(r \gets r - 1\)
-        \EndWhile     
-        \State \(l \gets l + \text{numLmatches} - 1\) 
-    \EndIf
-\EndWhile
-\State \Return mat
-\end{algorithmic}
+\KwInput{
+    $\Delta, M_d, M_{d^\prime}, p$
+}
+\KwNotation{Let $\ell_d = \textnormal{length}(M_d), \ell_{d^\prime} = \textnormal{length}(M_{d^\prime})$}
+\KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
+$\text{mat} \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+% Gave up on the \code{exps} thing here, personally I believe it looks
+% better (example in Algorithm 4), but this probably isn't the final 
+% version anyways
+$L \gets [\exps(\delta) \modp ~|~ \delta \in \Delta]$\;
+$R \gets [\exps(m) \modp ~|~ m \in M_{d}]$\;
+sort both  \(L\) and \(R\) \;
+\(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\)\;
+\(l \gets 1, r \gets \length(R)\)\;
+\While{\(1 \leq r ~\text{and}~ l \leq \length(L)\)}{
+    cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\)\;
+    \uIf{\textnormal{cmp < 0}}{
+        \(l \gets l + 1\)\;
+    }\uElseIf{\textnormal{0 < cmp}}{
+        \(r \gets r - 1\)\;
+    }\Else{
+        matchr \(\gets R[r]\)\;
+        numLmatches \(\gets\) the number of adjacent entries in \(L\)\;
+        which are equal to \(L[l]\)\;
+        \While{$R[r] == \text{matchr} \&\& 1 \leq r$}{
+            \For{\(ll \in (l, l+1, \ldots, l+\textnormal{numLmatches} - 1)\)}{
+                res \(\gets (\exps(\Delta^{\prime}[ll]) + \exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\)\;
+                coeff \(\gets \coeff(\Delta^{\prime}[ll])\)\;
+                \(\text{col} \gets \indexof(M^{\prime}[r],M_{d})\)\;
+                \(\text{row} \gets \indexof(\text{res},M_{d^{\prime}})\)\;
+                \(\text{mat}[\text{row},\text{col}] = \coeff\)\;
+            }
+        }
+        \(r \gets r - 1\)\;
+        \(l \gets l + \text{numLmatches} - 1\)\;
+    }
+}
+\Return mat
 \end{algorithm}
 
 Note that the inner while loops account for the fact that
@@ -358,28 +361,24 @@ by $generateMatchingMonomials(\delta, p, M_d)$, we have
 the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
-    \caption{Matrix of multiply then split: weak integer compositions algorithm}
+    \caption{Matrix of multiply then split: \wicsalg}
+    \KwInput{$\Delta, M_{d}, M_{d^{\prime}}, p$}
+    \KwNotation{Let \(\ell_{d} = \length(M_{d})\), 
+    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)}
+    \KwOutput{$\ell_{d^{\prime}} \times \ell_{d}$ 
+    	matrix representing ``multiply then split''}
+    $\text{mat} \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+    \For{$\delta \in \Delta$}{
+        mons $\gets generateMatchingMonomials(\delta, p, M_{d})$\;
+        \For{$m \in \text{mons}$}{
+            $c \gets \indexof(m,M_{d})$\;
+			res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$\;
+			$r \gets \indexof(\text{res},M_{d^{\prime}})$\;
+            $\text{mat}[r, c] = \coeff(\delta)$\;
+        }
+    }
+    \Return mat
     \label{alg:matrix:WICS}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-    	matrix representing ``multiply then split''
-    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-    %\State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ matrix representing ``multiply then split''
-    %\State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
-    \For{$\delta \in \Delta$}
-        \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$
-        \For{$m \in \text{mons}$}
-		    \State $c \gets \indexof(m,M_{d})$
-			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$
-			\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
-            \State $\text{mat}[r, c] = \coeff(\delta)$
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
 \end{algorithm}
 
 Letting $L_{d} = \length(M_d)$ and 
