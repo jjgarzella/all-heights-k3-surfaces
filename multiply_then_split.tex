@@ -128,7 +128,6 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
     \label{alg:matrix:trivial}
     \KwInput{
         $\Delta, B_d, B_{d^\prime}, p$
-        $\Delta, B_d, B_{d^\prime}, p$
     }
     \KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
     \KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
@@ -368,9 +367,6 @@ the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
     \caption{Matrix of multiply then split: \wicsalg}
-    \KwInput{$\Delta, B_{d}, B_{d^{\prime}}, p$}
-    \KwNotation{Let \(\ell_{d} = \length(B_{d})\), 
-    \(\ell_{d^{\prime}} = \length(B_{d^{\prime}})\)}
     \KwInput{$\Delta, B_{d}, B_{d^{\prime}}, p$}
     \KwNotation{Let \(\ell_{d} = \length(B_{d})\), 
     \(\ell_{d^{\prime}} = \length(B_{d^{\prime}})\)}
