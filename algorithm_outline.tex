@@ -512,21 +512,25 @@ exponents.
 \label{alg:naive:u}
 \KwInput{$f \in S$}
 \KwOutput{$u(f) \in S$}
-\Comment{Discard terms of $f$ with exponents not congruent to $(p-1, \dots, p-1) \mod p$}
+$r \gets 0$\;
+%\Comment{Discard terms of $f$ with exponents not congruent to $(p-1, \dots, p-1) \mod p$}
 \For{$t \in \textnormal{\texttt{terms}} (f)$}{
 	\Comment{See Def \ref{def:poly:nota} for exps() notation}
 	\If{$\textnormal{\texttt{exps}} (t) \not\equiv (p-1, \dots, p-1) \mod p$}{
-		$f \gets f - t$
+		%$f \gets f - t$
+	    $\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
+	    \Comment{This division is exact because of the previous step}
+	    $\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
+	    $r \gets r + t$
 	}
 }
 
-$r \gets 0$\;
-\For{$t \in \textnormal{\texttt{terms}} (f)$}{
-	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
-	\Comment{This division is exact because of the previous step}
-	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
-	$r \gets r + t$
-}
+% \For{$t \in \textnormal{\texttt{terms}} (f)$}{
+% 	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
+% 	\Comment{This division is exact because of the previous step}
+% 	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
+% 	$r \gets r + t$
+% }
 
 \Return $r$
 \end{algorithm}

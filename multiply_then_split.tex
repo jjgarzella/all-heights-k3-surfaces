@@ -128,6 +128,7 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
     \label{alg:matrix:trivial}
     \KwInput{
         $\Delta, B_d, B_{d^\prime}, p$
+        $\Delta, B_d, B_{d^\prime}, p$
     }
     \KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
     \KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
@@ -161,6 +162,7 @@ seen from the nested loops, assuming that integer
 arithmetic operations are constant time.
 
 In practice, the majority of the combinations of 
+terms of $\Delta$ and $B_{d}$ don't match. This means in
 terms of $\Delta$ and $B_{d}$ don't match. This means in
 Algorithm \ref{alg:matrix:trivial}, much of our 
 runtime is wasted on checking for whether terms match.
@@ -314,11 +316,15 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     Let $p = 5$, \(n = 4\), and $\delta$ a monomial 
     with exponent tuple $(21, 19, 22, 18)$. 
     Then $B_{16}$ is the monomial basis of 
+    Then $B_{16}$ is the monomial basis of 
     \(S_{16}\) (over $\mathbb{F}_5$). 
+    To find the monomials of $B_{16}$ that match with 
     To find the monomials of $B_{16}$ that match with 
     $\delta$, we begin by reducing $(21, 19, 22, 18) \mathmod 5 = (1, 4, 2, 3)$.
     This makes $m((1, 4, 2, 3)) = (3, 0, 2, 1)$ the 
     exponent tuple of a matching monomial mod \(p\).
+    However, \((3, 0, 2, 1)\) isn't in $B_{16}$. 
+    For it to be in $B_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     However, \((3, 0, 2, 1)\) isn't in $B_{16}$. 
     For it to be in $B_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     to the degree, and to maintain congruence to 
@@ -362,6 +368,9 @@ the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
     \caption{Matrix of multiply then split: \wicsalg}
+    \KwInput{$\Delta, B_{d}, B_{d^{\prime}}, p$}
+    \KwNotation{Let \(\ell_{d} = \length(B_{d})\), 
+    \(\ell_{d^{\prime}} = \length(B_{d^{\prime}})\)}
     \KwInput{$\Delta, B_{d}, B_{d^{\prime}}, p$}
     \KwNotation{Let \(\ell_{d} = \length(B_{d})\), 
     \(\ell_{d^{\prime}} = \length(B_{d^{\prime}})\)}
