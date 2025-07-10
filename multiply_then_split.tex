@@ -441,20 +441,16 @@ amount of time.
 \begin{figure}[ht]
 \label{fig:momts:compare}
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-    \hline
+\begin{tabular}{c c c c c c}
+    \toprule
     p & \triv ~- CPU & \triv ~- GPU & \merge   & \wicsalg ~- CPU & \wicsalg ~- GPU \\
-    \hline
-    3 & 0.01   & 0.0007  & 0.001  & 0.001   & 0.0002  \\
-    \hline                                          
+    \midrule
+    3 & 0.01   & 0.0007  & 0.001  & 0.001   & 0.0002  \\                                       
     5 & 1.6    & 0.005   & 0.046  & 0.028   & 0.0024  \\
-    \hline                                          
     7 & 45.33  & 0.104   & 0.670  & 0.277   & 0.025  \\
-    \hline                                          
     11 &    -  & 6.796   & 26.35  & 5.45    & 0.56  \\
-    \hline                                          
     13 &    -  & 31.86   & 88.97  & 17.06   & 2.05 \\
-    \hline
+    \bottomrule
 \end{tabular}
 \caption{Comparison of timings for various algorithms that calculate
 the matrix of ``multiply then split''. 
