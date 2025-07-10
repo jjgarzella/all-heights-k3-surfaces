@@ -100,6 +100,7 @@ For $p = 11$ and $p = 13$, the threshold for the NTT where
 GPU memory becomes a bottleneck is reached, and the algorithm 
 faces a sharp drop in speed. The examples below took about 12 compute hours
 on the aforementioned 2080Tis (via random guessing).
+
 Newton polygons of K3 surfaces may be computed by using the
 library ToricControlledReduction
 \cite{chk-2019-toric-controlled-reduction} 
@@ -107,7 +108,8 @@ library ToricControlledReduction
 function of the surface, from which the Newton polygon and thus the
 height can be deduced).
 Our method is comparable to ToricControlledReduction to find
-the height for \(p = 11\). On a Nvidia 3090 our method took 
+the height for \(p = 11\). 
+On an Nvidia 3090, our method took 
 around 39-40 seconds per surface, while ToricControlledReduction took 
 about 43 seconds per surface.
 For \(p = 13\), our 
