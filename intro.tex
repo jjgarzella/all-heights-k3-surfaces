@@ -15,7 +15,7 @@ of \(X\), which in turn gives partial information about the
 point counts of \(X\) over finite fields,
 i.e. \(\#X(\mathbb{F}_{q})\) for \(q = p^{r}, r \in \mathbb{N}\).
 One may construct another polygon, the \textit{Hodge polygon},
-from the Hodge-theotric data associated to \(X\).
+from the Hodge-theoretic data associated to \(X\).
 For K3 surfaces (and in fact for any surfaces), 
 the Newton polygon equals the Hodge polygon
 (i.e. the variety is ordinary) if and only if \(h=1\),
@@ -42,7 +42,7 @@ Artin shows\footnote{
 }
 that this holds over an algebraically
 closed field \(k\) of characteristic \(p\) in the
-case that \(p \equiv 3 \mod 4\).
+case that \(p \equiv 3 \mathmod 4\).
 In \cite{taelman-2016-k3-given-l-function}, 
 Taelman shows that
 all possible \(h\) are realized
@@ -65,10 +65,10 @@ have given examples of quartic K3 surfaces
 of all possible heights over \(\mathbb{F}_{3}\).
 
 Kawakami, Takamatsu, and Yoshikawa consider, 
-instead of the Artin--Mazur height, a different quantity called the
+instead of the Artin--Mazur height, another quantity called the
 \textit{quasi-\(F\)-split height} 
 (see Section 2 for a definition),
-which is known to be the same as the Artin--Mazur height
+which is known to be equal to the Artin--Mazur height
 for Calabi-Yau varieties, and thus K3 surfaces.
 The theory of the quasi-\(F\)-split height has its
 roots in the theory of \(F\)-singularites and commutative
@@ -130,9 +130,12 @@ of heights of K3 surfaces:
 about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
 about 180 surfaces per second over \(\mathbb{F}_{7}\).
 Our implementations can also handle \(\mathbb{F}_{11}\) 
-and \(\mathbb{F}_{13}\), though they are slower than known methods
-of calculating the Newton polygon (e.g. 
-\cite{chk-2019-toric-controlled-reduction}).
+and \(\mathbb{F}_{13}\). 
+For \(p = 11\), our method is comparable to the state of the art
+for computing Newton polygons (e.g. 
+\cite{chk-2019-toric-controlled-reduction}),
+though it is noticably slower 
+for \(p = 13\) (see section \ref{sec:heights:surfaces}).
 
 All of our algorithms are implemented in Julia 
 \cite{julia-2017}, and

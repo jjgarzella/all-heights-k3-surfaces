@@ -8,7 +8,7 @@ and then apply the map \(u\).
 Here, we consider a slightly more general problem.
 As usual, let \(S = k[x_{1}, \ldots, x_{n}]\).
 Let $S_\ell$ denote the vector space of homogeneous degree $\ell$ polynomials in \(S\).
-We let \(M_{\ell}\) denote a lexographically-ordered list
+We let \(B_{\ell}\) denote a lexographically-ordered list
 of the monomial basis of \(S_{\ell}\).
 Fix some \(D \in \mathbb{N}\), and let \(\Delta \in S_D\).
 Furthermore, fix \(d \in \mathbb{N}\).
@@ -63,6 +63,7 @@ is a for loop though all the monomials
 of \(\Delta\).
 
 \begin{defn}
+    \label{def:poly:nota}
     The \textit{exponent tuple} of a monomial 
     $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
 	We will denote it $\exps(m)$, and we also 
@@ -92,8 +93,8 @@ It follows that the dimension of the vector space is $|\wics(k, n)|$.
 
 \begin{proof}
 	This is a classical argument which goes by the 
-    name ``sticks and stones'', ``stars and bars'', or 
-    ``dots and dividers''.
+    name ``sticks and stones,'' ``stars and bars,'' or 
+    ``dots and dividers.''
 \end{proof}
 
 
@@ -101,13 +102,13 @@ It follows that the dimension of the vector space is $|\wics(k, n)|$.
     The number of terms of \(\Delta\) is bounded 
     above by \(\binom{D+n-1}{n-1}\) by Lemma \ref{lem:wics:size}.
     Likewise, the number of elements of 
-    \(M_{d}\) is \(\binom{d+n-1}{n-1}\).
-    For all of our time complexity calculations, 
-    we let $L_{d} = \length(M_{d}) = \binom{n + d - 1}{n - 1}$, 
-    and $L_{\Delta} = \length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
+    \(B_{d}\) is \(\binom{d+n-1}{n-1}\).
+    For all of our algorithmic complexity calculations, 
+    we let $\ell_{d} = \length(B_{d}) = \binom{n + d - 1}{n - 1}$, 
+    and $\ell_{\Delta} = \length(\Delta) \leq \binom{n + D - 1}{n - 1}$.
     In the case of the quasi-\(F\)-split height of a K3 surface, 
-    $L_{d} = \binom{n(p - 1) + n - 1}{n - 1} = \binom{np - 1}{n - 1}$, 
-    and $L_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$.
+    $\ell_{d} = \binom{n(p - 1) + n - 1}{n - 1} = \binom{np - 1}{n - 1}$, 
+    and $\ell_{\Delta} = \binom{np(p - 1) + n - 1}{n - 1} = \binom{n(p^2 - p + 1) - 1}{n - 1}$.
 \end{rmk}
 
 \begin{defn}
@@ -123,44 +124,45 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
 \subsection{The trivial algorithm}
 
 \begin{algorithm}[H]
-    \caption{Matrix of multiply then split: trivial algorithm}
+    \caption{Matrix of multiply then split: \triv}
     \label{alg:matrix:trivial}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-	matrix representing ``multiply then split''
-    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-    \For{$m \in M_{d}$}
-	    \State $c \gets \indexof(m, M _{d})$
-        \For{$\delta \in \Delta$}
-            \If{$(\exps(\delta) + \exps(m)) \equiv (p-1, \dots, p-1)$ \(\mod p\)} \Comment{\textbf{if} $\delta$ matches with $m$}
-			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$ \Comment{Apply $u$ to $\delta m$}
-				\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
-                \State $\text{mat}[r, c] = \coeff(\delta)$
-            \EndIf
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
+    \KwInput{
+        $\Delta, B_d, B_{d^\prime}, p$
+    }
+    \KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
+    \KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
+    $M \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+    \For{$m \in B_d$}{
+        \For{$\delta \in \Delta$}{
+            \Comment{If $\delta$ matches with $m$}
+            \If{$\code{exps}(\delta) + \code{exps}(m) \equiv (p - 1, \dots, p - 1) \mod p$}{
+                \Comment{Apply $u$ to $\delta m$}
+                $\text{res} \gets (\code{exps}(\delta) + \code{exps}(m) - (p - 1, \dots, p - 1)) / p$\;
+                $\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})$\;
+                $\text{col} \gets \code{indexof}(m, B_d)$\;
+                $M[\text{row}, \text{col}] = \code{coeff}(\delta)$
+            }
+        }
+    }
+    \Return $M$
 \end{algorithm}
 
 In this algorithm, which we call \triv, we iterate through 
-the monomials $m \in M_{d}$, each corresponding to a column in the
+the monomials $m \in B_{d}$, each corresponding to a column in the
 resulting matrix. For each monomial, we search for terms 
 that match $\delta \in \Delta$, apply $u$ to their product $\delta m$, and 
 get the lexographical index of the result to find which 
 row to add to.
 
 In this algorithm, the matrix can be generated in 
-$O(L_{d}L_{\Delta})$ operations. 
+$O(\ell_{d}\ell_{\Delta})$ operations. 
 This can be
 seen from the nested loops, assuming that integer 
 arithmetic operations are constant time.
 
 In practice, the majority of the combinations of 
-terms of $\Delta$ and $M_{d}$ don't match. This means in
+terms of $\Delta$ and $B_{d}$ don't match. This means in
+terms of $\Delta$ and $B_{d}$ don't match. This means in
 Algorithm \ref{alg:matrix:trivial}, much of our 
 runtime is wasted on checking for whether terms match.
 However, we emphasize that this algorithm, if 
@@ -176,37 +178,37 @@ performed in checking whether two terms match.
 
 \begin{lem}
 	\label{lem:tuples:modp}
-	Let \(A = (a_{1}, \ldots, a_{n}),
-	B = (b_{1}, \ldots, b_{n})\)
+	Let \(X = (x_{1}, \ldots, x_{n}),
+	Y = (y_{1}, \ldots, y_{n})\)
 	be in \(\{0, \ldots, p-1\}^{n} \ins \mathbb{Z}^{n}\).
-	Then \(A + B = 
+	Then \(X + Y = 
 	(p-1, \ldots, p-1) \mod p\)
 	if and only if 
-	\(A + B = 
+	\(X + Y = 
 	(p-1, \ldots, p-1)\).
 \end{lem}
 
 \begin{proof}
-	Each coordinate has \(a_{i} + b_{i} \leq 2(p-1) = 2p-2\).
+	Each coordinate has \(x_{i} + y_{i} \leq 2(p-1) = 2p-2\).
 \end{proof}
 
 \begin{cor}
     \label{cor:unique:match}
-	Let $A$ be as above.
+	Let $X$ be as above.
 	Then there exists a unique
-	match \(m(A) \in \{0, \ldots, p-1\}^{n}\) 
+	match \(m(X) \in \{0, \ldots, p-1\}^{n}\) 
 \end{cor}
 
 \begin{proof}
-	\(m(A) = 
-	(p-1, \ldots, p-1) - A\).
+	\(m(X) = 
+	(p-1, \ldots, p-1) - X\).
 	The claim follows from 
 	\ref{lem:tuples:modp}.
 \end{proof}
 
 Essentially, this corollary says that
 when we consider the exponent tuple mod $p$ of 
-an arbitrary monomial of \(M\),
+an arbitrary monomial of \(B\),
 it has a unique
 match mod \(p\).
 
@@ -214,9 +216,9 @@ match mod \(p\).
 	\label{cor:match:order}
 	Let \(\leq_{lex}\) denote the 
 	lexographical ordering.
-	If \(A \leq_{lex} B\),
+	If \(X \leq_{lex} Y\),
 	then 
-	\(m(B) \leq_{lex} m(A)\)
+	\(m(Y) \leq_{lex} m(X)\)
 \end{cor}
 
 \begin{proof}
@@ -228,44 +230,46 @@ Using these two corollaries, we have the following algorithm,
 which we call \merge:
 
 \begin{algorithm}[H]
-\caption{Matrix of multiply then split: merge-based algorithm}
+\caption{Matrix of multiply then split: \merge}
 \label{alg:theta:merge}
-\begin{algorithmic}[1]
-\State \textbf{Inputs:} \(\Delta, M_{d}, M_{d^{\prime}}, p\)
-\State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-\(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-\State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-	matrix representing ``multiply then split''
-\State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-\State $L \gets [\exps(\delta) \modp ~|~ \delta \in \Delta]$
-\State $R \gets [\exps(m) \modp ~|~ m \in M_{d}]$
-\State sort both  \(L\) and \(R\) 
-\State \(\Delta^{\prime}, M^{\prime} \gets \)permute \(\Delta\) and \(M\) by the sort permutations as \(L\) and \(R\).
-\State \(l \gets 1, r \gets \length(R)\)
-\While{\(1 \leq r ~\text{and}~ l \leq \length(L)\)}
-	\State cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\) 
-	\If{cmp < 0}
-	    \State \(l \gets l + 1\) 
-	\ElsIf{0 < cmp}
-	    \State \(r \gets r - 1\)
-    \ElsIf{0 == cmp}
-        \State matchr \(\gets R[r]\) 
-        \State numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\) 
-        \While{\(R[r] == \) matchr \(\&\& 1 \leq r\)}
-		    \For{\(ll \in (l, l+1, \ldots, l+\text{numLmatches})\)}
-                \State res \(\gets (\exps(\Delta^{\prime}[ll]) + \exps(M^{\prime}[r]) - (p-1, \ldots, p-1)) / p\) 
-                \State coeff \(\gets \coeff(\Delta^{\prime}[ll])\)
-                \State \(\text{col} \gets \indexof(M^{\prime}[r],M_{d})\)
-                \State \(\text{row} \gets \indexof(\text{res},M_{d^{\prime}})\)
-                \State \(\text{mat}[\text{row},\text{col}] = \coeff\) 
-            \EndFor
-            \State \(r \gets r - 1\)
-        \EndWhile     
-        \State \(l \gets l + \text{numLmatches} - 1\) 
-    \EndIf
-\EndWhile
-\State \Return mat
-\end{algorithmic}
+\KwInput{
+    $\Delta, B_d, B_{d^\prime}, p$
+}
+\KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
+\KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
+$M \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+$L \gets [\code{exps}(\delta) \modp ~|~ \delta \in \Delta]$\;
+$R \gets [\code{exps}(m) \modp ~|~ m \in B_{d}]$\;
+\Comment{Lexicographically sort $L$ and $R$ and keep the permutations}
+$P_1 =$ \code{sortperm}\((L)\), $P_2 =$ \code{sortperm}\((R)\) \;
+\Comment{Permute \(\Delta\) and \(B_d\)}
+$\Delta^{\prime} \gets \Delta[P_1], B_d^{\prime} \gets B_d[P_2]$\;
+\(l \gets 1, r \gets \code{length}(R)\)\;
+\While{\(r \geq 1 ~\textnormal{and}~ l \leq \code{length}(L)\)}{
+    cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\)\;
+    \uIf(\tcp*[h]{If lex sum of pair too small, increment index of $L$}){\textnormal{cmp < 0}}{
+        \(l \gets l + 1\)\;
+    }\uElseIf(~\tcp*[h]{If lex sum of pair too big, decrement index of $R$}){\textnormal{cmp > 0}}{
+        \(r \gets r - 1\)\;
+    }\Else(~\tcp*[h]{Match found}){
+        matchr \(\gets R[r]\)\;
+        numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\)\;
+        \Comment{For each monomial of $B_d$}
+        \While{$R[r] ~\code{==}~ \textnormal{matchr} ~\textnormal{and}~ 1 \leq r$}{
+            \Comment{Find matching terms of $\Delta$}
+            \For{\(ll \in \{l, l+1, \ldots, l+\textnormal{numLmatches} - 1\})\)}{
+                \Comment{And apply $u$}
+                res \(\gets (\code{exps}(\Delta^{\prime}[ll]) + \code{exps}(B^{\prime}[r]) - (p-1, \ldots, p-1)) / p\)\;
+                \(\text{col} \gets \code{indexof}(B^{\prime}[r],B_{d})\)\;
+                \(\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})\)\;
+                \(M[\text{row},\text{col}] = \code{coeff}(\Delta^{\prime}[ll])\)\;
+            }
+            \(r \gets r - 1\)\;
+        }
+        \(l \gets l + \text{numLmatches} - 1\)\;
+    }
+}
+\Return $M$
 \end{algorithm}
 
 Note that the inner while loops account for the fact that
@@ -274,22 +278,22 @@ either array to have unique elements.
 The algorithm is justified by the previous corollaries.
 
 In practice, instead of sorting the arrays in place, 
-we use a method like julia's \texttt{sortperm}
+we use a method like Julia's \texttt{sortperm}
 to get the sort permutation.
 
 Because we perform two sorts, then a linear merge, 
 we perform 
-$L_{d} \log L_{d} + L_{\Delta} \log L_{\Delta} + L_{d} + L_{\Delta}$ operations, 
+$\ell_{d} \log \ell_{d} + \ell_{\Delta} \log \ell_{\Delta} + \ell_{d} + \ell_{\Delta}$ operations, 
 giving the algorithm complexity 
-$O(\max(L_{d} \log L_{d}, L_{\Delta} \log L_{\Delta}))$.
+$O(\max(\ell_{d} \log \ell_{d}, \ell_{\Delta} \log \ell_{\Delta}))$.
 In practice (for Calabi-Yau hypersurfaces), 
-the $L_{\Delta} \log L_{\Delta}$ usually dominates.
+the $\ell_{\Delta} \log \ell_{\Delta}$ usually dominates.
 
 \subsection{Weak integer compositions-based algorithm}
 
 \begin{lem}
     \label{lem:generate:matching}
-    The set of exponent tuples of \(M_{d}\) that match with $\delta$ is given by 
+    The set of exponent tuples of \(B_{d}\) that match with $\delta$ is given by 
     \[
         \left\{ m(\exps(\delta) \mathmod p) + p\cdot w ~\Big|~ w \in \wics 
         \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \right\}
@@ -298,7 +302,7 @@ the $L_{\Delta} \log L_{\Delta}$ usually dominates.
 \end{lem}
 
 \begin{proof}
-    Direct computation from the defintions of weak integer compositions and matching terms.
+    Direct computation from the definitions of weak integer compositions and matching terms.
 \end{proof}
 
 
@@ -310,14 +314,14 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
 \begin{ex}
     Let $p = 5$, \(n = 4\), and $\delta$ a monomial 
     with exponent tuple $(21, 19, 22, 18)$. 
-    Then $M_{16}$ is the monomial basis of 
+    Then $B_{16}$ is the monomial basis of 
     \(S_{16}\) (over $\mathbb{F}_5$). 
-    To find the monomials of $M_{16}$ that match with 
+    To find the monomials of $B_{16}$ that match with 
     $\delta$, we begin by reducing $(21, 19, 22, 18) \mathmod 5 = (1, 4, 2, 3)$.
     This makes $m((1, 4, 2, 3)) = (3, 0, 2, 1)$ the 
     exponent tuple of a matching monomial mod \(p\).
-    However, \((3, 0, 2, 1)\) isn't in $M_{16}$. 
-    For it to be in $M_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
+    However, \((3, 0, 2, 1)\) isn't in $B_{16}$. 
+    For it to be in $B_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     to the degree, and to maintain congruence to 
     $(4, 4, 4, 4) \mathmod 5$, we need to add two $5$'s 
     to the elements of $(3, 0, 2, 1)$. This corresponds 
@@ -328,18 +332,18 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     \end{align*}
         
     \noindent Adding each of these to $(3, 0, 2, 1)$, we get the 
-    exponent tuples of monomials that match with $(21, 19, 22, 18)$
+    exponent tuples of monomials that match with $(21, 19, 22, 18)$:
     \begin{align*}
         \{&(13, 0, 2, 1), (8, 7, 0, 1), (8, 0, 7, 1), (8, 0, 2, 6), (3, 10, 2, 1), \\
         &(3, 5, 7, 1), (3, 5, 2, 6), (3, 0, 12, 1), (3, 0, 7, 6), (3, 0, 2, 11)\}
     \end{align*}    
 \end{ex}
 
-Because we need it later for our complexity computation, we have the corollary:
+Because we need it later for our complexity computations, we have the corollary:
 
 \begin{cor}
     \label{cor:num:matches}
-    The number of matching monomials of term $\delta$ is 
+    The number of matching monomials of any term $\delta$ is 
     bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
 \end{cor}
 
@@ -354,38 +358,33 @@ Because we need it later for our complexity computation, we have the corollary:
 \end{proof}
 
 Denoting the expression from Lemma \ref{lem:generate:matching} 
-by $generateMatchingMonomials(\delta, p, M_d)$, we have
+by \code{generateMatchingMonomials}$(\delta, p, M_d)$, we have
 the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
-    \caption{Matrix of multiply then split: weak integer compositions algorithm}
+    \caption{Matrix of multiply then split: \wicsalg}
+    \KwInput{$\Delta, B_{d}, B_{d^{\prime}}, p$}
+    \KwNotation{Let \(\ell_{d} = \length(B_{d})\), 
+    \(\ell_{d^{\prime}} = \length(B_{d^{\prime}})\)}
+    \KwOutput{$\ell_{d^{\prime}} \times \ell_{d}$ 
+    	matrix representing ``multiply then split''}
+    $M \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+    \For{$\delta \in \Delta$}{
+        mons $\gets \code{generateMatchingMonomials}(\delta, p, B_{d})$\;
+        \For{$m \in \textnormal{mons}$}{
+            $\text{col} \gets \code{indexof}(m,B_{d})$\;
+			res $\gets (\code{exps}(\delta) + \code{exps}(m) - (p-1, \ldots, p-1)) / p$\;
+			$\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})$\;
+            $M[\text{row}, \text{col}] = \code{coeff}(\delta)$\;
+        }
+    }
+    \Return $M$
     \label{alg:matrix:WICS}
-    \begin{algorithmic}[1]
-    \State \textbf{Input}: $\Delta, M_{d}, M_{d^{\prime}}, p$
-    \State \textbf{Notation}: Let \(\ell_{d} = \length(M_{d})\), 
-    \(\ell_{d^{\prime}} = \length(M_{d^{\prime}})\)
-    \State \textbf{Output}: $\ell_{d^{\prime}} \times \ell_{d}$ 
-    	matrix representing ``multiply then split''
-    \State mat $\gets$ zero matrix of size $\ell_{d^{\prime}} \times \ell_{d}$
-    %\State \textbf{Output}: $\length(M_{d^{\prime}}) \times \length(M_{d})$ matrix representing ``multiply then split''
-    %\State mat $\gets zeros(\length(M_{d^{\prime}}), \length(M_{d}))$
-    \For{$\delta \in \Delta$}
-        \State mons $\gets generateMatchingMonomials(\delta, p, M_{d})$
-        \For{$m \in \text{mons}$}
-		    \State $c \gets \indexof(m,M_{d})$
-			\State res $\gets (\exps(\delta) + \exps(m) - (p-1, \ldots, p-1)) / p$
-			\State $r \gets \indexof(\text{res},M_{d^{\prime}})$
-            \State $\text{mat}[r, c] = \coeff(\delta)$
-        \EndFor
-    \EndFor
-    \State \Return mat
-    \end{algorithmic}
 \end{algorithm}
 
-Letting $L_{d} = \length(M_d)$ and 
-$L_{\Delta} = \length(\Delta)$, this algorithm 
+This algorithm 
 generates the matrix in 
-$O \left( L_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.
+$O \left( \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.
 The number of matching monomials each term $\delta$ 
 has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n}$ 
 by Corollary \ref{cor:num:matches}, which is 
@@ -405,20 +404,20 @@ $n$-tuples reduces to addition and subtraction of
 integers, though broadcasted division and modulo still 
 require $n$ separate operations.
 
-All algorithms require the $indexof()$ function, 
+All algorithms require the \code{indexof}$()$ function, 
 which we implement using Julia's \texttt{Dict\{K,V\}}, 
 which is implemented as a hashtable.
 
 \triv ~and \wicsalg ~are easily GPU-parallelizable by creating 
 a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
-This creates the problem of needing an $indexof()$ function, 
+This creates the problem of needing an \code{indexof}$()$ function, 
 since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
 The solution we implement is a static hashtable, with size 
 and hashing function decided at compiletime.
 Due to Julia's JIT compilation nature, creating this 
 hashtable is quite slow.
 Another solution can be to perform a binary search 
-for the $indexof()$ function, since $M_d$ is lexicographically 
+for the \code{indexof}$()$ function, since $B_d$ is lexicographically 
 sorted, but for one-off computations, users are better 
 off using non-parallelized \merge ~or \wicsalg ~to avoid 
 first-time GPU kernel compilation times.
@@ -434,8 +433,7 @@ Below in Figure \ref{fig:momts:compare}, we compare running times
 for all the \(p\) which we consider. 
 \wicsalg \, ends up being the fastest practically, 
 both on the CPU and the GPU.
-We did not try running the tests for the 
-trivial algorithm on the 
+We did not try running the tests for \triv~ on the 
 CPU for \(p=11,13\) because we do not expect 
 it to finish in a reasonable
 amount of time.
@@ -445,7 +443,7 @@ amount of time.
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
     \hline
-    p & \triv - CPU & \triv - GPU & \merge   & \wicsalg - CPU & \wicsalg - GPU \\
+    p & \triv ~- CPU & \triv ~- GPU & \merge   & \wicsalg ~- CPU & \wicsalg ~- GPU \\
     \hline
     3 & 0.01   & 0.0007  & 0.001  & 0.001   & 0.0002  \\
     \hline                                          

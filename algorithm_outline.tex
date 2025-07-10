@@ -163,7 +163,7 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 
 \begin{proof}
     Since \(F\) is an isomorphism, this follows from 
-    Lemma \ref{lem:frob:versch}
+    Lemma \ref{lem:frob:versch}.
 \end{proof}
 
 \begin{rmk}
@@ -238,7 +238,7 @@ the Frobenius which will be useful later.
     		of \(R\).
     	\item Similarly, again assuming that \(R\) is reduced
     		we may view the Frobenius as the inclusion
-    		\(R^{p} \ins R\), 
+    		\(R^{p} \ins R\).
     	\item More generally, we define \(F_{\star}R\) to
 			be the \(R\)-algebra with ring structure 
 			the same as \(R\), with module structure
@@ -385,8 +385,8 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 	.\] 
 \end{defn}
 
-The following proposition demonstrates how we can calculate 
-\(\Delta_{1}(f)\) algorithmically.
+% The following proposition demonstrates how we can calculate 
+% \(\Delta_{1}(f)\) algorithmically.
 
 \begin{prop}
 	\label{prop:delta1:formula}
@@ -425,18 +425,17 @@ The following proposition demonstrates how we can calculate
     \(q \neq p\), replacing \(\mathbb{Z}\) with
     \(\mathbb{Z}[\zeta_{q-1}]\).
     This could be used to calculate the quasi-\(F\)-split 
-    heights for surfaces not defined over \(\mathbb{F}_{p}\),
-    though we have not attempted this.
+    heights for surfaces not defined over \(\mathbb{F}_{p}\).
     More generally, if \(q = p^{e}\), one may take
     any abelian extension \(K\) of degree \(e\) over \(\mathbb{Q}\) such that
     \(p\) is an inert prime in \(K\).
     Then, there is a unique prime \(\mathfrak{p}\) lying over \(p\) 
     such that \(\mathcal{O}_{K} / \mathfrak{p} \isom k\).
     Furthermore, \(\mathcal{O}_{K} \ins W(k)\)
-    and so we may lift \(f\) to \(\mathcal{O}_{K}\) 
+    so we may lift \(f\) to \(\mathcal{O}_{K}\) 
     and do arithmetic there. 
     Doing arithmetic in a degree \(e\) extension will have
-    better complexity then in the cyclotomic extension, which
+    better complexity than in the cyclotomic extension, which
     has degree \(\phi(q) = \phi(p^{e}) = p^{e-1}(p-1)\), where
     \(\phi\) is the Euler totient function.
     We do not implement the calculation of quasi-\(F\)-split
@@ -448,23 +447,26 @@ The following proposition demonstrates how we can calculate
 Proposition \ref{prop:delta1:formula} gives a natural algorithm
 for calculating the term \(\Delta_{1}(f)\): 
 
+
 \begin{algorithm}[H]
+\label{alg:calc:delta1}
 \caption{Calculation of \(\Delta_{1}(f)\) }
-	\label{alg:calc:delta1}
-    \begin{algorithmic}[1]
-		\State \textbf{Input:} \(f \in \mathbb{F}_{p}[x_{1}, \ldots, x_{n}]\) 
-		\State \textbf{Output:} $\Delta_1(f)$
-		\State \(\tilde{f} \gets \text{lift}(f)\) 
-		\State \(D \gets \tilde{f}^{p}\) 
-		\For{\(t \in \text{terms}(\tilde{f})\) }
-		    \State \(D \gets D - t^{p}\) 
-		\EndFor
-		\State \(D \gets D / p\)
-		\State \Return \(D \modp\) 
-	\end{algorithmic}
+\KwInput{$f \in \mathbb{F}_p[x_1, \dots , x_n]$}
+\KwOutput{$\Delta_1(f)$}
+
+$\tilde{f} \gets \texttt{lift}(f)$\;
+$D \gets \tilde{f}^p$\;
+
+\For{$t \in \textnormal{\texttt{terms}} (\tilde{f})$}{
+	$D \gets D - t^p$
+}
+
+$D \gets D / p$
+
+\Return{D}
 \end{algorithm}
 
-\subsection{Splittings of frobenius from a computational perspective}
+\subsection{Splittings of Frobenius from a computational perspective}
 
 Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
 We will use perspective (3) from
@@ -502,23 +504,34 @@ Given \(f \in S\), we will first compute
 \(S^{p} \isom S\) by taking \(p\)-th roots of 
 exponents.
 
+\SetKwComment{Comment}{// }{}
+
 \begin{algorithm}[H]
 \caption{Splitting of Frobenius}
 \label{alg:naive:u}
-\begin{algorithmic}[1]
-\State \textbf{Input:} \(f \in S\) 
-\State \textbf{Output:} \(u(f)\) considered as an element of \(S\).
-\State Discard all terms of \(f\) whose exponents are not congruent to
-	\((p-1, \ldots, p-1)\) mod \(p\).
-\State result \(\gets 0\)	
-\For{\(t \in \text{terms}(f)\) }
-    \State subtract \(p-1\) from all exponents of \(t\)
-    \State divide all exponents of \(t\) by \(p\).
-    \Comment This division is exact because of the previous step
-    \State result \(\gets \text{result} + t\)
-\EndFor 
-\State \Return result
-\end{algorithmic}
+\KwInput{$f \in S$}
+\KwOutput{$u(f) \in S$}
+$r \gets 0$\;
+%\Comment{Discard terms of $f$ with exponents not congruent to $(p-1, \dots, p-1) \mod p$}
+\For{$t \in \textnormal{\texttt{terms}} (f)$}{
+	\Comment{See Def \ref{def:poly:nota} for exps() notation}
+	\If{$\textnormal{\texttt{exps}} (t) \equiv (p-1, \dots, p-1) \mod p$}{
+		%$f \gets f - t$
+	    $\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
+	    \Comment{This division is exact because of the previous step}
+	    $\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
+	    $r \gets r + t$
+	}
+}
+
+% \For{$t \in \textnormal{\texttt{terms}} (f)$}{
+% 	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) - (p-1, \dots, p-1)$\;
+% 	\Comment{This division is exact because of the previous step}
+% 	$\textnormal{\texttt{exps}}(t) \gets \textnormal{\texttt{exps}}(t) / p$\;
+% 	$r \gets r + t$
+% }
+
+\Return $r$
 \end{algorithm}
 
 \subsection{The naive algorithm}
@@ -534,29 +547,29 @@ algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
 % I think consistency of the term overrides title capitalization.
-\caption{Quasi-\(F\)-split height: naive algorithm}
+\caption{quasi-\(F\)-split height: naive algorithm}
 \label{alg:qfs:naive}
-\begin{algorithmic}[1]
-\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
-	polynomial of degree \(n\) in \(S\).
-\State \textbf{Output:} $h(f)$
-\State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{[p]}\) }
-    \State \Return \(1\) 
-\EndIf
-\State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(h \gets 2\) 
-\While{true}
-    \If{\(b < h\)}
-        \State \Return \(\infty\)
-    \EndIf
-    \State \(g \gets u(\Delta g)\) \Comment{Use Algorithm \ref{alg:naive:u}}
-    \If{\(g \notin \mathfrak{m}^{[p]}\)}
-        \State \Return \(h\) 
-    \EndIf
-    \State \(h \gets h + 1\)
-\EndWhile
-\end{algorithmic}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p-1})$\;
+$h \gets 2$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g \gets u(\Delta g)$\;
+	\If{$g \notin \mathfrak{m}^{[p]}$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$\;
+}
 \end{algorithm}
 
 \begin{thm}
@@ -602,7 +615,7 @@ For a K3 surface, the height (if finite) is bounded by 10.
     obtaining another polynomial of degree \(8\). 
     We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero. 
     For this choice of $f$, all of the exponents for all quantities 
-    must be multiples of four\footnote{
+    must be multiples of four.\footnote{
     In fact, this implies that the degree \(8\) polynomial is zero.
     However, this phenomenon is quite rare.
     }
@@ -620,9 +633,9 @@ The bottleneck ends up being polynomial multiplication,
 in two places:
 \begin{enumerate}[(1)]
     \item raising (a lift of) \(g = f^{p-1}\) to the \(p\)-th power 
-        (in line 4 of Algorithm \ref{alg:calc:delta1})
+        (in line 2 of Algorithm \ref{alg:calc:delta1})
     \item multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
-        (in line 13 of Algorithm \ref{alg:qfs:naive})
+        (in line 11 of Algorithm \ref{alg:qfs:naive})
 \end{enumerate}
 
 \noindent For a quartic K3 surface of characteristic \(5\),
@@ -666,30 +679,30 @@ The algorithm for Fedder's criterion then becomes:
 \begin{algorithm}[H]
 \caption{Quasi-\(F\)-split height: matrix-based algorithm}
 \label{alg:qfs:matrix}
-\begin{algorithmic}[1]
-\State \textbf{Input}: \(b \in \mathbb{N}\) chosen bound, \(f\) a homogeneous
-	polynomial of degree \(n\) in \(S\).
-\State \textbf{Output:} $h(f)$
-\State \(g \gets f^{p-1}\) 
-\If{\(g \not\in \mathfrak{m}^{[p]}\) }
-    \State \Return \(1\) 
-\EndIf
-\State \(\Delta \gets \Delta_{1}(f^{p-1})\) \Comment{Use Algorithm \ref{alg:calc:delta1}}
-\State \(M \gets\) the matrix of  \(g^{\prime} \mapsto u(\Delta g^{\prime})\)
-\State \(h \gets 2\) 
-\State \(g_{v} \gets\) the representation of \(g\) as a vector
-\State \(i \gets \) the index of the monomial \(x_{1}^{p-1}\cdots x_{n}^{p-1}\)
-\While{true}
-    \If{\(b < h\)}
-        \State \Return \(\infty\)
-    \EndIf
-    \State \(g_{v} \gets M g_{v}\) 
-    \If{\(g[i] \neq 0\)}
-        \State \Return \(h\) 
-    \EndIf
-    \State \(h \gets h + 1\)
-\EndWhile
-\end{algorithmic}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p - 1})$\;
+$M \gets $ the matrix of $g^{\prime} \mapsto u(\Delta g^{\prime})$\;
+$h \gets 2$\;
+$g_v \gets $ the representation of $g$ as a vector\;
+$i \gets $ the index of the monomial $x_{1}^{p - 1} \dots x_{n}^{p - 1}$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g_v \gets Mg_v$\;
+	\If{$g_v[i] \neq 0$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$
+}
 \end{algorithm}
 
 Thus, we have reduced our problem (algorithmically, at least)

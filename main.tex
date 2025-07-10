@@ -19,14 +19,20 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{extarrows}
 \usepackage{tikz,tikz-cd}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
+\usepackage[ruled,linesnumbered]{algorithm2e}
 \usepackage{listings}
 \usepackage{nicefrac}
 \usepackage{array}
 % I think this is the solution to the pagebreaking
 % algorithms
 \usepackage{float}
+
+% algorithm2e stuff
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwNotation}{Notation}
+\SetKwInput{KwOutput}{Output}
+\DontPrintSemicolon
+\newcommand{\code}[1]{\textnormal{\texttt{#1}}}
 
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -145,6 +151,7 @@ quasi-\(F\)-split singularities and GPU acceleration}
 \input{matmul.tex}
 
 \section{Heights of K3 surfaces}
+\label{sec:heights:surfaces}
 
 \input{heights.tex}
 
