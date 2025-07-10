@@ -61,18 +61,15 @@ characteristic 11 (Figure 3).
 
 \begin{figure}[h]
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
+\begin{tabular}{c c c c c}
+    \toprule
     Size & CPU single-threaded & CPU multi-threaded & CUBLAS & Fallback implementation \\
-\hline
+    \midrule
     5,000  & 2.47   & 1.18  & 0.02 & 1.78   \\
-\hline
     10,000 & 18.72  & 8.03  & 0.13 & 15.00  \\
-\hline
     15,000 & 62.90  & 25.30 & 0.43 & 54.95  \\
-\hline
     20,000 & 150.76 & 58.83 & 3.66 & 114.72 \\
-\hline
+    \bottomrule
 \end{tabular}
 \caption{Matrix multiplication times (in seconds) for various sizes of matrices}
 \end{center}
