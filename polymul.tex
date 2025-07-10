@@ -113,7 +113,7 @@ optimized for 64-bit integers, and when NTT sizes get big, there
 aren't enough suitable primes under $2^{32}$ to choose from.
 Thus, for prime selection, 
 we choose primes satisfying $p \equiv 1 \mod L$ that fit 
-within 63 bits, because of the precision of Barrett Reduction.
+within 62 bits, because of the precision of Barrett Reduction.
 
 \subsubsection{Bound finding}
 The multi-modular NTT requires an upper bound $M$ in order to select primes 
