@@ -93,8 +93,8 @@ It follows that the dimension of the vector space is $|\wics(k, n)|$.
 
 \begin{proof}
 	This is a classical argument which goes by the 
-    name ``sticks and stones'', ``stars and bars'', or 
-    ``dots and dividers''.
+    name ``sticks and stones,'' ``stars and bars,'' or 
+    ``dots and dividers.''
 \end{proof}
 
 
@@ -278,7 +278,7 @@ either array to have unique elements.
 The algorithm is justified by the previous corollaries.
 
 In practice, instead of sorting the arrays in place, 
-we use a method like julia's \texttt{sortperm}
+we use a method like Julia's \texttt{sortperm}
 to get the sort permutation.
 
 Because we perform two sorts, then a linear merge, 
@@ -302,7 +302,7 @@ the $\ell_{\Delta} \log \ell_{\Delta}$ usually dominates.
 \end{lem}
 
 \begin{proof}
-    Direct computation from the defintions of weak integer compositions and matching terms.
+    Direct computation from the definitions of weak integer compositions and matching terms.
 \end{proof}
 
 
@@ -315,15 +315,11 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     Let $p = 5$, \(n = 4\), and $\delta$ a monomial 
     with exponent tuple $(21, 19, 22, 18)$. 
     Then $B_{16}$ is the monomial basis of 
-    Then $B_{16}$ is the monomial basis of 
     \(S_{16}\) (over $\mathbb{F}_5$). 
-    To find the monomials of $B_{16}$ that match with 
     To find the monomials of $B_{16}$ that match with 
     $\delta$, we begin by reducing $(21, 19, 22, 18) \mathmod 5 = (1, 4, 2, 3)$.
     This makes $m((1, 4, 2, 3)) = (3, 0, 2, 1)$ the 
     exponent tuple of a matching monomial mod \(p\).
-    However, \((3, 0, 2, 1)\) isn't in $B_{16}$. 
-    For it to be in $B_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     However, \((3, 0, 2, 1)\) isn't in $B_{16}$. 
     For it to be in $B_{16}$, we need to add $16 - (3 + 0 + 2 + 1) = 10$ 
     to the degree, and to maintain congruence to 
@@ -336,18 +332,18 @@ height of a K3 quartic surface over $\mathbb{F}_5$.
     \end{align*}
         
     \noindent Adding each of these to $(3, 0, 2, 1)$, we get the 
-    exponent tuples of monomials that match with $(21, 19, 22, 18)$
+    exponent tuples of monomials that match with $(21, 19, 22, 18)$:
     \begin{align*}
         \{&(13, 0, 2, 1), (8, 7, 0, 1), (8, 0, 7, 1), (8, 0, 2, 6), (3, 10, 2, 1), \\
         &(3, 5, 7, 1), (3, 5, 2, 6), (3, 0, 12, 1), (3, 0, 7, 6), (3, 0, 2, 11)\}
     \end{align*}    
 \end{ex}
 
-Because we need it later for our complexity computation, we have the corollary:
+Because we need it later for our complexity computations, we have the corollary:
 
 \begin{cor}
     \label{cor:num:matches}
-    The number of matching monomials of term $\delta$ is 
+    The number of matching monomials of any term $\delta$ is 
     bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
 \end{cor}
 
@@ -437,7 +433,7 @@ Below in Figure \ref{fig:momts:compare}, we compare running times
 for all the \(p\) which we consider. 
 \wicsalg \, ends up being the fastest practically, 
 both on the CPU and the GPU.
-We did not try running the tests for \triv on the 
+We did not try running the tests for \triv~ on the 
 CPU for \(p=11,13\) because we do not expect 
 it to finish in a reasonable
 amount of time.
