@@ -1,5 +1,5 @@
 In this section, we describe how Algorithm \ref{alg:calc:delta1} 
-is computed. Specifically, we focus on Step 2, 
+is implemented. Specifically, we focus on Step 2, 
 \(D \gets \tilde{f}^{p}\), which is the main 
 bottleneck. We first explain our implementation 
 of polynomial powering using the Number Theoretic 
@@ -148,7 +148,7 @@ If one only cares about a single shape of the problem
 this might be acceptable.
 However, for a single computation, it completely removes 
 the advantage of using the GPU, since we must perform an 
-expensive CPU mutliplication to set up the algorithm.
+expensive CPU multiplication to set up the algorithm.
 
 Alternatively, we can obtain a relatively tight upper 
 bound for the case of raising a homogeneous multivariate 
@@ -205,7 +205,7 @@ Many other algorithms
 for polynomial powering
 are described in \cite{monagan-2012-sparse-powering}. 
 They compare performance in sparse and dense cases. 
-Here, we breifly comment on how these algorithms perform on the GPU.
+Here, we briefly comment on how these algorithms perform on the GPU.
 We refer the reader to \cite{monagan-2012-sparse-powering}
 for a more precise description of all these algorithms.
 In the following, assume we have some polynomial \(f\) which we wish 

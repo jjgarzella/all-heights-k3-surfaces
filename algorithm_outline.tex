@@ -19,7 +19,7 @@ that relates to lifts of the Frobenius; and
 known as the ring of \textit{ramified Witt vectors} in detail.
 
 \begin{defn}
-	The \textit{\(n\)-th Witt Polynomial} \(\omega_{n}\) is defined as
+	The \textit{\(n\)-th Witt polynomial} \(\omega_{n}\) is defined as
 	\[
 		\omega_{n}(X_{0}, \ldots, X_{n}) = X_{0}^{p^{n}} + pX_{1}^{p^{n-1}} + \ldots + p^{n}X_{n}
         \in \mathbb{Z}[X_{0}, \ldots, X_{n}]
@@ -154,7 +154,7 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \end{lem}
 
 \begin{proof}
-	\cite[Proposition~5]{kim-2017-witt-vec}
+	\cite[Proposition~5]{kim-2017-witt-vec}.
 \end{proof}
 
 \begin{lem}
@@ -201,9 +201,9 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \begin{rmk}
 	\label{rmk:polyraise:w2}
     Our computations will end up primarily involving
-    \(W_{2}(R)\)\footnote{
+    \(W_{2}(R)\),\footnote{
     This comes from the delta formula,
-    \cite[Theorem~D]{kty-2022-fedder}},
+    \cite[Theorem~D]{kty-2022-fedder}}
     where addition is governed by the polynomials
 	\(S_{0}(X_{0}, Y_{0}) = X_{0} + Y_{0}\)
 	and
@@ -217,7 +217,7 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 	power in a lift of \(R\) to characteristic 0.
     Thus, the bottleneck for most computations with Witt vectors,
     including the present work, tends to be raising
-    integer polynonmials to powers.
+    polynomials to powers.
 \end{rmk}
 
 \subsection{Splittings of Frobenius}
@@ -495,7 +495,7 @@ Then the projection of \(S\) to any of the direct sum components
 is an element of \(\Hom(S,S^{p})\), which is a
 splitting of Frobenius.
 Let \(u\) be the projection onto the component of
-\(x_{1}^{p-1}, \ldots, x_{n}^{p-1}\).
+\(x_{1}^{p-1} \ldots x_{n}^{p-1}\).
 
 The splitting \(u\) plays an important role in \(F\)-singularity
 theory, see for example 
@@ -544,7 +544,7 @@ in \(S\),
 so that \(Z(f)\) is a Calabi-Yau hypersurface.
 Recall from Subsection \ref{subsec:split:frob} that
 \(\mathfrak{m}^{[p]} = (x_{1}^{p}, \ldots, x_{n}^{p})\)
-is the Frobenius power of the maximal ideal.
+is the Frobenius power of the maximal ideal \((x_1,..,x_n)\).
 Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
@@ -610,7 +610,7 @@ For a K3 surface, the height (if finite) is bounded by 10.
     Next, we must calculate \(\Delta_{1}(g)\).
     To do this, we take a lift of \(g\) by regarding the coefficients
     as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
-    We raise \(g^3\) in the integers, and subract by every term of \(g\) 
+    We raise \(g^3\) in the integers, and subtract by every term of \(g\) 
     cubed.
 
     Then, we multiply \(g\) by \(\Delta_{1}(g)\), getting a polynomial of degree 24.
@@ -709,4 +709,4 @@ $i \gets $ the index of the monomial $x_{1}^{p - 1} \dots x_{n}^{p - 1}$\;
 \end{algorithm}
 
 Thus, we have reduced our problem (algorithmically, at least)
-to finding the matrix of the ``mulitply then split'' operation.
+to finding the matrix of the ``multiply then split'' operation.

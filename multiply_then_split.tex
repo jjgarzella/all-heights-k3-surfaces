@@ -8,7 +8,7 @@ and then apply the map \(u\).
 Here, we consider a slightly more general problem.
 As usual, let \(S = k[x_{1}, \ldots, x_{n}]\).
 Let $S_\ell$ denote the vector space of homogeneous degree $\ell$ polynomials in \(S\).
-We let \(B_{\ell}\) denote a lexographically-ordered list
+We let \(B_{\ell}\) denote a lexicographically-ordered list
 of the monomial basis of \(S_{\ell}\).
 Fix some \(D \in \mathbb{N}\), and let \(\Delta \in S_D\).
 Furthermore, fix \(d \in \mathbb{N}\).
@@ -55,7 +55,7 @@ we mean componentwise application of these operations.
 Use of arbitrary componentwise operations is called
 \textit{broadcasting} in Julia, and we will
 sometimes use this term.
-Homogenoeus polynomials are represented in computer 
+Homogeneous polynomials are represented in computer 
 memory as a list of their terms. 
 This is reflected in our notation, 
 thus the meaning of ``for \(\delta \in \Delta\)''
@@ -151,7 +151,7 @@ In this algorithm, which we call \triv, we iterate through
 the monomials $m \in B_{d}$, each corresponding to a column in the
 resulting matrix. For each monomial, we search for terms 
 that match $\delta \in \Delta$, apply $u$ to their product $\delta m$, and 
-get the lexographical index of the result to find which 
+get the lexicographical index of the result to find which 
 row to add to.
 
 In this algorithm, the matrix can be generated in 
@@ -161,7 +161,6 @@ seen from the nested loops, assuming that integer
 arithmetic operations are constant time.
 
 In practice, the majority of the combinations of 
-terms of $\Delta$ and $B_{d}$ don't match. This means in
 terms of $\Delta$ and $B_{d}$ don't match. This means in
 Algorithm \ref{alg:matrix:trivial}, much of our 
 runtime is wasted on checking for whether terms match.
@@ -196,7 +195,7 @@ performed in checking whether two terms match.
     \label{cor:unique:match}
 	Let $X$ be as above.
 	Then there exists a unique
-	match \(m(X) \in \{0, \ldots, p-1\}^{n}\) 
+	match \(m(X) \in \{0, \ldots, p-1\}^{n}\).
 \end{cor}
 
 \begin{proof}
@@ -215,14 +214,14 @@ match mod \(p\).
 \begin{cor}
 	\label{cor:match:order}
 	Let \(\leq_{lex}\) denote the 
-	lexographical ordering.
+	lexicographical ordering.
 	If \(X \leq_{lex} Y\),
 	then 
-	\(m(Y) \leq_{lex} m(X)\)
+	\(m(Y) \leq_{lex} m(X)\).
 \end{cor}
 
 \begin{proof}
-	Follows from the definition of lexographical
+	Follows from the definition of lexicographical
 	ordering.
 \end{proof}
 
@@ -298,7 +297,7 @@ the $\ell_{\Delta} \log \ell_{\Delta}$ usually dominates.
         \left\{ m(\exps(\delta) \mathmod p) + p\cdot w ~\Big|~ w \in \wics 
         \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \right\}
     \]
-    where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}
+    where $sum(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}.
 \end{lem}
 
 \begin{proof}
@@ -388,7 +387,7 @@ $O \left( \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \ri
 The number of matching monomials each term $\delta$ 
 has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n}$ 
 by Corollary \ref{cor:num:matches}, which is 
-effectively constant for all reasonably computable $n$ and $p$
+effectively constant for all reasonably computable $n$ and $p$.
 
 \subsection{Implementation}
 
