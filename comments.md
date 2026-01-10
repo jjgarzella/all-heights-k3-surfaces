@@ -94,11 +94,13 @@ Hom_S(F_*S, S).
 and not just "partitions" for instance? You want to assume d_i nonnegative.
 
     - Alex: Too lazy to libgen a book to find a reputable definition of integer partitions, but generally order doesn't matter for partitions - (1, 1, 0) and (1, 0, 1) are the same partition. Order matters to us, so we use weak integer compositions.
+    - JJ: As far as I understand it, "weak integer decompositions" is a standard term from combinatorics which already implies d_i nonnegative, and the reviewer doesn't understand that, probably because the reviewer is not a combinatorist. We can fix this with a citation or two and a short sentence in our rebuttal. So we will need to find a citation, sorry.
 
 - p.11, Algorithm 7, line 8: can you add a few words explaining why you write =
 and not += here?
 
     - Alex: Probably should change to +=
+    - JJ: Indeed, the fact that it still works is probably a theorem that we haven't proven. But I don't know exactly what to make of it.
 
 - p.13, section 5.1.3: what are the "twiddle factors" you are referring to?
 
@@ -108,16 +110,19 @@ and not += here?
     understands the FFT, and I honestly disagree with the reviewer here. If they 
     understand the FFT but not "twiddle factors", then a 2-second google search should 
     give them all the information they need.
+    - JJ: I think the right thing to do is to define "twiddle factors" in a breif way, like: "... too big to fit twiddle factors (root of unity power tables, \[ref\]) and inputs ..." the first time the term "twiddle factors" appears. We should use the correct word, but explain it the first time for non-experts.
 
 - p.13 L31: what do you mean by "because of the precision of Barrett reduction"?
 
     - Alex: Not sure how to justify this without a long derivation, and even the original authors of this variation of Barrett reduction (https://arxiv.org/pdf/2209.01290) don't explain why moduli are limited to less than 2^62, they just claim they have the fastest 2^62 bit Barrett reduction.
+    - JJ: A reference will fix this probelm just as well, perhaps we can reference a specific page or theorem of 2209.01290? 
 
 - p.13 L46: "We know this computation will be correct because FLINT uses
 GMP". What do you mean by this? FLINT only uses GMP for its integer type, and
 GMP could contain bugs too, as far as I know.
 
     - Alex: I don't agree with the reviewer's sentiment to not trust GMP. How do we know to trust anything on our computers if cosmic rays can lead to nondeterministic CPU behavior?
+    - JJ: when you say, "we know this computation will be correct", I think perhaps you really mean "we know this computation won't overflow"? But the reviewer is thinking something a lot more deep because you said "know it'll be correct".
 
 - p.16, Theorem 7.1: O() is an asymptotic notation. What is going to infinity
 here? Is X defined over QQ?
