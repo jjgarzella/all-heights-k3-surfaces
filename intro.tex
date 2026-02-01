@@ -101,42 +101,111 @@ very low characteristic.
 
 
 
-In this work, we push the method of Kawakami,
+In this work, we use computational techniques to push the method of Kawakami,
 Takamatsu, and Yoshikawa to the limits of readily
-available hardware, 
-and produce examples of quartic K3 surfaces \(X\) with all
+available hardware.
+With our algorithmic improvements, we produce examples of quartic K3 surfaces \(X\) with all
 possible heights \(h\) 
 over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
-Our main insight is that one of the main
-bottlenecks of the problem can be broken down 
-into many repeated matrix-vector
-multiplications for a square matrix of size 
-\(\binom{4p-1}{3}\).
-Because of this, we can use Nvidia's CUBLAS library 
-\cite{nvidia-2024-cublas}
-to perform the matrix multiplications
-on a GPU, making such computations
-nearly instantaneous.
-To create this matrix, one must calculate the matrix of a
-certain linear operator.
-We provide a few novel algorithms which accomplish this task,
-including some that can be implemented on the GPU.
-The remaining algorithm is bottlenecked by the operation
-of raising a polynomial to a large power, 
-so we implement this on the GPU as well using 
-a Fast Fourier Transform (FFT) approach.
-Our algorithms and implementations lead to a high throughput
-of heights of K3 surfaces: 
+Our techniques are also applicable over \(\mathbb{F}_{11}\) and 
+\(\mathbb{F}_{13}\), where
+we produce examples of heights \(1 \leq h \leq 6\) and 
+\(1 \leq h \leq 5\), respectively.
+
+\subsection{On computational bottlenecks}
+
+We breifly overview the computational obstacales to fast computation
+of \(h\).
+As seen in Section \ref{sec:preliminaries},
+the algorithm presented in \cite{kty-2022-fedder} boils down to the 
+following elementary computations.
+
+\begin{enumerate}[(1)]
+    \item The computation of a quantity 
+        called \(\Delta_{1}\) (see Section \ref{subsec:compute:delta1}
+        particularly Definition \ref{defn:delta1}),
+        which involves
+        \begin{enumerate}[(a)]
+            \item Raising polynomials to powers
+            \item Extracting the cross terms from 
+                the result of the previous bullet point
+                (See Proposition \ref{prop:delta1:formula}
+                for the formal meaning of this operation).
+        \end{enumerate}
+        The coefficients in these steps must be over 
+        \(\mathbb{Z} / p^{2} \mathbb{Z}\).
+    \item A loop, which is guaranteed to run \(h-1\) times, in which we must
+        \begin{enumerate}[(a)]
+            \item perform a large polynomial multiplication 
+                for which \(\Delta_{1}\) is one of the summands
+            \item apply an operation which we call ``splitting'', 
+                following the literature on the
+                quasi-\(F\)-split height.
+                This is an operation on polynomials which involves
+                discarding many terms and lowering the exponents of
+                the remaining terms.
+                See Algorithm \ref{alg:naive:u} for a precise description.
+        \end{enumerate}
+        The coefficients in these steps live over \(\mathbb{F}_{p}\).
+\end{enumerate}
+
+In practice, the computation is bottlenecked by steps 
+(1a) and (2a), as (1b) and (2b) are linear-time in the number of
+terms of the polynomial.
+Our implementation, which can be found in 
+\cite{mmpsingularities-jl}, uses OSCAR, and thus uses FLINT
+for polynomial multiplication and powering operations.
+However, for \(p = 5\), the algorithm
+takes [TIME] seconds for (1) and [TIME] seconds for (2),
+while for \(p = 7\) it takes [TIME] seconds for (1) and
+[TIME] seconds for (2).
+
+Our main insight is that each iteration
+of (2) is a linear operator, and that we can speed
+up the computation by pre-computing its matrix.
+We call this matrix the ``matrix of multiply then split'',
+and once we do this, replace each iteration of the loop 
+with a (dense\footnote{
+    Our algorithm could be made sparse, but we do not need it here,
+    since as we will see below, matrix-vector multiplication
+    is not our bottleneck.
+    Thus, we put this off for future work.
+}) matrix-vector multiplication.
+This matrix-vector multiplication can be carried out using FLINT
+or Julia's bulit-in matrix multiplication, both of which call the same
+underlying BLAS library.
+We provide algorithms for calculating the matrix of multiply
+then split in Section \ref{sec:alg:momts}.
+This essentially eliminates (2) as a bottleneck.
+In our implementation of this verison, step (2) takes
+[TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
+Meanwhile, calculating the matrix of multiply then split
+takes [TIME] seconds for \(p=5\) and 
+[TIME] seconds for \(p = 7\).
+
+To address the bottleneck of (1),
+we have no clever trick. 
+Instead, we implement polynomial via Fast Fourier Transform (FFT) using
+Graphics Processing Unit (GPU) hardware,
+allowing us to run the computation in a massively parallel way.
+Our GPU implementation of (1) takes [TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
+In order to avoid the memory overhead of communication between the Central Processing Unit (CPU) and
+the GPU, we also provide a GPU implementation of calculating the matrix
+of multiply then split. 
+We also use Nvidia's CUBLAS library \cite{nvidia-2024-cublas} to
+do the matrix-vector multiplication.
+We emphasize that these are only necessary because of the communication overhead, and that matrix-vector
+multiplication on the CPU is already fast enough to overcome bottleneck (2).
+
+In our tests, we were able to achieve high throughput of examples,
 about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
 about 180 surfaces per second over \(\mathbb{F}_{7}\).
-Our implementations can also handle \(\mathbb{F}_{11}\) 
-and \(\mathbb{F}_{13}\). 
-For \(p = 11\), our method is comparable to the state of the art
-for computing Newton polygons (e.g. 
-\cite{chk-2019-toric-controlled-reduction}),
-though it is noticeably slower 
-for \(p = 13\) (see section \ref{sec:heights:surfaces}).
-
+Our implementations can also compute the height \(h\) for examples
+over
+\(\mathbb{F}_{11}\) and \(\mathbb{F}_{13}\).
+Overe these two primes, our algorithms are roughly two orders of magnitude
+better than other methods for calculating \(h\),
+but are not fast enough to compute examples of all possible heights.
 All of our algorithms are implemented in Julia 
 \cite{julia-2017}, and
 make use of the OSCAR computer algebra system 
@@ -148,6 +217,50 @@ MMPSingularities.jl \cite{mmpsingularities-jl},
 GPUFiniteFieldMatrices.jl \cite{gpuffmatrices-jl}, 
 GPUPolynomials.jl \cite{gpupolynomials-jl},
 and CudaNTTs.jl \cite{cudantts-jl}.
+
+% One possibility to further speed up the the computation
+% would be to compute the matrix of multiply then split
+% in a lazy/sparse way, computing each row only when it
+% is needed for (2).
+% However, as we are still bottlenecked by (1), 
+% it is unlikely to affect the overall computation much.
+
+% Our algorithm, which is Theorem C of \cite{kty-2022-fedder}, 
+% is not presented as an algorithm. 
+% In Section \ref{sec:preliminaries}, we give a more thorough overview.
+
+% Our main insight is that one of the main
+% bottlenecks of the problem can be broken down 
+% into many repeated matrix-vector
+% multiplications for a square matrix of size 
+% \(\binom{4p-1}{3}\).
+% Because of this, we can use Nvidia's CUBLAS library 
+% \cite{nvidia-2024-cublas}
+% to perform the matrix multiplications
+% on a GPU, making such computations
+% nearly instantaneous.
+% To create this matrix, one must calculate the matrix of a
+% certain linear operator.
+% We provide a few novel algorithms which accomplish this task,
+% including some that can be implemented on the GPU.
+% The remaining algorithm is bottlenecked by the operation
+% of raising a polynomial to a large power, 
+% so we implement this on the GPU as well using 
+% a Fast Fourier Transform (FFT) approach.
+% Our algorithms and implementations lead to a high throughput
+% of heights of K3 surfaces: 
+% about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
+% about 180 surfaces per second over \(\mathbb{F}_{7}\).
+% Our implementations can also handle \(\mathbb{F}_{11}\) 
+% and \(\mathbb{F}_{13}\). 
+% For \(p = 11\), our method is comparable to the state of the art
+% for computing Newton polygons (e.g. 
+% \cite{chk-2019-toric-controlled-reduction}),
+% though it is noticeably slower 
+% for \(p = 13\) (see section \ref{sec:heights:surfaces}).
+
+\subsection{Outline of this paper}
+
 
 In Section 2, we give background on the quasi-\(F\)-split height
 and Fedder's criterion.

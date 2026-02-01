@@ -1,4 +1,179 @@
 
+% \subsection{The naive algorithm}
+
+Let \(f\) be a homogeneous polynomial of degree \(n\) 
+in \(S\), 
+so that \(Z(f)\) is a Calabi-Yau hypersurface.
+Recall from Subsection \ref{subsec:split:frob} that
+\(\mathfrak{m}^{[p]} = (x_{1}^{p}, \ldots, x_{n}^{p})\)
+is the Frobenius power of the maximal ideal \((x_1,..,x_n)\).
+Following \cite{kty-2022-fedder}, we have the following
+algorithm to calculate the quasi-\(F\)-split height.
+
+\begin{algorithm}[H]
+% I think consistency of the term overrides title capitalization.
+\caption{quasi-\(F\)-split height: naive algorithm}
+\label{alg:qfs:naive}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p-1})$\;
+$h \gets 2$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g \gets u(\Delta g)$\;
+	\If{$g \notin \mathfrak{m}^{[p]}$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$\;
+}
+\end{algorithm}
+
+\begin{thm}
+	[\cite{kty-2022-fedder}, Theorem C]
+	Assume that
+	\(Z(f)\) has quasi-\(F\)-split height \(h < b\).
+	Then Algorithm \ref{alg:qfs:naive} terminates
+	and returns \(h\).
+\end{thm}
+
+\begin{proof}
+	This is just rephrasing \cite[Theorem~C]{kty-2022-fedder}.
+\end{proof}
+
+In the case of Calabi-Yau hypersurfaces, we have bounds on the height by
+\cite{van-der-geer-katsura-2003-calabi-yau},
+so we can deterministically recover the height.  
+See also \cite[Theorem~0.1]{artin-1974-k3-surfaces},
+for the case of K3 surfaces.
+For a K3 surface, the height (if finite) is bounded by 10.
+
+\begin{ex}
+    Let \(p=3\), and let
+    \(f = x^4 + y^4 + z^4 + w^4 \in S = k[x,y,z,w]\).
+    Raising \(f\) to the \(p-1 = 2\) in \(\mathbb{F}_{3}\), we get
+    \[
+    g = x^8 + 2x^4y^4 + 2x^4z^4 + 2x^4w^4 + y^8 + 2y^4z^4 + 2y^4w^4 + z^8 + 2z^4w^4 + w^8
+    .\] 
+    The only monomial of degree \(8\) that is not contained
+    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, x^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
+    Call this monomial \(c\).
+    Since this coefficient of \(c\) in \(g\) is zero, we conclude
+    by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
+    that \(g\) is not \(F\)-split.
+    Next, we must calculate \(\Delta_{1}(g)\).
+    To do this, we take a lift of \(g\) by regarding the coefficients
+    as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
+    We raise \(g^3\) in the integers, and subtract by every term of \(g\) 
+    cubed.
+
+    Then, we multiply \(g\) by \(\Delta_{1}(g)\), getting a polynomial of degree 24.
+    We apply the splitting of Frobenius, as described in Algorithm \ref{alg:naive:u}, 
+    obtaining another polynomial of degree \(8\). 
+    We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero. 
+    For this choice of $f$, all of the exponents for all quantities 
+    must be multiples of four.\footnote{
+    In fact, this implies that the degree \(8\) polynomial is zero.
+    However, this phenomenon is quite rare.
+    }
+    We then continue, multiplying, applying the splitting, checking the coefficient, 
+    until we conclude that the height is greater than 10. 
+    Now, by Hodge theory, if the height is greater than 10, it must be infinity. 
+    So we conclude that the height is infinity.
+\end{ex}
+
+\subsection{The key idea: finding the matrix of the linear operator ``multiply then split''}
+
+An implementation of Algorithm \ref{alg:qfs:naive}
+is provided in MMPSingularities.jl.
+The bottleneck ends up being polynomial multiplication, 
+in two places:
+\begin{enumerate}[(1)]
+    \item raising (a lift of) \(g = f^{p-1}\) to the \(p\)-th power 
+        (in line 2 of Algorithm \ref{alg:calc:delta1})
+    \item multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
+        (in line 11 of Algorithm \ref{alg:qfs:naive})
+\end{enumerate}
+
+\noindent For a quartic K3 surface of characteristic \(5\),
+for example, each step takes about 1 second 
+using FLINT \cite{flint-2023-flint}. 
+
+We now explain how to overcome the second
+bottleneck. Since \(Z(f)\) is Calabi-Yau
+(i.e. \(\deg f = n\)), we have that \(f^{p-1}\) has degree
+\(n(p-1)\). 
+Furthermore, by Proposition \ref{prop:delta1:formula}
+the degree of \(\Delta_{1}(f^{p-1})\) 
+is \(np(p - 1)\).
+Thus, \(\Delta_{1}(f^{p-1})g\) has degree
+\(n(p^{2} - 1)\).
+Since the effect 
+of \(u\) on any polynomial is subtracting \(p-1\)
+from the exponents of the terms and dividing by \(p\) 
+(see Algorithm \ref{alg:naive:u}).
+Thus, the ``multiply then split'' map 
+\(g \mapsto u(\Delta_{1}(f^{p-1}) g)\) 
+is a linear map from 
+the space of homogeneous polynomials of degree \(n(p-1)\) 
+to itself.
+As a consequence of this observation,
+if we can efficiently compute the matrix of 
+\(g \mapsto u(\Delta_{1}(f^{p-1})g)\),
+we can repeatedly apply matrix-vector multiplication.
+
+Furthermore, when \(g\) is written as a vector 
+in the basis of homogeneous monomials of degree
+\(n(p-1)\), we can test if \(g \notin \mathfrak{m}^{[p]}\) 
+in an especially simple way: the only 
+monomial that is not in \(\mathfrak{m}^{[p]}\) is
+\(x_{1}^{p-1}\cdots x_{n}^{p-1}\), 
+see for example \cite{kty-2022-fedder}.
+Thus, we can check if a single element of the vector representing
+\(g\) is nonzero.
+
+The algorithm for Fedder's criterion then becomes:
+
+\begin{algorithm}[H]
+\caption{Quasi-\(F\)-split height: matrix-based algorithm}
+\label{alg:qfs:matrix}
+\KwInput{
+	Chosen bound $b \in \mathbb{N}$, \\
+	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
+}
+\KwOutput{$h(f)$}
+$g \gets f^{p - 1}$\;
+\If{$g \notin \mathfrak{m}^{[p]}$}{
+	\Return $1$\;
+}
+$\Delta \gets \Delta_1(f^{p - 1})$\;
+$M \gets $ the matrix of $g^{\prime} \mapsto u(\Delta g^{\prime})$\;
+$h \gets 2$\;
+$g_v \gets $ the representation of $g$ as a vector\;
+$i \gets $ the index of the monomial $x_{1}^{p - 1} \dots x_{n}^{p - 1}$\;
+\While{true}{
+	\If{$b < h$}{
+		\Return $\infty$\;
+	}
+	$g_v \gets Mg_v$\;
+	\If{$g_v[i] \neq 0$}{
+		\Return $h$\;
+	}
+	$h \gets h + 1$
+}
+\end{algorithm}
+
+% Thus, we have reduced our problem (algorithmically, at least)
+% to finding the matrix of the ``multiply then split'' operation.
+
 To find the matrix of ``multiply then split''
 in the Algorithm for the quasi-\(F\)-split height
 of a Calabi-Yau hypersurface, 
@@ -48,31 +223,10 @@ in memory.
 Both of our improved algorithms ignore
 all of these unnecessary terms.
 
-In what follows, 
-when we apply arithmetic operations to arrays, 
-(particularly addition, multiplication, and modulo)
-we mean componentwise application of these operations.
-Use of arbitrary componentwise operations is called
-\textit{broadcasting} in Julia, and we will
-sometimes use this term.
-Homogeneous polynomials are represented in computer 
-memory as a list of their terms. 
-This is reflected in our notation, 
-thus the meaning of ``for \(\delta \in \Delta\)''
-is a for loop though all the monomials
-of \(\Delta\).
-
 \begin{defn}
-    \label{def:poly:nota}
-    The \textit{exponent tuple} of a monomial 
-    $m = ax_{1}^{d_1}, \dots, x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
-	We will denote it $\exps(m)$, and we also 
-    define $\coeff(m) \colonequals a$
-\end{defn}
-
-\begin{defn}
-    The weak integer compositions of $k$ into $n$ parts, 
-    denoted $\wics(k, n)$, is the set of ordered tuples 
+    The \textit{weak integer compositions} of $k$ into $n$ parts, 
+    denoted $\wics(k, n)$, is the set of ordered tuples of
+    nonnegative integers
 	\((d_{1}, \ldots, d_{n})\) such that 
     \(d_{1} + \ldots + d_{n} = k\).
 \end{defn}
