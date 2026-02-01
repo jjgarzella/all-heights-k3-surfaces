@@ -139,8 +139,8 @@ reduce modulo Goldilocks is given in \cite{ozcan-2023-fft}.
 Note that 
 the fact that $2^{32}$ is a primitive 6th root of unity in $\mathbb{F}_q$ 
 can be used to slightly speed up the forward NTT, which we don't 
-implement due to its implementation difficulty and potential marginal 
-speedup.
+implement due to its implementation difficulty, the fact that we don't need it, and 
+our expectations that the gains will be marginal.
 
 \subsubsection{Bound Finding}
 \label{subsec:poly:bounds}
@@ -160,17 +160,20 @@ as possible to minimize loop iterations, and $p_2$ to be the remaining
 power of $f$ to reach $f^k$. With this goal, $p_1 > p_2$.
 
 To find how large we can make $p_1$, we take the ``worst case'' 
-polynomial $f'$ in our input space, the polynomial with all possible 
+polynomial $f'$ (i.e. the polynomial whose coefficients are uniformly \(p^{2}-1\)) in our input space, the polynomial with all possible 
 terms, and all coefficients taking on their maximum values. Then, using 
 an arbitrary precision computer algebra system like FLINT, 
 we raise $f'$ to higher and higher powers 
 until we reach a power where the largest resulting coefficient is 
 larger than Goldilocks. We can then take $p_1$ to be the previous 
-power, and solve for $p_2$ as the remainder of the division of 
-$k \div p_1$. Note that this computation is relatively expensive, 
+power, and solve for $p_2$ as the remainder 
+\(k \text{ mod } p_{1}\).
+% of the division of 
+% $k \div p_1$. 
+Note that this computation is relatively expensive, 
 taking a few minutes per power, but it only needs to be ran once, and 
-$p_1$, $p_2$ and $i$ can be hard coded for any problem of the same shape.
-Thus, given a problem shape, \code{steps} is hard coded to return the 
+$p_1$, $p_2$ and $i$ can be stored for any problem of the same shape.
+Thus, given a problem shape, \code{steps} simply returns the 
 corresponding $(p_1, p_2, i)$.
 
 For the intermediate multiplications, we can use the trivial 

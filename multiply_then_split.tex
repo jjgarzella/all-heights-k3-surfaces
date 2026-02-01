@@ -322,12 +322,92 @@ However, we emphasize that this algorithm, if
 implemented in parallel on the GPU, is indeed
 fast enough to not be a bottleneck in practice.
 
-\subsection{Modified merge-based algorithm}
+% \subsection{Modified merge-based algorithm}
 
-We now introduce an algorithm that utilizes 
-properties of monomial ordering to reduce the 
-number of comparisons 
-performed in checking whether two terms match.
+% We now introduce an algorithm that utilizes 
+% properties of monomial ordering to reduce the 
+% number of comparisons 
+% performed in checking whether two terms match.
+
+
+% \begin{cor}
+% 	\label{cor:match:order}
+% 	Let \(\leq_{lex}\) denote the 
+% 	lexicographical ordering.
+% 	If \(X \leq_{lex} Y\),
+% 	then 
+% 	\(m(Y) \leq_{lex} m(X)\).
+% \end{cor}
+
+% \begin{proof}
+% 	Follows from the definition of lexicographical
+% 	ordering.
+% \end{proof}
+
+% Using these two corollaries, we have the following algorithm,
+% which we call \merge:
+
+% \begin{algorithm}[H]
+% \caption{Matrix of multiply then split: \merge}
+% \label{alg:theta:merge}
+% \KwInput{
+%     $\Delta, B_d, B_{d^\prime}, p$
+% }
+% \KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
+% \KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
+% $M \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
+% $L \gets [\code{exps}(\delta) \modp ~|~ \delta \in \Delta]$\;
+% $R \gets [\code{exps}(m) \modp ~|~ m \in B_{d}]$\;
+% \Comment{Lexicographically sort $L$ and $R$ and keep the permutations}
+% $P_1 =$ \code{sortperm}\((L)\), $P_2 =$ \code{sortperm}\((R)\) \;
+% \Comment{Permute \(\Delta\) and \(B_d\)}
+% $\Delta^{\prime} \gets \Delta[P_1], B_d^{\prime} \gets B_d[P_2]$\;
+% \(l \gets 1, r \gets \code{length}(R)\)\;
+% \While{\(r \geq 1 ~\textnormal{and}~ l \leq \code{length}(L)\)}{
+%     cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\)\;
+%     \uIf(\tcp*[h]{If lex sum of pair too small, increment index of $L$}){\textnormal{cmp < 0}}{
+%         \(l \gets l + 1\)\;
+%     }\uElseIf(~\tcp*[h]{If lex sum of pair too big, decrement index of $R$}){\textnormal{cmp > 0}}{
+%         \(r \gets r - 1\)\;
+%     }\Else(~\tcp*[h]{Match found}){
+%         matchr \(\gets R[r]\)\;
+%         numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\)\;
+%         \Comment{For each monomial of $B_d$}
+%         \While{$R[r] ~\code{==}~ \textnormal{matchr} ~\textnormal{and}~ 1 \leq r$}{
+%             \Comment{Find matching terms of $\Delta$}
+%             \For{\(ll \in \{l, l+1, \ldots, l+\textnormal{numLmatches} - 1\})\)}{
+%                 \Comment{And apply $u$}
+%                 res \(\gets (\code{exps}(\Delta^{\prime}[ll]) + \code{exps}(B^{\prime}[r]) - (p-1, \ldots, p-1)) / p\)\;
+%                 \(\text{col} \gets \code{indexof}(B^{\prime}[r],B_{d})\)\;
+%                 \(\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})\)\;
+%                 \(M[\text{row},\text{col}] = \code{coeff}(\Delta^{\prime}[ll])\)\;
+%             }
+%             \(r \gets r - 1\)\;
+%         }
+%         \(l \gets l + \text{numLmatches} - 1\)\;
+%     }
+% }
+% \Return $M$
+% \end{algorithm}
+
+% Note that the inner while loops account for the fact that
+% after modding by \(p\), one does not expect 
+% either array to have unique elements.
+% The algorithm is justified by the previous corollaries.
+
+% In practice, instead of sorting the arrays in place, 
+% we use a method like Julia's \texttt{sortperm}
+% to get the sort permutation.
+
+% Because we perform two sorts, then a linear merge, 
+% we perform 
+% $\ell_{d} \log \ell_{d} + \ell_{\Delta} \log \ell_{\Delta} + \ell_{d} + \ell_{\Delta}$ operations, 
+% giving the algorithm complexity 
+% $O(\max(\ell_{d} \log \ell_{d}, \ell_{\Delta} \log \ell_{\Delta}))$.
+% In practice (for Calabi-Yau hypersurfaces), 
+% the $\ell_{\Delta} \log \ell_{\Delta}$ usually dominates.
+
+\subsection{Weak integer compositions-based algorithm}
 
 \begin{lem}
 	\label{lem:tuples:modp}
@@ -364,85 +444,6 @@ when we consider the exponent tuple mod $p$ of
 an arbitrary monomial of \(B\),
 it has a unique
 match mod \(p\).
-
-\begin{cor}
-	\label{cor:match:order}
-	Let \(\leq_{lex}\) denote the 
-	lexicographical ordering.
-	If \(X \leq_{lex} Y\),
-	then 
-	\(m(Y) \leq_{lex} m(X)\).
-\end{cor}
-
-\begin{proof}
-	Follows from the definition of lexicographical
-	ordering.
-\end{proof}
-
-Using these two corollaries, we have the following algorithm,
-which we call \merge:
-
-\begin{algorithm}[H]
-\caption{Matrix of multiply then split: \merge}
-\label{alg:theta:merge}
-\KwInput{
-    $\Delta, B_d, B_{d^\prime}, p$
-}
-\KwNotation{Let $\ell_d = \code{length}(B_d), \ell_{d^\prime} = \code{length}(B_{d^\prime})$}
-\KwOutput{$\ell_{d^\prime} \times \ell_d $ matrix representing ``multiply then split''}
-$M \gets \text{zero matrix of size } \ell_{d^\prime} \times \ell_d $\;
-$L \gets [\code{exps}(\delta) \modp ~|~ \delta \in \Delta]$\;
-$R \gets [\code{exps}(m) \modp ~|~ m \in B_{d}]$\;
-\Comment{Lexicographically sort $L$ and $R$ and keep the permutations}
-$P_1 =$ \code{sortperm}\((L)\), $P_2 =$ \code{sortperm}\((R)\) \;
-\Comment{Permute \(\Delta\) and \(B_d\)}
-$\Delta^{\prime} \gets \Delta[P_1], B_d^{\prime} \gets B_d[P_2]$\;
-\(l \gets 1, r \gets \code{length}(R)\)\;
-\While{\(r \geq 1 ~\textnormal{and}~ l \leq \code{length}(L)\)}{
-    cmp \(\gets L[l] + R[r] - (p-1, \ldots, p-1)\)\;
-    \uIf(\tcp*[h]{If lex sum of pair too small, increment index of $L$}){\textnormal{cmp < 0}}{
-        \(l \gets l + 1\)\;
-    }\uElseIf(~\tcp*[h]{If lex sum of pair too big, decrement index of $R$}){\textnormal{cmp > 0}}{
-        \(r \gets r - 1\)\;
-    }\Else(~\tcp*[h]{Match found}){
-        matchr \(\gets R[r]\)\;
-        numLmatches \(\gets\) the number of adjacent entries in \(L\) which are equal to \(L[l]\)\;
-        \Comment{For each monomial of $B_d$}
-        \While{$R[r] ~\code{==}~ \textnormal{matchr} ~\textnormal{and}~ 1 \leq r$}{
-            \Comment{Find matching terms of $\Delta$}
-            \For{\(ll \in \{l, l+1, \ldots, l+\textnormal{numLmatches} - 1\})\)}{
-                \Comment{And apply $u$}
-                res \(\gets (\code{exps}(\Delta^{\prime}[ll]) + \code{exps}(B^{\prime}[r]) - (p-1, \ldots, p-1)) / p\)\;
-                \(\text{col} \gets \code{indexof}(B^{\prime}[r],B_{d})\)\;
-                \(\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})\)\;
-                \(M[\text{row},\text{col}] = \code{coeff}(\Delta^{\prime}[ll])\)\;
-            }
-            \(r \gets r - 1\)\;
-        }
-        \(l \gets l + \text{numLmatches} - 1\)\;
-    }
-}
-\Return $M$
-\end{algorithm}
-
-Note that the inner while loops account for the fact that
-after modding by \(p\), one does not expect 
-either array to have unique elements.
-The algorithm is justified by the previous corollaries.
-
-In practice, instead of sorting the arrays in place, 
-we use a method like Julia's \texttt{sortperm}
-to get the sort permutation.
-
-Because we perform two sorts, then a linear merge, 
-we perform 
-$\ell_{d} \log \ell_{d} + \ell_{\Delta} \log \ell_{\Delta} + \ell_{d} + \ell_{\Delta}$ operations, 
-giving the algorithm complexity 
-$O(\max(\ell_{d} \log \ell_{d}, \ell_{\Delta} \log \ell_{\Delta}))$.
-In practice (for Calabi-Yau hypersurfaces), 
-the $\ell_{\Delta} \log \ell_{\Delta}$ usually dominates.
-
-\subsection{Weak integer compositions-based algorithm}
 
 \begin{lem}
     \label{lem:generate:matching}
@@ -545,7 +546,7 @@ effectively constant for all reasonably computable $n$ and $p$.
 
 \subsection{Implementation}
 
-In the implementation of \triv, \merge, and \wicsalg, there are a 
+In the implementation of \triv ~and \wicsalg, there are a 
 few optimizations and considerations common to all the implementations.
 First, all exponent tuples are bitpacked into 
 unsigned integers, improving memory efficiency 
@@ -572,15 +573,15 @@ hashtable is quite slow.
 Another solution can be to perform a binary search 
 for the \code{indexof}$()$ function, since $B_d$ is lexicographically 
 sorted, but for one-off computations, users are better 
-off using non-parallelized \merge ~or \wicsalg ~to avoid 
+off using non-parallelized \wicsalg ~to avoid 
 first-time GPU kernel compilation times.
 However, if many matrices need to be created, caching 
 the hashtable allows the GPU implementations to far outpace 
 the non-parallelized CPU implementations.
 
-\merge ~should be parallelizable by implementing a modified parallel merge and using a parallel sort. 
-However, we expect the sorting bottleneck to mean that such a parallel algorithm wouldn't beat GPU-parallel \wicsalg,
-so we don't bother developing the modified parallel merge.
+% \merge ~should be parallelizable by implementing a modified parallel merge and using a parallel sort. 
+% However, we expect the sorting bottleneck to mean that such a parallel algorithm wouldn't beat GPU-parallel \wicsalg,
+% so we don't bother developing the modified parallel merge.
 
 Below in Figure \ref{fig:momts:compare}, we compare running times 
 for all the \(p\) which we consider. 
@@ -596,13 +597,19 @@ amount of time.
 \begin{center}
 \begin{tabular}{c c c c c c}
     \toprule
-    p & \triv ~- CPU & \triv ~- GPU & \merge   & \wicsalg ~- CPU & \wicsalg ~- GPU \\
+    p & \triv ~- CPU & \triv ~- GPU %& \merge   
+      & \wicsalg ~- CPU & \wicsalg ~- GPU \\
     \midrule
-    3 & 0.01   & 0.0007  & 0.001  & 0.001   & 0.0002  \\                                       
-    5 & 1.6    & 0.005   & 0.046  & 0.028   & 0.0024  \\
-    7 & 45.33  & 0.104   & 0.670  & 0.277   & 0.025  \\
-    11 &    -  & 6.796   & 26.35  & 5.45    & 0.56  \\
-    13 &    -  & 31.86   & 88.97  & 17.06   & 2.05 \\
+    3 & 0.01   & 0.0007  %& 0.001  
+      & 0.001   & 0.0002  \\                                       
+    5 & 1.6    & 0.005   %& 0.046  
+      & 0.028   & 0.0024  \\
+    7 & 45.33  & 0.104   %& 0.670  
+      & 0.277   & 0.025  \\
+    11 &    -  & 6.796   %& 26.35  
+       & 5.45    & 0.56  \\
+    13 &    -  & 31.86   %& 88.97  
+       & 17.06   & 2.05 \\
     \bottomrule
 \end{tabular}
 \caption{Comparison of timings for various algorithms that calculate
