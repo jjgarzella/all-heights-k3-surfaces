@@ -35,9 +35,9 @@ We define the map \(\Phi\) to be the map
 % 	\prod_{n \in \mathbb{N}}^{} R  
 % \] 
 \begin{align*}
-    \Phi : \prod_{n \in \mathbb{N}}^{R} R  
+    \Phi : \prod_{n \in \mathbb{N}}^{} R  
     &\xlongrightarrow{(\omega_{n})_{n}} 
-    \prod_{n \in \mathbb{N}}^{R} R \\
+    \prod_{n \in \mathbb{N}}^{} R \\
     %
     (r_{0}, r_{1}, \ldots, r_{n}, \ldots) 
     &\xmapsto{\hphantom{(\omega_{n})_{n}}}
@@ -47,7 +47,8 @@ We define the map \(\Phi\) to be the map
 
 defined as \(\omega_{n}\) for the \(n\)-th component.
 That is, \(\omega_{n}\) is considered as a 
-map (of sets) \(R^{n} \xrightarrow{} R\) by
+% \omega_n takes n+1 arguments, so R^{n + 1}
+map (of sets) \(R^{n + 1} \xrightarrow{} R\) by
 evaluation.
 
 \begin{lem}
@@ -344,7 +345,7 @@ of \(R = S / (f)\).
 \begin{rmk}
 	Both \(F\)-splitness and quasi-\(F\)-splitness have 
 	various geometric
-	variants which are more general then the 
+	variants which are more general than the 
 	ring-theoretic/affine versions given here. 
 	These are covered extensively in the literature, for example
 	see \cite{kttwyy-2022-qfs-birat}.
@@ -387,7 +388,7 @@ Homogeneous polynomials are represented in computer
 memory as a list of their terms. 
 This is reflected in our notation, 
 thus the meaning of ``for \(\delta \in \Delta\)''
-is a for loop though all the monomials
+is a for loop through all the monomials
 of \(\Delta\).
 
 \begin{defn}

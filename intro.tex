@@ -71,7 +71,7 @@ instead of the Artin--Mazur height, another quantity called the
 which is known to be equal to the Artin--Mazur height
 for Calabi-Yau varieties, and thus K3 surfaces.
 The theory of the quasi-\(F\)-split height has its
-roots in the theory of \(F\)-singularites and commutative
+roots in the theory of \(F\)-singularities and commutative
 algebra/birational geometry in characteristic \(p\).
 In particular, one theorem fundamental
 to the development of the theory of \(F\)-singularities
@@ -114,7 +114,7 @@ we produce examples of heights \(1 \leq h \leq 6\) and
 
 \subsection{On computational bottlenecks}
 
-We breifly overview the computational obstacales to fast computation
+We briefly overview the computational obstacles to fast computation
 of \(h\).
 As seen in Section \ref{sec:preliminaries},
 the algorithm presented in \cite{kty-2022-fedder} boils down to the 
@@ -172,12 +172,12 @@ with a (dense\footnote{
     Thus, we put this off for future work.
 }) matrix-vector multiplication.
 This matrix-vector multiplication can be carried out using FLINT
-or Julia's bulit-in matrix multiplication, both of which call the same
+or Julia's built-in matrix multiplication, both of which call the same
 underlying BLAS library.
 We provide algorithms for calculating the matrix of multiply
 then split in Section \ref{sec:alg:momts}.
 This essentially eliminates (2) as a bottleneck.
-In our implementation of this verison, step (2) takes
+In our implementation of this version, step (2) takes
 [TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
 takes [TIME] seconds for \(p=5\) and 
@@ -185,7 +185,7 @@ takes [TIME] seconds for \(p=5\) and
 
 To address the bottleneck of (1),
 we have no clever trick. 
-Instead, we implement polynomial via Fast Fourier Transform (FFT) using
+Instead, we implement polynomial powering via Fast Fourier Transform (FFT) using
 Graphics Processing Unit (GPU) hardware,
 allowing us to run the computation in a massively parallel way.
 Our GPU implementation of (1) takes [TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
@@ -203,7 +203,7 @@ about 180 surfaces per second over \(\mathbb{F}_{7}\).
 Our implementations can also compute the height \(h\) for examples
 over
 \(\mathbb{F}_{11}\) and \(\mathbb{F}_{13}\).
-Overe these two primes, our algorithms are roughly two orders of magnitude
+Over these two primes, our algorithms are roughly two orders of magnitude
 better than other methods for calculating \(h\),
 but are not fast enough to compute examples of all possible heights.
 All of our algorithms are implemented in Julia 
