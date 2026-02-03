@@ -76,7 +76,8 @@ for low heights, with more variance at higher heights.
 For \(p=5\), the algorithm throughput is about
 1400 surfaces per second on 
 Nvidia 2080Ti GPUs provided by the 
-UCSD research cluster.
+UCSD research cluster, with 8 CPU threads running
+examples on the same GPU.
 Since much less time is taken for height \(1\) examples
 (since the classical Fedder's criterion suffices), 
 for the purposes of estimating the time to compute a
@@ -84,9 +85,9 @@ high height example we may ignore them.
 Thus,
 the expected compute time necessary to find a height = \(10\) 
 example is about  \(5^{9} / 1400 \approx 1395\) seconds, or about 
-23 compute minutes.
+compute minutes.
 For \(p=7\), the throughput is about 185 surfaces
-per second.
+per second, also with 8 CPU cores calling the same GPU.
 Thus, the expected compute time to compute
 a height = \(10\) example is 
 \(7^{9} / 185 \approx \) 218,127 seconds, or about 
@@ -94,11 +95,12 @@ a height = \(10\) example is
 The actual times to find the examples were much 
 longer than this, because the authors were using a 
 less-optimized NTT and had not yet discovered $\wicsalg$
-and were using \(\merge\) instead.
+when the computation started.
+This is about three orders of magnitude better than the state of the art,
+for calcualting newton polygons, which was \cite{fgmqt-2025-witt-vectors-macaulay2}.
 
-For $p = 11$ and $p = 13$, the threshold for the NTT where 
-GPU memory becomes a bottleneck is reached, and the algorithm 
-faces a sharp drop in speed. The examples below took about 12 compute hours
+For $p = 11$ and $p = 13$, 
+the examples below could be computed in less than 12 compute hours
 on the aforementioned 2080Tis (via random guessing).
 Newton polygons of K3 surfaces may be computed by using the
 library ToricControlledReduction
@@ -106,13 +108,18 @@ library ToricControlledReduction
 (which computes the zeta
 function of the surface, from which the Newton polygon and thus the
 height can be deduced).
-Our method is comparable to ToricControlledReduction to find
-the height for \(p = 11\). On an Nvidia 3090 our method took 
-around 39-40 seconds per surface, while ToricControlledReduction took 
+Our algorithm beats ToricControlledReduction by about 1.5 orders of magnitude:
+on an Nvidia 3090 our method took 
+around [TIME] seconds per surface (one CPU thread) in characteristic \(p = 11\), 
+while ToricControlledReduction took 
 about 43 seconds per surface.
 For \(p = 13\), our 
-code took 100-110 seconds per surface, while ToricControlledReduction
+code took [TIME] seconds per surface, while ToricControlledReduction
 again took about 43 seconds per surface.
+Since ToricControlledReduction has complexity \(O(p^{1 / 2})\) as \(p\) 
+grows, we expect that if we implemented our algorithms for larger primes,
+ToricControlledReduction would eventually beat it.
+
 
 % p=11,
 % us: 39s,TCR: error

@@ -200,9 +200,12 @@ multiplication on the CPU is already fast enough to overcome bottleneck (2).
 In our tests, we were able to achieve high throughput of examples,
 about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
 about 180 surfaces per second over \(\mathbb{F}_{7}\).
+This is roughly three orders of magnitude better than the state of the art
+(see Section ).
 Our implementations can also compute the height \(h\) for examples
 over
-\(\mathbb{F}_{11}\) and \(\mathbb{F}_{13}\).
+\(\mathbb{F}_{11}\) and \(\mathbb{F}_{13}\),
+where they are about 1.5 orders of magnitude better than the state of the art.
 Over these two primes, our algorithms are roughly two orders of magnitude
 better than other methods for calculating \(h\),
 but are not fast enough to compute examples of all possible heights.
@@ -282,6 +285,13 @@ approaches for each computational step.
 All timing tests were performed with 
 an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.
 
+\subsection{Future Work}
+
+In the future, we hope to implement other algorithms, such as Theorem A of \cite{kty-2022-fedder}
+and other variants of the quasi-\(F\)-split height.
+We also hope that our speedups will inspire others in computer algebra to consider the possibilities
+for optimization using GPU acceleration methods.
+
 \subsection{Acknowledgements}
 
 The authors thank the maintainers and support staff 
@@ -304,3 +314,4 @@ The second author was partially supported by the
 National Science Foundation Graduate Research
 Fellowship Program under Grant No. 2038238, and a fellowship
 from the Sloan Foundation.
+
