@@ -110,11 +110,11 @@ function of the surface, from which the Newton polygon and thus the
 height can be deduced).
 Our algorithm beats ToricControlledReduction by about 1.5 orders of magnitude:
 on an Nvidia 3090 our method took 
-around [TIME] seconds per surface (one CPU thread) in characteristic \(p = 11\), 
+around 0.94 seconds per surface (one CPU thread) in characteristic \(p = 11\), 
 while ToricControlledReduction took 
 about 43 seconds per surface.
 For \(p = 13\), our 
-code took [TIME] seconds per surface, while ToricControlledReduction
+code took 4.5 seconds per surface, while ToricControlledReduction
 again took about 43 seconds per surface.
 Since ToricControlledReduction has complexity \(O(p^{1 / 2})\) as \(p\) 
 grows, we expect that if we implemented our algorithms for larger primes,

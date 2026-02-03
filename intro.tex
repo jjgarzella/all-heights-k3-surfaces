@@ -178,7 +178,7 @@ We provide algorithms for calculating the matrix of multiply
 then split in Section \ref{sec:alg:momts}.
 This essentially eliminates (2) as a bottleneck.
 In our implementation of this version, step (2) takes
-[TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
+ seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
 takes [TIME] seconds for \(p=5\) and 
 [TIME] seconds for \(p = 7\).
@@ -188,7 +188,7 @@ we have no clever trick.
 Instead, we implement polynomial powering via Fast Fourier Transform (FFT) using
 Graphics Processing Unit (GPU) hardware,
 allowing us to run the computation in a massively parallel way.
-Our GPU implementation of (1) takes [TIME] seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
+Our GPU implementation of (1) takes 0.017 seconds for \(p = 5\) and 0.16 seconds for \(p = 7\).
 In order to avoid the memory overhead of communication between the Central Processing Unit (CPU) and
 the GPU, we also provide a GPU implementation of calculating the matrix
 of multiply then split. 
