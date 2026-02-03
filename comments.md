@@ -31,7 +31,7 @@
 >> e.g. Algorithm 3.1 in arXiv:2504.01834. What about the nmod_mpoly type in
 >> FLINT for instance?
 
-We would like to thank Reviewer 1 for pointing this out, not lifting to ZZ/p^2 ZZ was a clear oversight in our approach. See below for the changes we made.
+We would like to thank Reviewer 1 for pointing this out, not lifting to ZZ/p^2 ZZ was a clear oversight in our approach. Please see below for the changes we made.
 
 >> 
 >> - In Section 4, it is quite clear that Algorithm 7 is the correct way to
@@ -41,11 +41,13 @@ We would like to thank Reviewer 1 for pointing this out, not lifting to ZZ/p^2 Z
 >> compute u(Delta*m) only for the monomials m that actually occur in g at some
 >> point during Algorithm 3 (and that match with some monomial of Delta).
 
-It is not strictly necessary to compute the whole matrix. In fact, our algorithms for computing the matrix of a \mapsto u(\delta a) can easily be made sparse. However, this is not necessary for the our computation (finding K3 surfaces of all heights) in characteristic 5 and 7. To finish the computation in p=11, we would need a speedup of 3-4 orders of magnitude while this step is not the bottleneck of the computation (see below). So this improvement is out of scope for this project.
+It is not strictly necessary to compute the whole matrix. For example, our algorithms for computing the matrix of a \mapsto u(\delta a) can easily be made sparse. However, we found this was not necessary for our computation (finding K3 surfaces of all heights) in characteristic 5 and 7. Sparse computations may offer a speedup, but we have found that this step is not the bottleneck of the computation, even in characteristic 11.
 
-In fact, we have a work in progress that implements a few similar algorithms to the ones presented here, where calculating this matrix does in fact sometimes become a bottleneck. In that work, we have implemented a sparse version and it has led to a nice speedup.
+In fact, we have a work in progress that implements similar algorithms to the ones presented here. There, calculating this matrix may sometimes be the bottleneck. In that work, we have implemented a sparse version and it has led to a nice speedup.
 
-One can also ask to use a sparse multiplication/powering algorithm for the computation of Delta_1. We do this by default on the CPU since that's what FLINT does. On the GPU, however, we (1) don't need it, and (2) some preliminary experiments we did in Summer 2024 suggest that it will actually be worse than a dense GPU algorithm for our problem size. Thus, we also push this to future work. Perhaps there are some variants of this problem where a sparse GPU algorithm makes sense.
+One can also ask to use a sparse multiplication/powering algorithm for the computation of Delta_1. We do this by default on the CPU using FLINT. However, on the GPU the choice is not as clear. In Summer 2024, some preliminary experiments suggested that sparse GPU implementations may actually be worse than a dense GPU algorithms for our problem size.
+
+Perhaps there are some variants of this problem where a sparse GPU algorithm provides significant speedups. We recognize this as future work.
 
 >> 
 >> - In Section 4, I understand that you thought of Algorithm 7 only after the
@@ -53,10 +55,11 @@ One can also ask to use a sparse multiplication/powering algorithm for the compu
 >> more efficient than Algorithms 5 and 6, so I wonder whether those should be
 >> presented in such detail in the final version of your paper.
 
-In our revision, we chose to remove Algorithm 6, and keep Algorithm 5. We justify this choice with two reasons:
+We agree that section 4 needs improvement. In our revision, we have chosen to remove Algorithm 6 and keep Algorithm 5. There are two main reasons that led us to this choice:
 
-* One finding which we feel is interesting and worth keeping is that even using the most naive possible algorithm (i.e. Algorithm 5), but doing it on the GPU, gives a speedup that is enough to solve our existence of K3 surfaces problem in characteristic 5, and possibly in characteristic 7 (it would be the bottleneck in this case).
-* Algorithm 5 takes up a lot less space than Algorithm 6, only about half a page.
+First, we would like ot note that even the most naive algorithm (i.e. Algorithm 5) on the GPU gives a significant speedup. Indeed, this speedup was sufficient to solve the existence of K3 surfaces in characteristic 5, and perhaps characteristic 7. We find this very interesting and worth sharing through the paper.
+
+Second, algorithm 5's writeup is relatively short compared to algorithm 6.
 
 >> 
 >> - In Section 6, I am not sure what the timings in Figure 3 refer to. Are you
@@ -65,13 +68,12 @@ In our revision, we chose to remove Algorithm 6, and keep Algorithm 5. We justif
 >> in characteristic 0 or directly mod p? Have you tried using FLINT's nmod_mat
 >> type for instance?
 
+In our revision, we have tried to improve Figure 3 to highlight that:
+
 * These are matrix-matrix products
 * They are dense matrices
-* They are multiplying in characteristic p. Per the description in the section, the time is taken by doing an integer/floating point MATMUL and then reducing modulo p.
-* FLINT uses a BLAS library for multiplication in this case. Indeed one of the columns (single-threaded BLAS) is FLINT, via it's Oscar.jl wrapper.
-
-We have attempted to clarify all of these in the section.
-
+* They are multiplying in characteristic p. The time is taken by doing an integer/floating point MATMUL and then reducing modulo p.
+* FLINT uses single-threaded BLAS for multiplication in this case, via its Oscar.jl wrapper. We have highlighted this in the figure.
 
 >> 
 >> Assuming the above comments make sense, I would encourage the authors to
@@ -88,18 +90,20 @@ We have attempted to clarify all of these in the section.
 >> I realize that this is substantial work, however, such a rewrite is necessary
 >> in my opinion to pass the acceptance bar.
 
-It seems like we didn't make this clear in our paper, but we had already done much of this work; for example, all of our GPU algorithms first had CPU version that used FLINT (via Oscar.jl). The time we didn't use FLINT was for CPU matrix multiplication used Julia's built-in matrix multiplication, which calls the same BLAS library as FLINT under the covers, but with more threads by default.
+We would like to thank Reviewer 1 for these suggestions. At the same time, we would like to mention that we had already done much of this work. However, these may not have been communicated clearly in the paper.
 
-The thing we had not done was only lift modulo p^2 instead of lifting to ZZ, which affects only the computation of \Delta_1. Thus, for the revision, we have implemented
+For example, all of our GPU algorithms have a CPU implementation that uses FLINT via Oscar.jl. The only instance where FLINT was not used was for CPU matrix multiplication, where we used Julia's built-in matrix multiplication. This calls the same BLAS library that FLINT uses, but with more threads by default.
+
+The one thing we had not implemented was the lift modulo p^2 instead of the lift to ZZ, which affects the computation of \Delta_1 only. We have addressed this in our revision by providing:
 
 * A (FLINT via Oscar) CPU version of Delta_1 that lifts modulo p^2
-* An FFT-based GPU implementation of an "incremental multiplication" algorithm. If we wish to compute g^d, it computes d = n * d_1 + d\_2 for d_1 as large as possible so that g^{d_1} does not overflow the prime in our "multimodular" (now single-modular) algorithm. Since we can now use only one prime, we use the Goldilocks prime to achieve fast reductions and FFTs.
+* An FFT-based GPU implementation of an "incremental multiplication" algorithm. Namely, if we wish to compute g^d, it computes d = n * d_1 + d\_2 for d_1 as large as possible so that g^{d_1} does not overflow the prime in our "multimodular" (now single-modular) algorithm. Since we can now use only one prime, we use the Goldilocks prime to achieve fast reductions and FFTs.
 
-Our FLINT CPU times are comparable to the times for ZZ, which was expected: the coefficient explosion doesn't really hit until p=11, while the explosion in the number of terms already hurts us when p=5. To be sure, p=7 already takes so long that we don't even bother trying to time Delta_1 on the CPU for p=11.
+Our FLINT CPU times are comparable to the times for ZZ, which was expected: the coefficient explosion does not trigger until p=11, while the explosion in the number of terms can already be seen at p=5. p=7 took such a significant amount of time that we found it was unnecessary to time Delta_1 on the CPU for p=11.
 
-The incremental multiplicaiton algorithm gives no discernible difference for p=5 (since we only needed one prime anyways here). For p=7, it gives a nice speedup. For p=11 and p=13, incremental multiplication crushes our previous algorithm, giving about 1.5 orders of magnitude of speedup. With this algorithm, we actually found a height h=6 K3 surface in characteristic p=11. We wish to thank Reviewer 1 very much for this suggestion.
+On the other hand, the incremental multiplication algorithm gives no discernible difference for p=5 (since we only needed one prime anyways here). For p=7, it provides a small speedup. For p=11 and p=13, incremental multiplication gives an incredible 1.5 orders of magnitude speedup. With this algorithm, we actually found a height h=6 K3 surface in characteristic p=11. Once again, we would like to thank Reviewer 1 for this suggestion.
 
-We have added a section to the introduction that explains the bottlenecks with timings. The polynomial powering section has also been updated to describe the incremental multiplication algorithm, instead of multimodular FFT.
+Furthermore, we have added a section to the introduction that explains the algorithm's bottlenecks with timings. The polynomial powering section has also been updated to describe the incremental multiplication algorithm, instead of multimodular FFT.
 
 >> 
 >> More minor comments follow.
@@ -108,25 +112,19 @@ We have added a section to the introduction that explains the bottlenecks with t
 >> from R to R. (3) does make sense though, because you can give the set R
 >> different R-module structures.
 
-We may identify R with the set R^p = {r^p | r \in R}, where the "raising to the p" is a formal decoration.
-This is, completely formally, a ring which is isomorphic to R.
-Now, we may define the map of sets R^p \to R, r^p \mapsto r^p,
-where the latter uses multiplication in the ring R.
-This map is a ring homomorphism by the freshman's dream,
-and when we undo the identification R^p \isom R, it identifies with the Frobenius.
+We have tried to clarify this in the revised exposition.  
 
-We may also identify the ring R with R^1/p, the set of formal pth roots of elements in R, in an exactly analogous way. When we apply the previous construction to that, we find that (R^1/p)^p is formally just R under the map r^1/p^p \mapsto r, just removing both symbols.
+In particular, we may identify R with the set R^p = {r^p | r \in R}, where the "raising to the p" is a formal decoration. Formally, this is a ring isomorphic to R. Now, we may define the map of sets R^p \to R, r^p \mapsto r^p, where the latter uses multiplication in the ring R. This map is a ring homomorphism by the freshman's dream. When we undo the identification R^p \isom R, it identifies with the Frobenius.
 
-We have tried to clarify this in the exposition.  
+We may also identify the ring R with R^1/p, the set of formal pth roots of elements in R, in an exactly analogous way. When we apply the previous construction to that, we find that (R^1/p)^p is just R under the map r^1/p^p \mapsto r, removing both symbols.
 
 >> 
 >> - p.4, Definition 2.13: what do you mean by "split"? Same question for
 >> "module-finite".
 
-split = map back such that the composition is identity
-module-finite = finitely generated as a module, in contrast to finitely generated as an algebra "finite type" or "algebra-finite". This is a commutative-algebra-ism.
+We have added clarifications to the paper. 
 
-Added clarifications to the paper. I feel that it probably isn't right to define split separately, since it's commonly taught in graudate algebra, but we can definitely spell out what it means. 
+Here, split means to map back such that the composition is identity. Module-finite refers to a finitely generated as a module, in contrast to finitely generated as an algebra "finite type" or "algebra-finite". This is a commutative-algebra-ism.
 
 >> 
 >> - p.4 L26: I think I^[m] is well-defined only when m is a power of p and R has
@@ -145,7 +143,7 @@ Since this term never comes up in the rest of the paper, we omit it.
 >> - p.4, Definition 2.17: I was wondering whether R n-quasi-F-split implies that
 >> R is (n+1)-squasi-F-split. Is this true?
 
-It is! This is good to include, explanation added.
+It is! This is good to include, and an explanation has been added.
 
 >> 
 >> - p.5, Definition 3.1: it would be helpful to say which ring Delta_1(f) belongs
@@ -169,7 +167,7 @@ This was a typo. It was supposed to be (2), which has now changed to (1) with ot
 >> - p.8, Definition 4.3: why are you calling this "weak integer decompositions"
 >> and not just "partitions" for instance? You want to assume d_i nonnegative.
 
-"Weak integer compositions" is a standard term in the enumerative combinatorics literature. A composition is an ordered partition, and a weak composition allows entries to be zero. "Integer" here is in the same sense as integer partitions (as opposed to, say, set partitions or partitions of elements in some ring).
+"Weak integer compositions" is term from the enumerative combinatorics literature. A composition is an ordered partition, and a weak composition allows entries to be zero. "Integer" here is in the same sense as integer partitions (as opposed to, say, set partitions or partitions of elements in some ring).
 
 
 >> 
@@ -177,7 +175,7 @@ This was a typo. It was supposed to be (2), which has now changed to (1) with ot
 >> and not += here?
 >> 
 
-This was a typo, but at least in some cases the algorithm still seems to work when it has an "=", indicating that there is at most one matching term. This seems to deserve further consideration, but is out of scope for this project, as understanding this is unlikely to give a speedup big enough to compute K3 surfaces with higher heights.
+This was a typo. We note that in some cases, the algorithm still seems to work when it has an "=", indicating that there is at most one matching term. This seems to deserve further consideration, but is out of scope for this project. Namely, understanding this is unlikely to give a speedup big enough to compute K3 surfaces with higher heights.
 
 >> 
 >> - p.13, section 5.1.3: what are the "twiddle factors" you are referring to?
@@ -186,14 +184,14 @@ This was a typo, but at least in some cases the algorithm still seems to work wh
 >> - p.13 L31: what do you mean by "because of the precision of Barrett reduction"?
 >> 
 
-These to comments are moot because the corresponding section has been edited to describe incremental multiplication rather than multimodular FFT.
+The corresponding section has been edited to describe incremental multiplication rather than multimodular FFT.
 
 >> 
 >> - p.13 L46: "We know this computation will be correct because FLINT uses
 >> GMP". What do you mean by this? FLINT only uses GMP for its integer type, and
 >> GMP could contain bugs too, as far as I know.
 
-This one was also removed, but what we meant to say was "we know that this computaiton won't overflow because FLINT uses GMP"
+This has been removed. At the time, we meant to say "this computation won't overflow as FLINT uses GMP."
 
 >> 
 >> - p.16, Theorem 7.1: O() is an asymptotic notation. What is going to infinity
@@ -201,9 +199,9 @@ This one was also removed, but what we meant to say was "we know that this compu
 
 One may interpret this as p is going to infinity, which tacitly assumes that X is defined over QQ and we are implicitly lifting/reducing mod p. 
 
-However, it may also be interpreted in a more casual sense, which will mean something like the following: there exists an expression for which p^{r - 1/2} (possibly with some constant in front) is the dominant term, i.e. of all the terms in the expression, this one has the largest norm. Such notation shows up, for example, when one prints out elements of power series rings in Oscar.jl (there, one is using the x-adic norm).
+However, it may also be interpreted in a more casual sense: there exists an expression for which p^{r - 1/2} (possibly with some constant) is the dominant term, In other words, of all the terms in the expression, this one has the largest norm. Such notation shows up, for example, when one prints out elements of power series rings in Oscar.jl (there, one is using the x-adic norm).
 
-Either way is fine for interprenting the big O here.
+Both are fine interpretations of the big O notation here.
 
 >> 
 >> - p.16 L46: do you have a sense of why ToricControlledReduction becomes a
@@ -216,7 +214,7 @@ It's complexity in p is p^1/2, while this algorithm is exponential.
 >> indeed have the correct Newton polygons?
 >> 
 
-In fact, ToricControlledReduction only supports p=11 and p=13. Instead, we checked this against a forthcoming project of the second author, the first author, Mellberg, and Huang, which implements a similar algorithm to ToricControlledReduction, and has been tested against it.
+Please note that ToricControlledReduction only supports p=11 and p=13. Instead, we checked this against a forthcoming project of the second author, the first author, Mellberg, and Huang, which implements a similar algorithm to ToricControlledReduction.
 
 This revealed that some of the examples in our tables for p=5 and p=7 were not smooth, so we updated the tables with other examples that are smooth. According to this, the Newton polygons are all correct.
 
@@ -309,9 +307,9 @@ This revealed that some of the examples in our tables for p=5 and p=7 were not s
 >> (I prefer the term reduction instead of splitting because it
 >> captures more adequatly the computation involved).
 
-We are concerned that using the term "reduction" for this operation will be confusing, since we (and other literature in this area) regularly speac of reduction mod p, and more generally reduction modulo an idea I of a ring. This operation is not a reduction in that sense, and we do not wish to overload the word. 
+We are concerned that the term "reduction" may be confusing. We regularly speak of reduction mod p, and more generally reduction modulo an ideal I of a ring. Much literature in the area uses similar terminologies. This operation is not a reduction in that sense, and we do not wish to overload the word. 
 
-In the revised version of the paper, we continue to refer to this as "splitting" to match the matematical origins. However, we are open to other brainstorms for a word that better captures the computation.
+In the revised version of the paper, we continue to refer to this as "splitting" to match the matematical origins. However, we are open to other suggestions for a word that better captures the computation.
 
 >> - (the precise -- ie algorithmic -- definitions of the shift and
 >> the reduction can be given here without reference to the mathematical
@@ -355,13 +353,15 @@ In the revised version of the paper, we continue to refer to this as "splitting"
 >> Sections 3.4 and 4 should be merged in my opinion, as optimizations
 >> of the reduction step. Section 5 is fine.
 
-We agree with Reviewer 2 about our mathematical vs. algorithmic computations. Our paper was written in this way since it was meant to be read both by experts in the F-singularities literature and computer algebra experts - hence the extra background. We apprecieate Reviewer 2's comments, and believe that they will help make the article more accessible.
+We appreciate Reviewer 2's comments, and believe that they will help make the article more accessible.
+
+In particular, we agree with Reviewer 2 about our mathematical vs. algorithmic computations. Our paper was written with both experts in the F-singularities literature and computer algebra experts in mind - hence the extra background. 
 
 In our revision, we have attempted to address these issues by expanding the introduction and reorganizing the paper.
 
-* The introduction now contains a section which describes the bottlenecks and gives timings.
-* We decided to merge much of Section 3 into Section 2, including Section 3.2, the above mentioned remark, and Definition 4.2, as describe above.
-* The remaining material in Section 3, before section 4, was so short that we merged it into Section 4. So section 4 has a slightly bigger scope now, and Section 3 is gone.
+* The introduction now contains a section which describes the algorithmic bottlenecks and gives timings.
+* We decided to merge much of Section 3 into Section 2, Section 3.2, the above mentioned remark, and Definition 4.2, as described above.
+* The remaining material in Section 3 has been merged more tidily into Section 4. Thus section 4 has a slightly bigger scope now, and Section 3 has been removed.
 
 >> The paper lacks a proper conclusion (what next on the topic, on the
 >> experience of programming and using GPU, on software for Witt vectors...?)
@@ -373,7 +373,7 @@ In our revision, we have attempted to address these issues by expanding the intr
 >> p4.17: please make the definition more readable by adding
 >> a reformulation of the splitting
 
-Added, reviewer 1 also asked for this.
+Added, Reviewer 1 also asked for this.
 
 >> 
 >> p5.25: link to remark 2.11
@@ -383,5 +383,4 @@ Added.
 >> 
 >> p16.8: final dot
 
-We think this was about the end of the paragraph before Heuristic 7.2. 
-Added semicolon at the end of that paragraph.
+We believe this feedback was about the end of the paragraph before Heuristic 7.2. We added a semicolon to the end of that paragraph.
