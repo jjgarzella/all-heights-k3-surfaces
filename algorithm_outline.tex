@@ -114,6 +114,7 @@ giving an alternative construction of the \(p\)-adic numbers.
 \end{warn}
 
 \begin{defn}
+    \label{def:witt:frob}
 	There exists a homomorphism \(F \colon W(R) \xrightarrow{} W(R)\),
 	called the \textit{Frobenius},
 	defined by
@@ -236,13 +237,23 @@ the Frobenius which will be useful later.
     \hfill
     \begin{enumerate}[(1)]
     	\item Let \(R\) be reduced. 
-    		Then we may view the Frobenius as the inclusion
+            We may formally identify \(R\) with the set \(R^{p}\)
+            of symbols \(\{r^{p} : r \in R\}\),
+            which inherits the ring structure from \(R\).
+            Then, the Frobenius map identifies as
+            \(r^{p} \mapsto r^{p}\), where the former
+            ``to the \(p\)'' is just a symbol, and the
+            latter comes from multiplication in the ring \(R\).
+            Since \(R\) is reduced, this map is an injection,
+            so we may identify \(R^{p}\) with this image.
+    		Thus, we may view the Frobenius as the inclusion
+    		\(R^{p} \ins R\).
+    	\item 
+            Similarly, again assuming that \(R\) is reduced
+    		we may view the Frobenius as the inclusion
     		\(R \ins R^{1 / p}\), where \(R^{1 / p}\) 
     		is the ring of formal \(p\)-th roots of elements
     		of \(R\).
-    	\item Similarly, again assuming that \(R\) is reduced
-    		we may view the Frobenius as the inclusion
-    		\(R^{p} \ins R\).
     	\item More generally, we define \(F_{\star}R\) to
 			be the \(R\)-algebra with ring structure 
 			the same as \(R\), with module structure
@@ -266,6 +277,8 @@ the Frobenius which will be useful later.
 	We say that \(R\) is \textit{\(F\)-split} if the map \(F\) is
 	split as a map of 
 	\(R\)-modules \(R \xrightarrow{} F_{\star}R\).
+    That is, there exists a map \(\sigma : F_{\star}R \xrightarrow{} R\) 
+    such that \(\sigma \circ F = id\).
 \end{defn}
 
 We will be chiefly concerned with \textit{hypersurfaces},
@@ -273,7 +286,7 @@ so we specialize to this case now.
 For what follows, we assume that \(k\) is a field
 of characteristic \(p > 0\) which is 
 \textit{\(F\)-finite}; that is, the Frobenius
-map is module-finite.
+map is module-finite (that is, finitely generated as a module).
 
 \begin{defn}
 	Let \(S = k[x_{1}, \ldots, x_{n}]\).
@@ -287,8 +300,8 @@ not a polynomial (hypersurface) \(f\) is \(F\)-split.
 First, we introduce some notation.
 If \(I = (x_{1}, \ldots, x_{n})\) is a finitely generated 
 ideal of some ring \(R\), 
-then \(I^{[m]}\)
-is defined to be \((x_{1}^{m}, \ldots, x_{n}^{m})\).
+then \(I^{[p^{e}]}\)
+is defined to be \((x_{1}^{p^{e}}, \ldots, x_{n}^{p^{e}})\).
 
 \begin{thm}
 	[Fedder's Criterion]
@@ -316,7 +329,7 @@ In this case, we have
 	is \(F\)-split,
 	then the Artin--Mazur height 
 	of \(Z(f) = \Proj (S / (f))\) 
-	is 1. That is, \(Z(f)\) is weakly ordinary.
+	is 1. 
 \end{thm}
 
 Recently, in \cite{yobuko-2019-qfs-calabi-yau}
@@ -336,6 +349,11 @@ quasi-\(F\)-splitness, which generalizes \(F\)-splitness.
 	where the vertical map is the first Witt vector truncation.
 \end{defn}
 
+One may observe that if \(R\) is \(n\)-quasi-\(F\)-split,
+then it is \(n+1\)-quasi-\(F\)-split, by composing \(\phi\)
+with the truncation map \(W_{n+1}(R) \xrightarrow{} R\)
+(this uses that the Witt vector Frobenius commutes with truncation,
+which can be observed from Definition \ref{def:witt:frob}).
 We further define the \textit{quasi-\(F\)-split height} of \(R\) as the smallest \(n\) 
 for which \(R\) is \(n\)-quasi-\(F\)-split.
 As above, the quasi-\(F\)-split height of 
@@ -406,7 +424,7 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{defn}
     \label{defn:delta1}
-	Let \(\Delta_{1}(f)\)
+	Let \(\Delta_{1}(f) \in S\)
 	be defined by the following equation in \(W_{2}(S)\):
 	\[
 		(0, \Delta_{1}(f)) = (f,0) - \sum_{I}^{} (a_{I}\mathbf{x}^{I}, 0) 
@@ -432,7 +450,7 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{proof}
 	Iteratively apply the formula of the first
-	Witt polynomial \(S_{1}\) 
+    Witt polynomial \(S_{1}\) (see Remark \ref{rmk:polyraise:w2})
 	to the monomials of \(\tilde{f}\).
 \end{proof}
 
@@ -497,7 +515,7 @@ $D \gets D / p$
 \subsection{Splittings of Frobenius from a computational perspective}
 
 Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
-We will use perspective (3) from
+We will use perspective (1) from
 Remark \ref{rmk:frob:perspectives}; 
 recall that we identify 
 \(S\) with the target of Frobenius and

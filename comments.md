@@ -1,4 +1,4 @@
-Response to Reviewer 1:
+# Response to Reviewer 1:
 
 >> Reviewer 1: Consider a K3 surface X over a finite field F_q. Its Artin-Mazur height is an
 >> integer h between 1 and 10, or +infinity, which determines the Newton polygon
@@ -107,75 +107,120 @@ We have added a section to the introduction that explains the bottlenecks with t
 >> - p.4, Remark 2.12: (1) and (2) simply make no sense to me. F is a map of sets
 >> from R to R. (3) does make sense though, because you can give the set R
 >> different R-module structures.
+
+We may identify R with the set R^p = {r^p | r \in R}, where the "raising to the p" is a formal decoration.
+This is, completely formally, a ring which is isomorphic to R.
+Now, we may define the map of sets R^p \to R, r^p \mapsto r^p,
+where the latter uses multiplication in the ring R.
+This map is a ring homomorphism by the freshman's dream,
+and when we undo the identification R^p \isom R, it identifies with the Frobenius.
+
+We may also identify the ring R with R^1/p, the set of formal pth roots of elements in R, in an exactly analogous way. When we apply the previous construction to that, we find that (R^1/p)^p is formally just R under the map r^1/p^p \mapsto r, just removing both symbols.
+
+We have tried to clarify this in the exposition.  
+
 >> 
 >> - p.4, Definition 2.13: what do you mean by "split"? Same question for
 >> "module-finite".
+
+split = map back such that the composition is identity
+module-finite = finitely generated as a module, in contrast to finitely generated as an algebra "finite type" or "algebra-finite". This is a commutative-algebra-ism.
+
+Added clarifications to the paper. I feel that it probably isn't right to define split separately, since it's commonly taught in graudate algebra, but we can definitely spell out what it means. 
+
 >> 
 >> - p.4 L26: I think I^[m] is well-defined only when m is a power of p and R has
 >> characteristic p. Otherwise, it will depend on the chosen set of generators.
+
+The definition has been changed to use p^e.
+
 >> 
 >> - p.4, Theorem 2.16: this is the first time you use "weakly ordinary". If you
 >> wish to define this term, it's better to do it outside of a theorem
 >> statement.
+
+Since this term never comes up in the rest of the paper, we omit it.
+
 >> 
 >> - p.4, Definition 2.17: I was wondering whether R n-quasi-F-split implies that
 >> R is (n+1)-squasi-F-split. Is this true?
+
+It is! This is good to include, explanation added.
+
 >> 
 >> - p.5, Definition 3.1: it would be helpful to say which ring Delta_1(f) belongs
 >> to.
+
+Added.
+
 >> 
 >> - p.5, Remark 3.4: as above, is it really necessary to lift all the way to
 >> characteristic zero?
->> 
+
+No, see above.
+
 >> - p.5 L55: I don't recognize perspective (3) which would be a map S ->
 >> F_*S. The set you describe generates F_*S as an S-module, and u lies in
 >> Hom_S(F_*S, S).
+
+This was a typo. It was supposed to be (2), which has now changed to (1) with other edits.
+
 >> 
 >> - p.8, Definition 4.3: why are you calling this "weak integer decompositions"
 >> and not just "partitions" for instance? You want to assume d_i nonnegative.
->> 
->>     - Alex: Too lazy to libgen a book to find a reputable definition of integer partitions, but generally order doesn't matter for partitions - (1, 1, 0) and (1, 0, 1) are the same partition. Order matters to us, so we use weak integer compositions.
->>     - JJ: As far as I understand it, "weak integer decompositions" is a standard term from combinatorics which already implies d_i nonnegative, and the reviewer doesn't understand that, probably because the reviewer is not a combinatorist. We can fix this with a citation or two and a short sentence in our rebuttal. So we will need to find a citation, sorry.
+
+"Weak integer compositions" is a standard term in the enumerative combinatorics literature. A composition is an ordered partition, and a weak composition allows entries to be zero. "Integer" here is in the same sense as integer partitions (as opposed to, say, set partitions or partitions of elements in some ring).
+
+
 >> 
 >> - p.11, Algorithm 7, line 8: can you add a few words explaining why you write =
 >> and not += here?
 >> 
->>     - Alex: Probably should change to +=
->>     - JJ: Indeed, the fact that it still works is probably a theorem that we haven't proven. But I don't know exactly what to make of it.
+
+This was a typo, but at least in some cases the algorithm still seems to work when it has an "=", indicating that there is at most one matching term. This seems to deserve further consideration, but is out of scope for this project, as understanding this is unlikely to give a speedup big enough to compute K3 surfaces with higher heights.
+
 >> 
 >> - p.13, section 5.1.3: what are the "twiddle factors" you are referring to?
 >> 
->>     - Alex: Suggested edit: "... too big to fit root of unity power tables and inputs ..."
->>             "... and don't cache the root of unity power tables. Because ..."
->>     The vocabulary "twiddle factors" should make sense to a reader who we assume 
->>     understands the FFT, and I honestly disagree with the reviewer here. If they 
->>     understand the FFT but not "twiddle factors", then a 2-second google search should 
->>     give them all the information they need.
->>     - JJ: I think the right thing to do is to define "twiddle factors" in a breif way, like: "... too big to fit twiddle factors (root of unity power tables, \[ref\]) and inputs ..." the first time the term "twiddle factors" appears. We should use the correct word, but explain it the first time for non-experts.
 >> 
 >> - p.13 L31: what do you mean by "because of the precision of Barrett reduction"?
 >> 
->>     - Alex: Not sure how to justify this without a long derivation, and even the original authors of this variation of Barrett reduction (https://arxiv.org/pdf/2209.01290) don't explain why moduli are limited to less than 2^62, they just claim they have the fastest 2^62 bit Barrett reduction.
->>     - JJ: A reference will fix this probelm just as well, perhaps we can reference a specific page or theorem of 2209.01290? 
+
+These to comments are moot because the corresponding section has been edited to describe incremental multiplication rather than multimodular FFT.
+
 >> 
 >> - p.13 L46: "We know this computation will be correct because FLINT uses
 >> GMP". What do you mean by this? FLINT only uses GMP for its integer type, and
 >> GMP could contain bugs too, as far as I know.
->> 
->>     - Alex: I don't agree with the reviewer's sentiment to not trust GMP. How do we know to trust anything on our computers if cosmic rays can lead to nondeterministic CPU behavior?
->>     - JJ: when you say, "we know this computation will be correct", I think perhaps you really mean "we know this computation won't overflow"? But the reviewer is thinking something a lot more deep because you said "know it'll be correct".
+
+This one was also removed, but what we meant to say was "we know that this computaiton won't overflow because FLINT uses GMP"
+
 >> 
 >> - p.16, Theorem 7.1: O() is an asymptotic notation. What is going to infinity
 >> here? Is X defined over QQ?
+
+One may interpret this as p is going to infinity, which tacitly assumes that X is defined over QQ and we are implicitly lifting/reducing mod p. 
+
+However, it may also be interpreted in a more casual sense, which will mean something like the following: there exists an expression for which p^{r - 1/2} (possibly with some constant in front) is the dominant term, i.e. of all the terms in the expression, this one has the largest norm. Such notation shows up, for example, when one prints out elements of power series rings in Oscar.jl (there, one is using the x-adic norm).
+
+Either way is fine for interprenting the big O here.
+
 >> 
 >> - p.16 L46: do you have a sense of why ToricControlledReduction becomes a
 >> faster way to compute the Newton polygon as p grows?
+
+It's complexity in p is p^1/2, while this algorithm is exponential.
+
 >> 
 >> - p.17 and following: can you check using the code of [11] that your examples
 >> indeed have the correct Newton polygons?
 >> 
 
-Response to Reviewer 2:
+In fact, ToricControlledReduction only supports p=11 and p=13. Instead, we checked this against a forthcoming project of the second author, the first author, Mellberg, and Huang, which implements a similar algorithm to ToricControlledReduction, and has been tested against it.
+
+This revealed that some of the examples in our tables for p=5 and p=7 were not smooth, so we updated the tables with other examples that are smooth. According to this, the Newton polygons are all correct.
+
+# Response to Reviewer 2:
 
 >> 
 >> Reviewer 2: The article under review is of a computational nature.
@@ -327,8 +372,16 @@ In our revision, we have attempted to address these issues by expanding the intr
 >> 
 >> p4.17: please make the definition more readable by adding
 >> a reformulation of the splitting
+
+Added, reviewer 1 also asked for this.
+
 >> 
 >> p5.25: link to remark 2.11
+
+Added.
+
 >> 
 >> p16.8: final dot
->>     - Alex: can't find it
+
+We think this was about the end of the paragraph before Heuristic 7.2. 
+Added semicolon at the end of that paragraph.
