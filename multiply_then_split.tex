@@ -560,23 +560,23 @@ require $n$ separate operations.
 
 All algorithms require the \code{indexof}$()$ function, 
 which we implement using Julia's \texttt{Dict\{K,V\}}, 
-which is implemented as a hashtable.
+which is implemented as a hash table.
 
 \triv ~and \wicsalg ~are easily GPU-parallelizable by creating 
 a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
 This creates the problem of needing an \code{indexof}$()$ function, 
 since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
-The solution we implement is a static hashtable, with size 
-and hashing function decided at compiletime.
+The solution we implement is a static hash table, with size 
+and hashing function decided at compile time.
 Due to Julia's JIT compilation nature, creating this 
-hashtable is quite slow.
+hash table is quite slow.
 Another solution can be to perform a binary search 
 for the \code{indexof}$()$ function, since $B_d$ is lexicographically 
 sorted, but for one-off computations, users are better 
 off using non-parallelized \wicsalg ~to avoid 
 first-time GPU kernel compilation times.
 However, if many matrices need to be created, caching 
-the hashtable allows the GPU implementations to far outpace 
+the hash table allows the GPU implementations to far outpace 
 the non-parallelized CPU implementations.
 
 % \merge ~should be parallelizable by implementing a modified parallel merge and using a parallel sort. 
