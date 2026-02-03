@@ -57,7 +57,7 @@ Perhaps there are some variants of this problem where a sparse GPU algorithm pro
 
 We agree that section 4 needs improvement. In our revision, we have chosen to remove Algorithm 6 and keep Algorithm 5. There are two main reasons that led us to this choice:
 
-First, we would like ot note that even the most naive algorithm (i.e. Algorithm 5) on the GPU gives a significant speedup. Indeed, this speedup was sufficient to solve the existence of K3 surfaces in characteristic 5, and perhaps characteristic 7. We find this very interesting and worth sharing through the paper.
+First, we would like to note that even the most naive algorithm (i.e. Algorithm 5) on the GPU gives a significant speedup. Indeed, this speedup was sufficient to solve the existence of K3 surfaces in characteristic 5, and perhaps characteristic 7. We find this very interesting and worth sharing through the paper.
 
 Second, algorithm 5's writeup is relatively short compared to algorithm 6.
 
@@ -90,20 +90,22 @@ In our revision, we have tried to improve Figure 3 to highlight that:
 >> I realize that this is substantial work, however, such a rewrite is necessary
 >> in my opinion to pass the acceptance bar.
 
-We would like to thank Reviewer 1 for these suggestions. At the same time, we would like to mention that we had already done much of this work. However, these may not have been communicated clearly in the paper.
+We would like to thank Reviewer 1 for these suggestions. At the same time, we would like to mention that we had already done much of this work. However, this may not have been communicated clearly in the paper.
 
 For example, all of our GPU algorithms have a CPU implementation that uses FLINT via Oscar.jl. The only instance where FLINT was not used was for CPU matrix multiplication, where we used Julia's built-in matrix multiplication. This calls the same BLAS library that FLINT uses, but with more threads by default.
 
 The one thing we had not implemented was the lift modulo p^2 instead of the lift to ZZ, which affects the computation of \Delta_1 only. We have addressed this in our revision by providing:
 
 * A (FLINT via Oscar) CPU version of Delta_1 that lifts modulo p^2
-* An FFT-based GPU implementation of an "incremental multiplication" algorithm. Namely, if we wish to compute g^d, it computes d = n * d_1 + d\_2 for d_1 as large as possible so that g^{d_1} does not overflow the prime in our "multimodular" (now single-modular) algorithm. Since we can now use only one prime, we use the Goldilocks prime to achieve fast reductions and FFTs.
+* An FFT-based GPU implementation of an "incremental multiplication" algorithm. Namely, if we wish to compute g^d, it computes d = n * d_1 + d\_2 for d_1 as large as possible so that g^{d_1} does not overflow the prime in our "multimodular" (now single-modular) algorithm. Since we can now use a single prime, we use the Goldilocks prime to achieve fast reductions and FFTs.
 
 Our FLINT CPU times are comparable to the times for ZZ, which was expected: the coefficient explosion does not trigger until p=11, while the explosion in the number of terms can already be seen at p=5. p=7 took such a significant amount of time that we found it was unnecessary to time Delta_1 on the CPU for p=11.
 
 On the other hand, the incremental multiplication algorithm gives no discernible difference for p=5 (since we only needed one prime anyways here). For p=7, it provides a small speedup. For p=11 and p=13, incremental multiplication gives an incredible 1.5 orders of magnitude speedup. With this algorithm, we actually found a height h=6 K3 surface in characteristic p=11. Once again, we would like to thank Reviewer 1 for this suggestion.
 
 Furthermore, we have added a section to the introduction that explains the algorithm's bottlenecks with timings. The polynomial powering section has also been updated to describe the incremental multiplication algorithm, instead of multimodular FFT.
+
+Even after this speedup, the computation of Delta_1 remains the bottleneck in all cases we consider. 
 
 >> 
 >> More minor comments follow.
@@ -383,4 +385,4 @@ Added.
 >> 
 >> p16.8: final dot
 
-We believe this feedback was about the end of the paragraph before Heuristic 7.2. We added a semicolon to the end of that paragraph.
+We believe this feedback was about the end of the paragraph before Heuristic 7.2. We added a colon to the end of that paragraph.
