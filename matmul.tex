@@ -58,7 +58,7 @@ Fedder type criterion calculations.
 To illustrate the performance difference between CPU and GPU, we timed
 matrix-matrix multiplication of various sizes on the CPU and GPU (an RTX 3060) in 
 characteristic 11 (Figure 3). 
-Note that the our CPU BLAS tests are called via the default matrix multiplication from Julia and FLINT
+Note that our CPU BLAS tests are called via the default matrix multiplication from Julia and FLINT
 (via \texttt{nmod\_matrix}), respectively.
 
 \begin{figure}[h]
@@ -78,6 +78,6 @@ Note that the our CPU BLAS tests are called via the default matrix multiplicatio
     20,000 & 150.76 & 58.83 & 3.66 & 114.72 \\
     \bottomrule
 \end{tabular}
-\caption{Dense square matrix-matrix multiplication times (in seconds) over characteristic $$11$$}
+\caption{Dense square matrix-matrix multiplication times (in seconds) over characteristic $11$}
 \end{center}
 \end{figure}

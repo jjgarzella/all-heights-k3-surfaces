@@ -28,7 +28,7 @@ homomorphism
 which takes \(x_{i}\) to
 \(z^{M^{i-1}}\).
 This map cannot be injective in general, but it
-is injective on the subset of elements of
+is injective on the subset of elements 
 \(f \in R[x_{1}, \ldots, x_{n}]\) 
 whose terms have all degrees strictly less than \(M\).
 Given two polynomials \(f_{1}, f_{2}\) that
@@ -64,7 +64,7 @@ then use the Chinese Remainder Theorem to obtain the result in
 $\mathbb{Z}[x]$, as described in \cite{monagan-2012-sparse-powering}.
 This method, known as the multimodular NTT, is competitive 
 for medium-sized problems, like 
-computing the quasi-$F$-split height for a $K_3$ surface over 
+computing the quasi-$F$-split height for a K3 surface over 
 $\mathbb{F}_5$ or $\mathbb{F}_7$. However, for larger problems, 
 large coefficients require the use of many primes. Combining this 
 with large NTT sizes makes GPU DRAM size a bottleneck, 
@@ -77,7 +77,7 @@ If we compute the power in smaller increments by repeatedly
 multiplying to an accumulator, we can reduce coefficients $\mod p^2$ 
 after each step, and completely avoid the consequences of having 
 extremely large coefficients. In fact, even for large problems like 
-computing the quasi-$F$-split height for $K_3$ surfaces over 
+computing the quasi-$F$-split height for K3 surfaces over 
 $\mathbb{F}_{11}$ or $\mathbb{F}_{13}$, we can get away with only using 
 one prime for the entire computation.
 
@@ -145,7 +145,7 @@ our expectations that the gains will be marginal.
 \subsubsection{Bound Finding}
 \label{subsec:poly:bounds}
 
-Ideally, we'd like to perform as little multiplications as possible, 
+Ideally, we'd like to perform as few multiplications as possible, 
 meaning we should be greedy with breaking the power down into 
 increments as large as possible. Our only limitation is that we don't 
 want the resulting coefficients of any polynomial operation to 
@@ -171,7 +171,7 @@ power, and solve for $p_2$ as the remainder
 % of the division of 
 % $k \div p_1$. 
 Note that this computation is relatively expensive, 
-taking a few minutes per power, but it only needs to be ran once, and 
+taking a few minutes per power, but it only needs to be run once, and 
 $p_1$, $p_2$ and $i$ can be stored for any problem of the same shape.
 Thus, given a problem shape, \code{steps} simply returns the 
 corresponding $(p_1, p_2, i)$.
@@ -184,7 +184,7 @@ multiplying two univariate $n-1$ degree polynomials with maximum
 coefficients $m$ results in the $m^2n$ upper bound on the resulting 
 coefficients. Because our largest 
 FFT length ends up being $2^{28}$ for the quasi-$F$-split height of a 
-$K_3$ surface over $\mathbb{F}_{13}$ problem, and we are working mod $p^2$,
+K3 surface over $\mathbb{F}_{13}$ problem, and we are working mod $p^2$,
 this gives us the upper bound $2^{28} \cdot 12^2$, which is less than 
 Goldilocks.
 

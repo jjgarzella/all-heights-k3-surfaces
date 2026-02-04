@@ -64,7 +64,7 @@ For a K3 surface, the height (if finite) is bounded by 10.
     g = x^8 + 2x^4y^4 + 2x^4z^4 + 2x^4w^4 + y^8 + 2y^4z^4 + 2y^4w^4 + z^8 + 2z^4w^4 + w^8
     .\] 
     The only monomial of degree \(8\) that is not contained
-    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, x^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
+    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, z^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
     Call this monomial \(c\).
     Since this coefficient of \(c\) in \(g\) is zero, we conclude
     by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
@@ -539,9 +539,9 @@ the following algorithm, which we call \wicsalg:
 
 This algorithm 
 generates the matrix in 
-$O \left( \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n} \right)$ operations.
+$O \left( \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1} \right)$ operations.
 The number of matching monomials each term $\delta$ 
-has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n}$ 
+has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$ 
 by Corollary \ref{cor:num:matches}, which is 
 effectively constant for all reasonably computable $n$ and $p$.
 

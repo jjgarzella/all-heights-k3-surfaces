@@ -158,7 +158,7 @@ for polynomial multiplication and powering operations.
 However, for \(p = 5\), the algorithm
 takes 0.5 seconds for (1) and 0.73 seconds per iteration for (2),
 while for \(p = 7\) it takes 126 seconds for (1) and
-21 seconds per iteration seconds for (2).
+21 seconds per iteration for (2).
 
 Our main insight is that each iteration
 of (2) is a linear operator, and that we can speed
@@ -194,7 +194,7 @@ the GPU, we also provide a GPU implementation of calculating the matrix
 of multiply then split. 
 We also use Nvidia's CUBLAS library \cite{nvidia-2024-cublas} to
 do the matrix-vector multiplication.
-For p=5 and p=7, calcualting the matrix of multiply then split consistently takes around 0.0001
+For $p=5$ and $p=7$, calculating the matrix of multiply then split consistently takes around 0.0001
 seconds, and each matrix-vector product takes around 0.0002 seconds.
 Thus, the algorithm is still bottlenecked by (1).
 % We emphasize that these are only necessary because of the communication overhead, and that matrix-vector
@@ -204,7 +204,7 @@ In our tests, we were able to achieve a high throughput of examples,
 about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
 about 180 surfaces per second over \(\mathbb{F}_{7}\).
 This is roughly three orders of magnitude better than the state of the art
-(see Section ).
+(see Section \ref{sec:computations}).
 Our implementations can also compute the height \(h\) for examples
 over
 \(\mathbb{F}_{11}\) and \(\mathbb{F}_{13}\),
