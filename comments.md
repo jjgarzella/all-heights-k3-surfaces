@@ -59,7 +59,7 @@ We agree that section 4 needs improvement. In our revision, we have chosen to re
 
 First, we would like to note that even the most naive algorithm (i.e. Algorithm 5) on the GPU gives a significant speedup. Indeed, this speedup was sufficient to solve the existence of K3 surfaces in characteristic 5, and perhaps characteristic 7. We find this very interesting and worth sharing through the paper.
 
-Second, algorithm 5's writeup is relatively short compared to algorithm 6.
+Second, Algorithm 5's writeup is relatively short compared to Algorithm 6.
 
 >> 
 >> - In Section 6, I am not sure what the timings in Figure 3 refer to. Are you

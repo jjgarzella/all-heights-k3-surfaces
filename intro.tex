@@ -156,9 +156,9 @@ Our implementation, which can be found in
 \cite{mmpsingularities-jl}, uses OSCAR, and thus uses FLINT
 for polynomial multiplication and powering operations.
 However, for \(p = 5\), the algorithm
-takes [TIME] seconds for (1) and [TIME] seconds for (2),
-while for \(p = 7\) it takes [TIME] seconds for (1) and
-[TIME] seconds for (2).
+takes 0.5 seconds for (1) and 0.73 seconds per iteration for (2),
+while for \(p = 7\) it takes 126 seconds for (1) and
+21 seconds per iteration seconds for (2).
 
 Our main insight is that each iteration
 of (2) is a linear operator, and that we can speed
@@ -178,10 +178,10 @@ We provide algorithms for calculating the matrix of multiply
 then split in Section \ref{sec:alg:momts}.
 This essentially eliminates (2) as a bottleneck.
 In our implementation of this version, step (2) takes
- seconds for \(p = 5\) and [TIME] seconds for \(p = 7\).
+0.0005 seconds per iteration for \(p = 5\) and 0.005 seconds per iteration for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
-takes [TIME] seconds for \(p=5\) and 
-[TIME] seconds for \(p = 7\).
+takes 0.037 seconds for \(p=5\) and 
+0.343 seconds for \(p = 7\).
 
 To address the bottleneck of (1),
 we have no clever trick. 
@@ -194,8 +194,11 @@ the GPU, we also provide a GPU implementation of calculating the matrix
 of multiply then split. 
 We also use Nvidia's CUBLAS library \cite{nvidia-2024-cublas} to
 do the matrix-vector multiplication.
-We emphasize that these are only necessary because of the communication overhead, and that matrix-vector
-multiplication on the CPU is already fast enough to overcome bottleneck (2).
+For p=5 and p=7, calcualting the matrix of multiply then split consistently takes around 0.0001
+seconds, and each matrix-vector product takes around 0.0002 seconds.
+Thus, the algorithm is still bottlenecked by (1).
+% We emphasize that these are only necessary because of the communication overhead, and that matrix-vector
+% multiplication on the CPU is already fast enough to overcome bottleneck (2).
 
 In our tests, we were able to achieve a high throughput of examples,
 about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
