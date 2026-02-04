@@ -269,24 +269,26 @@ and CudaNTTs.jl \cite{cudantts-jl}.
 
 
 In Section 2, we give background on the quasi-\(F\)-split height
-and Fedder's criterion.
-In Section 3, we describe the naive implementation of
-\cite[Theorem~C]{kty-2022-fedder} and describe
-our modification.
-In Section 4, we describe our algorithms for calculating the matrix
+and Fedder's criterion, including the naive implementation
+of \cite[Theorem~C]{kty-2022-fedder}.
+In Section 3, we describe our modifications 
+to the algorithm, including
+our algorithms for calculating the matrix
 % We say "multiply then split" everywhere else
 of the key linear operator which we term ``multiply then split''.
-In Section 5, we describe our GPU implementation of the Number Theoretic
-Transform, which is a finite field variant of the FFT.
-In Section 6, we describe the considerations we need to keep in mind
+In Section 4, we describe our GPU-based implementation polynomial
+powering via an incremental FFT-based multiplication algorithm which uses 
+the Goldilocks prime.
+In Section 5, we describe the considerations we need to keep in mind
 to use CUBLAS.
-In Section 7, we describe the computation of surfaces of all possible
+In Section 6, we describe the computation of surfaces of all possible
 heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
 Throughout the paper, we do various timing experiments to compare 
 approaches for each computational step.
 All timing tests were performed with 
-an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU.
+an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU
+unless otherwise specified.
 
 \subsection{Future Work}
 
