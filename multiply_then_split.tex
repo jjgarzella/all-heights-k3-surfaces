@@ -6,7 +6,7 @@ in \(S\),
 so that \(Z(f)\) is a Calabi-Yau hypersurface.
 Recall from Subsection \ref{subsec:split:frob} that
 \(\mathfrak{m}^{[p]} = (x_{1}^{p}, \ldots, x_{n}^{p})\)
-is the Frobenius power of the maximal ideal \((x_1,..,x_n)\).
+is the Frobenius power of the maximal ideal \((x_1, \ldots, x_n)\).
 Following \cite{kty-2022-fedder}, we have the following
 algorithm to calculate the quasi-\(F\)-split height.
 
@@ -64,11 +64,11 @@ For a K3 surface, the height (if finite) is bounded by 10.
     g = x^8 + 2x^4y^4 + 2x^4z^4 + 2x^4w^4 + y^8 + 2y^4z^4 + 2y^4w^4 + z^8 + 2z^4w^4 + w^8
     .\] 
     The only monomial of degree \(8\) that is not contained
-    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, x^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
+    in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, z^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
     Call this monomial \(c\).
     Since this coefficient of \(c\) in \(g\) is zero, we conclude
     by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
-    that \(g\) is not \(F\)-split.
+    that \(f\) is not \(F\)-split.
     Next, we must calculate \(\Delta_{1}(g)\).
     To do this, we take a lift of \(g\) by regarding the coefficients
     as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
@@ -116,7 +116,7 @@ the degree of \(\Delta_{1}(f^{p-1})\)
 is \(np(p - 1)\).
 Thus, \(\Delta_{1}(f^{p-1})g\) has degree
 \(n(p^{2} - 1)\).
-Since the effect 
+The effect 
 of \(u\) on any polynomial is subtracting \(p-1\)
 from the exponents of the terms and dividing by \(p\) 
 (see Algorithm \ref{alg:naive:u}).
@@ -192,11 +192,12 @@ We consider the problem of finding the matrix of
 on the space \(S_{d}\).
 The target of this map is
 \(S_{d^{\prime}}\), where
-\(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
+% \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
+\(d^{\prime} \colonequals \frac{d+D-n(p-1)}{p}\).
 By convention, if \(d^{\prime}\) is not an integer,
 we declare \(S_{d^{\prime}}\) to be zero.
 Note that in this case there are
-there are no terms which survive \(u\), so
+no terms which survive \(u\), so
 \(g \mapsto u(\Delta g)\) is indeed the zero map.
 
 \begin{rmk}
@@ -224,7 +225,7 @@ Both of our improved algorithms ignore
 all of these unnecessary terms.
 
 \begin{defn}
-    (c.f. \cite{stanley-1997-enumerative}, pg. 18)
+    (c.f. \cite{stanley-1997-enumerative}, p. 18)
     The \textit{weak integer compositions} of $k$ into $n$ parts, 
     denoted $\wics(k, n)$, is the set of ordered tuples of
     nonnegative integers

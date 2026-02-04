@@ -145,7 +145,7 @@ our expectations that the gains will be marginal.
 \subsubsection{Bound Finding}
 \label{subsec:poly:bounds}
 
-Ideally, we'd like to perform as little multiplications as possible, 
+Ideally, we'd like to perform as few multiplications as possible, 
 meaning we should be greedy with breaking the power down into 
 increments as large as possible. Our only limitation is that we don't 
 want the resulting coefficients of any polynomial operation to 
@@ -171,8 +171,8 @@ power, and solve for $p_2$ as the remainder
 % of the division of 
 % $k \div p_1$. 
 Note that this computation is relatively expensive, 
-taking a few minutes per power, but it only needs to be ran once, and 
-$p_1$, $p_2$ and $i$ can be stored for any problem of the same shape.
+taking a few minutes per power, but it only needs to be run once, and 
+$p_1$, $p_2$, and $i$ can be stored for any problem of the same shape.
 Thus, given a problem shape, \code{steps} simply returns the 
 corresponding $(p_1, p_2, i)$.
 

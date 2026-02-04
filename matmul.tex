@@ -25,10 +25,10 @@ $o' \cdot (N^2 - 2N + 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integ
 For Nvidia GPUs, we wish to use the Float32 type, for the primes
 \(p \in \{3,5,7,11,13\}\).
 Respectively, for each of these values we have
-\(o = 4194302, 599185, 246722, 135299, 85597, 59073\).
+\(o = 4194303, \,1048575, \,466032, \,167771, \,116507\).
 Furthermore, the sizes of the matrices in question are 
 respectively
- \(165, 969, 2925, 12341, 20825\).
+ \(165, \,969, \,2925, \,12341, \,20825\).
 Thus, we see that for \(p \leq 13\), we can use a fully floating-point
 library like CUBLAS naively.
 \footnote{
@@ -39,8 +39,7 @@ library like CUBLAS naively.
     Note that MAGMA also provides
     a mod $p$ matrix multiplication implementation,
     which (according to its documentation) wraps CUBLAS for 
-    for p=11 and
-    p=13. 
+    p=11 and p=13. 
 }
 To support larger primes, we implement a 
 simple GPU-based fallback implementation of matrix multiplication using CUDA.jl
@@ -48,7 +47,7 @@ based on \cite{mao-2024-matmul}
 which reduces mod \(p\) every 32 entries.
 Our implementation is provided in GPUFiniteFieldMatrices.jl.
 While it doesn't come close to CUBLAS, and is in fact slower
-than a OpenBLAS when using CPU multithreading, it gives exact
+than OpenBLAS when using CPU multithreading, it gives exact
 computations for arbitrarily large
 matrices (as long as \(32 < o\))
 and is good enough that
@@ -58,7 +57,7 @@ Fedder type criterion calculations.
 To illustrate the performance difference between CPU and GPU, we timed
 matrix-matrix multiplication of various sizes on the CPU and GPU (an RTX 3060) in 
 characteristic 11 (Figure 3). 
-Note that the our CPU BLAS tests are called via the default matrix multiplication from Julia and FLINT
+Note that our CPU BLAS tests are called via the default matrix multiplication from Julia and FLINT
 (via \texttt{nmod\_matrix}), respectively.
 
 \begin{figure}[h]
@@ -78,6 +77,7 @@ Note that the our CPU BLAS tests are called via the default matrix multiplicatio
     20,000 & 150.76 & 58.83 & 3.66 & 114.72 \\
     \bottomrule
 \end{tabular}
-\caption{Dense square matrix-matrix multiplication times (in seconds) over characteristic $$11$$}
+% make copilot happy
+\caption{Dense square matrix-matrix multiplication times (in seconds) over characteristic $11$}
 \end{center}
 \end{figure}

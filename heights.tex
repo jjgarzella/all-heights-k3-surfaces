@@ -60,6 +60,7 @@ probability--the group quotient and the actual
 error term in the estimate.
 
 \subsection{Computations}
+\label{subsec:computations}
 
 Over \(\mathbb{F}_{5}\), we 
 found that the probability of finding a K3 surface
@@ -84,24 +85,24 @@ for the purposes of estimating the time to compute a
 high height example we may ignore them.
 Thus,
 the expected compute time necessary to find a height = \(10\) 
-example is about  \(5^{9} / 1400 \approx 1395\) seconds, or about 
+example is about  \(5^{9} / 1400 \approx 1395\) seconds, or about 23
 compute minutes.
-For \(p=7\), the throughput is about 185 surfaces
+For \(p=7\), the throughput is about 180 surfaces
 per second, also with 8 CPU cores calling the same GPU.
 Thus, the expected compute time to compute
 a height = \(10\) example is 
-\(7^{9} / 185 \approx \) 218,127 seconds, or about 
+\(7^{9} / 180 \approx \) 218,127 seconds, or about 
 60 compute hours.
 The actual times to find the examples were much 
 longer than this, because the authors were using a 
 less-optimized NTT and had not yet discovered $\wicsalg$
 when the computation started.
 This is about three orders of magnitude better than the state of the art,
-for calcualting newton polygons, which was \cite{fgmqt-2025-witt-vectors-macaulay2}.
+for calculating Newton polygons, which was \cite{fgmqt-2025-witt-vectors-macaulay2}.
 
 For $p = 11$ and $p = 13$, 
 the examples below could be computed in less than 12 compute hours
-on the aforementioned 2080Tis (via random guessing).
+on the aforementioned 2080Ti GPUs (via random guessing).
 Newton polygons of K3 surfaces may be computed by using the
 library ToricControlledReduction
 \cite{chk-2019-toric-controlled-reduction} 

@@ -1,3 +1,5 @@
+Note: Comments on typos were addressed, and responses to those are omitted here.
+
 # Response to Reviewer 1:
 
 >> Reviewer 1: Consider a K3 surface X over a finite field F_q. Its Artin-Mazur height is an
