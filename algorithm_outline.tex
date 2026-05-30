@@ -324,9 +324,11 @@ In this case, we have
 
 \begin{thm}
 	\label{thm:fsplit:ordinary}
-	If \(f \in S\) 
+	Let \(f \in S\), and
+    \(Z(f) \colonequals \Proj (S / (f))\).
+    If \(f\) is 
 	homogeneous of degree \(n\) 
-	is \(F\)-split,
+	is \(F\)-split and \(Z(f)\) is smooth,
 	then the Artin--Mazur height 
 	of \(Z(f) = \Proj (S / (f))\) 
 	is 1. 
@@ -373,7 +375,10 @@ The quasi-\(F\)-split height also gives a generalization
 of Theorem \ref{thm:fsplit:ordinary}:
 
 \begin{thm}
-	If \(f \in S\) is homogeneous of degree \(n\),
+	Let \(f \in S\), and
+    \(Z(f) \colonequals \Proj (S / (f))\).
+	If \(f \in S\) is homogeneous of degree \(n\)
+    and \(Z(f)\) is smooth,
 	then the Artin--Mazur height of \(Z(f)\)
 	is equal to the quasi-\(F\)-split height
 	of \(f\).
@@ -642,7 +647,10 @@ for the case of K3 surfaces.
 For a K3 surface, the height (if finite) is bounded by 10.
 
 \begin{ex}
-    Let \(p=3\), and let
+    Let \(p=3\), and \(n = 4\).
+    For the following, we use the simplified notation
+    \(x \colonequals x_{1}, y \colonequals x_{2}, z \colonequals x_{3}, w \colonequals x_{4}\).
+    Now, let
     \(f = x^4 + y^4 + z^4 + w^4 \in S = k[x,y,z,w]\).
     Raising \(f\) to the power \(p-1 = 2\) in \(\mathbb{F}_{3}\), we get
     \[

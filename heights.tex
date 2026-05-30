@@ -1,21 +1,35 @@
 \subsection{Recollections on the moduli of K3 surfaces}
 
-% We have the following:
+The \textit{Lang-Weil estimate} gives a rigorous estimate
+on the point counts of any variety in positive characteristic:
 
 \begin{thm}
-    [Lang-Weil, \cite{lang-weil-1954-estimate} Theorem 1]
+    [Lang-Weil, \cite{lang-weil-1954-estimate}]
 	Let \(X \ins \mathbb{P}^{n}\)
-	be a projective variety of dimension \(r\). 
+	be an irreducible projective variety of dimension \(r\), and \(k \in \mathbb{N}\). 
 	Then 
 	\[
-		\#X(\mathbb{F}_{p}) = p^r + O(p^{r - \frac{1}{2}})
+		\#X(\mathbb{F}_{p^{k}}) = (p^{k})^r + O((p^{k})^{r - \frac{1}{2}})
 	\] 
+    as \(k \xrightarrow{} \infty\).
 \end{thm}
+
+In our computations, we only ever consider the case when
+\(k=1\). Though the Lang-Weil estimate only applies 
+asymptotically, we find in our computations it gives a useful heuristic in practice
+for the number of points that appear.
+
+\begin{heur}
+    \label{heur:lang:weil}
+    Let \(X \ins \mathbb{P}^{n}\) 
+    be an irreducible projective variety of dimension \(r\).
+    Then \(\#X(\mathbb{F}_{p}) \approx p^{r}\).
+\end{heur}
 
 Say we have an ambient projective variety
 \(Y\) with chosen
 hypersurface \(D\).
-The Lang-Weil estimate roughly
+Heuristic \ref{heur:lang:weil} 
 says that if we pick a random point \(x\),
 we can expect \(x\) to lie in \(D\) 
 with probability about \(1 / p\).

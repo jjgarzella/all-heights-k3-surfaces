@@ -207,7 +207,7 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
                 $\text{res} \gets (\code{exps}(\delta) + \code{exps}(m) - (p - 1, \dots, p - 1)) / p$\;
                 $\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})$\;
                 $\text{col} \gets \code{indexof}(m, B_d)$\;
-                $M[\text{row}, \text{col}] = \code{coeff}(\delta)$
+                $M[\text{row}, \text{col}] \mathrel{+}= \code{coeff}(\delta)$
             }
         }
     }
@@ -442,7 +442,7 @@ the following algorithm, which we call \wicsalg:
             $\text{col} \gets \code{indexof}(m,B_{d})$\;
 			res $\gets (\code{exps}(\delta) + \code{exps}(m) - (p-1, \ldots, p-1)) / p$\;
 			$\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})$\;
-            $M[\text{row}, \text{col}] = \code{coeff}(\delta)$\;
+            $M[\text{row}, \text{col}] \mathrel{+}= \code{coeff}(\delta)$\;
         }
     }
     \Return $M$
