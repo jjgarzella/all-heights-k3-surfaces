@@ -8,9 +8,9 @@ The bottleneck ends up being polynomial multiplication,
 in two places:
 \begin{enumerate}[(1)]
     \item raising (a lift of) \(g = f^{p-1}\) to the \(p\)-th power 
-        (in line 2 of Algorithm \ref{alg:calc:delta1})
+        (in line 2 of Algorithm \ref{alg:calc:delta1}), and
     \item multiplying \(g\) by \(\Delta_{1}(f^{p-1})\) 
-        (in line 11 of Algorithm \ref{alg:qfs:naive})
+        (in line 11 of Algorithm \ref{alg:qfs:naive}).
 \end{enumerate}
 
 \noindent For a quartic K3 surface of characteristic \(5\),
@@ -103,7 +103,7 @@ on the space \(S_{d}\).
 The target of this map is
 \(S_{d^{\prime}}\), where
 % \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
-\(d^{\prime} \colonequals \frac{d+D-n(p-1)}{p}\).
+\(d^{\prime} \colonequals \tfrac{d+D-n(p-1)}{p}\).
 By convention, if \(d^{\prime}\) is not an integer,
 we declare \(S_{d^{\prime}}\) to be zero.
 Note that in this case there are
@@ -125,7 +125,7 @@ does plenty of unnecessary work.
 In particular, any term in the 
 product \(\Delta g\) with exponents 
 not congruent to 
-\((p-1, \ldots, p-1) \mod p\)
+\((p-1, \ldots, p-1) \bmod p\)
 is not needed. 
 Even if \(g\) is a monomial, giving a linear
 algorithm for multiplication, using naive
@@ -186,7 +186,7 @@ It follows that the dimension of the vector space is $|\wics(k, n)|$.
 	not killed by \(u\).
 \end{defn}
 
-Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \mod p$.
+Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, p - 1) \bmod p$.
 
 \subsection{The trivial algorithm}
 
@@ -202,7 +202,7 @@ Concretely, this means that $\exps(m) + \exps(m^{\prime}) \equiv (p - 1, \dots, 
     \For{$m \in B_d$}{
         \For{$\delta \in \Delta$}{
             \Comment{If $\delta$ matches with $m$}
-            \If{$\code{exps}(\delta) + \code{exps}(m) \equiv (p - 1, \dots, p - 1) \mod p$}{
+            \If{$\code{exps}(\delta) + \code{exps}(m) \equiv (p - 1, \dots, p - 1) \bmod p$}{
                 \Comment{Apply $u$ to $\delta m$}
                 $\text{res} \gets (\code{exps}(\delta) + \code{exps}(m) - (p - 1, \dots, p - 1)) / p$\;
                 $\text{row} \gets \code{indexof}(\text{res},B_{d^{\prime}})$\;
@@ -328,7 +328,7 @@ fast enough to not be a bottleneck in practice.
 	Y = (y_{1}, \ldots, y_{n})\)
 	be in \(\{0, \ldots, p-1\}^{n} \ins \mathbb{Z}^{n}\).
 	Then \(X + Y = 
-	(p-1, \ldots, p-1) \mod p\)
+	(p-1, \ldots, p-1) \bmod p\)
 	if and only if 
 	\(X + Y = 
 	(p-1, \ldots, p-1)\).
