@@ -190,7 +190,7 @@ Graphics Processing Unit (GPU) hardware,
 allowing us to run the computation in a massively parallel way.
 Our GPU implementation of (1) takes 0.017 seconds for \(p = 5\) and 0.16 seconds for \(p = 7\).
 In order to avoid the memory overhead of communication between the Central Processing Unit (CPU) and
-the GPU, we also provide a GPU implementation of calculating the matrix
+the GPU, we also provide a GPU implementation for calculating the matrix
 of multiply then split. 
 We also use Nvidia's CUBLAS library \cite{nvidia-2024-cublas} to
 do the matrix-vector multiplication.
@@ -273,11 +273,11 @@ and Fedder's criterion, including the naive implementation
 of \cite[Theorem~C]{kty-2022-fedder}.
 In Section 3, we describe our modifications 
 to the algorithm, including
-our algorithms for calculating the matrix
+algorithms for calculating the matrix
 % We say "multiply then split" everywhere else
 of the key linear operator which we term ``multiply then split''.
-In Section 4, we describe our GPU-based implementation polynomial
-powering via an incremental FFT-based multiplication algorithm which uses 
+In Section 4, we describe our GPU-based polynomial
+powering algorithm, which utilizes incremental FFT-based multiplication using  
 the Goldilocks prime.
 In Section 5, we describe the considerations we need to keep in mind
 to use CUBLAS.
