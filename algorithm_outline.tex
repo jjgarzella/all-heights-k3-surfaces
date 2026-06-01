@@ -326,9 +326,9 @@ In this case, we have
 	\label{thm:fsplit:ordinary}
 	Let \(f \in S\), and
     \(Z(f) \colonequals \Proj (S / (f))\).
-    If \(f\) is 
-	homogeneous of degree \(n\) 
-	is \(F\)-split and \(Z(f)\) is smooth,
+    If \(f\) is \(F\)-split,
+	homogeneous of degree \(n\), 
+	and \(Z(f)\) is smooth,
 	then the Artin--Mazur height 
 	of \(Z(f) = \Proj (S / (f))\) 
 	is 1. 
@@ -377,7 +377,7 @@ of Theorem \ref{thm:fsplit:ordinary}:
 \begin{thm}
 	Let \(f \in S\), and
     \(Z(f) \colonequals \Proj (S / (f))\).
-	If \(f \in S\) is homogeneous of degree \(n\)
+	If \(f\) is homogeneous of degree \(n\)
     and \(Z(f)\) is smooth,
 	then the Artin--Mazur height of \(Z(f)\)
 	is equal to the quasi-\(F\)-split height
@@ -659,14 +659,13 @@ For a K3 surface, the height (if finite) is bounded by 10.
     The only monomial of degree \(8\) that is not contained
     in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, z^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
     Call this monomial \(c\).
-    Since this coefficient of \(c\) in \(g\) is zero, we conclude
+    Since the coefficient of \(c\) in \(g\) is zero, we conclude
     by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
     that \(f\) is not \(F\)-split.
     Next, we must calculate \(\Delta_{1}(g)\).
     To do this, we take a lift of \(g\) by regarding the coefficients
     as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
-    We raise \(g^3\) in the integers, and subtract by every term of \(g\) 
-    cubed.
+    We raise \(g^3\) in the integers, and subtract by the cube of every term of \(g\).
 
     Then, we multiply \(g\) by \(\Delta_{1}(g)\), getting a polynomial of degree 24.
     We apply the splitting of Frobenius, as described in Algorithm \ref{alg:naive:u}, 
