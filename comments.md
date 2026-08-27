@@ -359,7 +359,7 @@ In the revised version of the paper, we continue to refer to this as "splitting"
 
 We appreciate Reviewer 2's comments, and believe that they will help make the article more accessible.
 
-In particular, we agree with Reviewer 2 about our mathematical vs. algorithmic computations. Our paper was written with both experts in the F-singularities literature and computer algebra experts in mind - hence the extra background. 
+In particular, we agree with Reviewer 2 about our mathematical vs. algorithmic contributions (namely, that our contributions are generally algorithmic). Our paper was written with both experts in the F-singularities literature and computer algebra experts in mind - hence the extra background. 
 
 In our revision, we have attempted to address these issues by expanding the introduction and reorganizing the paper.
 

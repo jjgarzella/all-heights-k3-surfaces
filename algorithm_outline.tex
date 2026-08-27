@@ -465,16 +465,25 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 \end{rmk}
 
 \begin{rmk}
-    \label{rmk:lift:roi}
-    Note that if \(k = \mathbb{F}_{p}\), we can always choose a lift
-    of \(f\) with coefficients in \(\mathbb{Z}\), 
-    not just \(W(k) = \mathbb{Z}_{p}\).
-    In practice, we must choose a lift to the integers
-    so we can represent it computationally.
+    The computation of \(\Delta_{1}(f)\) 
+    requires doing arithmetic in \(W_{2}(S)\),
+    which is \(\mathbb{Z} / p^{2} \mathbb{Z} [x_{1},\ldots, x_{n}]\) 
+    if \(k = \mathbb{F}_{p}\).
 
-    A similar fact holds for \(k = \mathbb{F}_{q}\) with 
-    \(q \neq p\), replacing \(\mathbb{Z}\) with
-    \(\mathbb{Z}[\zeta_{q-1}]\).
+    In practice, we represent elements of \(\mathbb{F}_{p}\)
+    and \(\mathbb{Z} / p^{2} \mathbb{Z}\) with 
+    machine integers,
+    and periodically perform modulo operations.
+    This way, in computer memory, choosing a lift does
+    not change the memory, only the behavior of arithmetic.
+\end{rmk}
+
+\begin{rmk}
+    \label{rmk:lift:roi}
+    For \(k = \mathbb{F}_{q}\),
+    we may perform similar computatinos for 
+    \(q \neq p\) by replacing machine integers with
+    elements of \(\mathbb{Z}[\zeta_{q-1}]\).
     This could be used to calculate the quasi-\(F\)-split 
     heights for surfaces not defined over \(\mathbb{F}_{p}\).
     More generally, if \(q = p^{e}\), one may take
@@ -493,11 +502,8 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
     heights for \(q \neq p\).
 \end{rmk}
 
-
-
 Proposition \ref{prop:delta1:formula} gives a natural algorithm
 for calculating the term \(\Delta_{1}(f)\): 
-
 
 \begin{algorithm}[H]
 \label{alg:calc:delta1}
@@ -505,7 +511,7 @@ for calculating the term \(\Delta_{1}(f)\):
 \KwInput{$f \in \mathbb{F}_p[x_1, \dots , x_n]$}
 \KwOutput{$\Delta_1(f)$}
 
-$\tilde{f} \gets \texttt{lift}(f)$\;
+$\tilde{f} \gets \texttt{lift\_coefficients}(f,\mathbb{Z} / p^{2} \mathbb{Z})$\;
 $D \gets \tilde{f}^p$\;
 
 \For{$t \in \textnormal{\texttt{terms}} (\tilde{f})$}{

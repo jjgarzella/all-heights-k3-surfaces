@@ -219,10 +219,13 @@ make use of the OSCAR computer algebra system
 Code from this work is open source and available online 
 in various
 Julia packages: 
-MMPSingularities.jl \cite{mmpsingularities-jl},
-GPUFiniteFieldMatrices.jl \cite{gpuffmatrices-jl}, 
-GPUPolynomials.jl \cite{gpupolynomials-jl},
-and CudaNTTs.jl \cite{cudantts-jl}.
+MMPSingularities.jl (version 0.2.0) \cite{mmpsingularities-jl} contains the algorithms
+for the quasi-\(F\)-split Fedder's criterion;
+GPUFiniteFieldMatrices.jl (version 0.3.1) \cite{gpuffmatrices-jl}
+implements matrix multiplication utilities;
+GPUPolynomials.jl (version 0.1.1) contains implementations of polynomial multiplication
+\cite{gpupolynomials-jl};
+finally, CudaNTTs.jl contains GPU-accelerated implementations of NTT (version 1.2.0) \cite{cudantts-jl}.
 
 % One possibility to further speed up the the computation
 % would be to compute the matrix of multiply then split
