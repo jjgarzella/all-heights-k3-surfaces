@@ -472,16 +472,15 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
     In practice, we represent elements of \(\mathbb{F}_{p}\)
     and \(\mathbb{Z} / p^{2} \mathbb{Z}\) with 
-    machine integers,
-    and periodically perform modulo operations.
+    machine integers periodically reduced modulo $p^2$.
     This way, in computer memory, choosing a lift does
-    not change the memory, only the behavior of arithmetic.
+    not change the memory allocation, only the behavior of arithmetic.
 \end{rmk}
 
 \begin{rmk}
     \label{rmk:lift:roi}
     For \(k = \mathbb{F}_{q}\),
-    we may perform similar computatinos for 
+    we may perform similar computations for 
     \(q \neq p\) by replacing machine integers with
     elements of \(\mathbb{Z}[\zeta_{q-1}]\).
     This could be used to calculate the quasi-\(F\)-split 
@@ -518,7 +517,7 @@ $D \gets \tilde{f}^p$\;
 	$D \gets D - t^p$
 }
 
-$D \gets D / p$
+$D \gets \texttt{divide\_by\_p\_and\_reduce\_mod\_p}(D)$
 
 \Return{D}
 \end{algorithm}
