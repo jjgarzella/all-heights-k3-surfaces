@@ -1,0 +1,22 @@
+{"p": 5, "claimed": 1, "computed": 1, "trace": [4], "seconds": 0.07}
+{"p": 5, "claimed": 2, "computed": 2, "trace": [0, 4], "seconds": 0.2}
+{"p": 5, "claimed": 3, "computed": 3, "trace": [0, 0, 1], "seconds": 0.1}
+{"p": 5, "claimed": 4, "computed": 4, "trace": [0, 0, 0, 4], "seconds": 0.09}
+{"p": 5, "claimed": 5, "computed": 5, "trace": [0, 0, 0, 0, 3], "seconds": 0.09}
+{"p": 5, "claimed": 6, "computed": 6, "trace": [0, 0, 0, 0, 0, 4], "seconds": 0.1}
+{"p": 5, "claimed": 7, "computed": 7, "trace": [0, 0, 0, 0, 0, 0, 1], "seconds": 0.09}
+{"p": 5, "claimed": 8, "computed": 8, "trace": [0, 0, 0, 0, 0, 0, 0, 3], "seconds": 0.09}
+{"p": 5, "claimed": 9, "computed": 9, "trace": [0, 0, 0, 0, 0, 0, 0, 0, 4], "seconds": 0.09}
+{"p": 5, "claimed": 10, "computed": 10, "trace": [0, 0, 0, 0, 0, 0, 0, 0, 0, 4], "seconds": 0.11}
+{"p": 5, "claimed": "infinity", "computed": "infinity", "trace": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "seconds": 0.1}
+{"p": 7, "claimed": 1, "computed": 1, "trace": [4], "seconds": 0.0}
+{"p": 7, "claimed": 2, "computed": 2, "trace": [0, 5], "seconds": 1.51}
+{"p": 7, "claimed": 3, "computed": 3, "trace": [0, 0, 2], "seconds": 1.4}
+{"p": 7, "claimed": 4, "computed": 4, "trace": [0, 0, 0, 5], "seconds": 1.45}
+{"p": 7, "claimed": 5, "computed": 5, "trace": [0, 0, 0, 0, 2], "seconds": 1.35}
+{"p": 7, "claimed": 6, "computed": 6, "trace": [0, 0, 0, 0, 0, 5], "seconds": 1.33}
+{"p": 7, "claimed": 7, "computed": 9, "trace": [0, 0, 0, 0, 0, 0, 0, 0, 4], "seconds": 1.46}
+{"p": 7, "claimed": 8, "computed": 8, "trace": [0, 0, 0, 0, 0, 0, 0, 2], "seconds": 1.34}
+{"p": 7, "claimed": 9, "computed": 9, "trace": [0, 0, 0, 0, 0, 0, 0, 0, 2], "seconds": 1.33}
+{"p": 7, "claimed": 10, "computed": 10, "trace": [0, 0, 0, 0, 0, 0, 0, 0, 0, 3], "seconds": 1.39}
+{"p": 7, "claimed": "infinity", "computed": "infinity", "trace": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "seconds": 1.35}
