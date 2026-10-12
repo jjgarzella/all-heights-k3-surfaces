@@ -1,18 +1,18 @@
 
 \subsection{Witt vectors}
 
-We begin by defining the ring of Witt vectors. 
+We begin by defining the ring of Witt vectors.
 Since the theory of Witt vectors is a vast and active topic of research,
-we recall the bare minimum 
+we recall the bare minimum
 required for the quasi-\(F\)-split Fedder's criterion algorithm.
-For a more complete introduction to the ring of Witt vectors with proofs, 
+For a more complete introduction to the ring of Witt vectors with proofs,
 see \cite{rabinoff-2014-witt-vec}.
 For an intuitive introduction or derivation of the ring of Witt vectors, see
 \cite{kim-2017-witt-vec}.
-There are many other perspectives on Witt vectors. 
+There are many other perspectives on Witt vectors.
 For example:
 \cite[Chapter~17]{hazewinkel-1978-formal-groups} covers the ring of Witt vectors
-and its relationship with formal groups; 
+and its relationship with formal groups;
 \cite{kedlaya-2021-prismatic} gives a categorical perspective on the ring of Witt vectors
 that relates to lifts of the Frobenius; and
 \cite[Chapter~1]{schneider-2017-galois-rep-phi-gamma} defines a generalization
@@ -23,94 +23,91 @@ known as the ring of \textit{ramified Witt vectors} in detail.
 	\[
 		\omega_{n}(X_{0}, \ldots, X_{n}) = X_{0}^{p^{n}} + pX_{1}^{p^{n-1}} + \cdots + p^{n}X_{n}
         \in \mathbb{Z}[X_{0}, \ldots, X_{n}]
-	\] 
-    
+	\]
+
 \end{defn}
 
 \noindent Now let \(R\) be a ring of characteristic \(p\).
-We define \(\Phi\) to be the map 
+We define \(\Phi\) to be the map
 % \[
-% 	\prod_{n \in \mathbb{N}}^{} R 
-% 	\xrightarrow{(\omega_{n})_{n}} 
-% 	\prod_{n \in \mathbb{N}}^{} R  
-% \] 
+% 	\prod_{n \in \mathbb{N}}^{} R
+% 	\xrightarrow{(\omega_{n})_{n}}
+% 	\prod_{n \in \mathbb{N}}^{} R
+% \]
 \begin{align*}
-    \Phi : \prod_{n \in \mathbb{N}}^{} R  
-    &\xlongrightarrow{(\omega_{n})_{n}} 
+    \Phi : \prod_{n \in \mathbb{N}}^{} R
+    &\xlongrightarrow{(\omega_{n})_{n}}
     \prod_{n \in \mathbb{N}}^{} R \\
     %
-    (r_{0}, r_{1}, \ldots, r_{n}, \ldots) 
+    (r_{0}, r_{1}, \ldots, r_{n}, \ldots)
     &\xmapsto{\hphantom{(\omega_{n})_{n}}}
-    (\omega_{0}(r_{0}), \omega_{1}(r_{0}, r_{1}), 
+    (\omega_{0}(r_{0}), \omega_{1}(r_{0}, r_{1}),
     \ldots, \omega_{n}(r_{0}, \ldots, r_{n}), \ldots).
 \end{align*}
 
 where the \(n\)-th component is defined by \(\omega_{n}\).
-That is, \(\omega_{n}\) is considered as a 
+That is, \(\omega_{n}\) is considered as a
 % \omega_n takes n+1 arguments, so R^{n + 1}
 map (of sets) \(R^{n + 1} \xrightarrow{} R\) by
 evaluation.
 
 \begin{lem}
-	There exist integer polynomials 
-	\(S_n(X_{0}, \ldots, X_{n}, Y_{0}, \ldots, Y_{n})\) 
-	with the property that 
+	There exist unique integer polynomials
+	\(S_n(X_{0}, \ldots, X_{n}, Y_{0}, \ldots, Y_{n})\)
+	with the property that
 	\[
 		\Phi((S_{n})_{n \in \mathbb{N}}) =
-		\Phi((X_{n})_{n \in \mathbb{N}}) 
+		\Phi((X_{n})_{n \in \mathbb{N}})
 		+ \Phi((Y_{n})_{n \in \mathbb{N}})
-	.\] 
-	Likewise, there exist integer polynomials 
+	.\]
+	Likewise, there exist unique integer polynomials
 	\(P_{n}(X_{0}, \ldots, X_{n}, Y_{0}, \ldots, Y_{n})\)
 	such that
 	\[
 		\Phi((P_{n})_{n \in \mathbb{N}}) =
-		\Phi((X_{n})_{n \in \mathbb{N}}) 
+		\Phi((X_{n})_{n \in \mathbb{N}})
 		\cdot \Phi((Y_{n})_{n \in \mathbb{N}})
-	.\] 
+	.\]
 \end{lem}
 
 \begin{proof}
-	For example, see \cite[Theorem~2.6]{rabinoff-2014-witt-vec} and the 
+    For example, see \cite[Theorem~2.6]{rabinoff-2014-witt-vec} and the
 	surrounding discussion.
 \end{proof}
 
-We now define the ring of Witt vectors 
-\(W(R)\) to be 
-\(\prod_{n \in \mathbb{N}}^{} R \) 
+We now define the ring of Witt vectors
+\(W(R)\) to be
+\(\prod_{n \in \mathbb{N}}^{} R \)
 as a set, with the ring structure defined
-by 
+by
 \[
-	(a_{n})_{n \in \mathbb{N}} + 
+	(a_{n})_{n \in \mathbb{N}} +
 	(b_{n})_{n \in \mathbb{N}} =
 	(S_{n}(a_{0}, \ldots, a_{n}, b_{0}, \ldots, b_{n}))_{n \in \mathbb{N}}
-\] 
+\]
 and likewise, multiplication is defined
 using the \(P_{n}\).
-The lemma then shows that \(\Phi\) is a homomorphism 
+The lemma then shows that \(\Phi\) is a homomorphism
 \[
-	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R 
-.\] 
+	W(R) \xrightarrow{} \prod_{n \in \mathbb{N}}^{} R
+.\]
 The fact that the polynomials \(S_{n}\) and \(P_{n}\) do not depend on the base
 ring \(R\) means that the construction is functorial; that is,
-for a map of rings \(R \xrightarrow{} R^{\prime} \), we get a 
+for a map of rings \(R \xrightarrow{} R^{\prime} \), we get a
 map \(W(R) \xrightarrow{} W(R^{\prime})\).
 
 The main example, which also provides the fundamental motivation
 for Witt vectors, is the case when \(R = \mathbb{F}_{p}\).
-It is well known that \(W(\mathbb{F}_{p}) = \mathbb{Z}_{p}\), 
-giving an alternative construction of the \(p\)-adic numbers.
+It is well known that \(W(\mathbb{F}_{p}) = \mathbb{Z}_{p}\),
+giving an alternative construction of the \(p\)-adic integers.
 
 \begin{warn}
-	If one takes a
-    naive \(p\)-adic expansion 
-    \(\sum_{n = 0}^{\infty} c_{n}p^{n} \in \mathbb{Z}_{p}\)
-    with \(c_{n} \in \{0, \ldots, p-1\}\), this does not correspond
-    to the Witt vector \((c_{0}, c_{1}, c_{2}, \ldots)\).
-    In fact, the aforementioned sum corresponds to 
-    \((c_{0}, c_{1}^{p}, c_{2}^{p^{2}}, \ldots)\). See
-	\cite[Section~2]{kim-2017-witt-vec}. 
-    This motivates the following: 
+    Ordinary integer digits are not Teichm\"uller representatives.
+    Over a perfect field, the Witt vector \((a_0,a_1,\ldots)\)
+    corresponds to \(\sum_{j\geq0}p^j[a_j^{p^{-j}}]\).
+    For example, in \(W_2(\mathbb F_3)\cong\mathbb Z/9\mathbb Z\),
+    \((2,0)\) corresponds to 8, whereas the ordinary integer 2
+    corresponds to \((2,1)\). See \cite[Section~2]{kim-2017-witt-vec}.
 \end{warn}
 
 \begin{defn}
@@ -120,17 +117,17 @@ giving an alternative construction of the \(p\)-adic numbers.
 	defined by
 	\[
 	 (c_{0}, c_{1}, \ldots) \mapsto (c_{0}^{p}, c_{1}^{p}, \ldots)
-	\] 
+	\]
     (this is induced by the Frobenius on \(R\) by functoriality).
 \end{defn}
 
 \begin{defn}
-	There exists a homomorphism \(V \colon W(R) \xrightarrow{} W(R)\),
-	called the \textit{Verschiebung},
+	The \textit{Verschiebung} is a homomorphism of additive groups
+    \(V\colon W(R)\xrightarrow{}W(R)\),
 	defined by
 	\[
 		(c_{0}, c_{1}, c_{2}, \ldots) \mapsto  (0, c_{0}, c_{1}, \ldots)
-	.\] 
+	.\]
 \end{defn}
 
 We see that \(W(R) / VW(R) \isom R\).
@@ -147,7 +144,7 @@ We also have higher truncated variants.
 We may regard the \(n\)-th truncated Witt vectors as consisting
 of elements \((c_{0}, \ldots, c_{n-1})\) with addition
 and multiplication by the \(S_{i}\) and \(P_{i}\).
-Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
+Thus, one has \(\varprojlim_{n} W_{n}(R) = W(R)\).
 
 \begin{lem}
     \label{lem:frob:versch}
@@ -167,7 +164,7 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \end{lem}
 
 \begin{proof}
-    Since \(F\) is an isomorphism, this follows from 
+    Since \(F\) is an isomorphism, this follows from
     Lemma \ref{lem:frob:versch}.
 \end{proof}
 
@@ -177,8 +174,8 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
     shows that \(W_{n}(\mathbb{F}_{p}) = \mathbb{Z} / p^{n}\mathbb{Z}\).
     One common intuition for \(W_{n}(R)\)
     for more general \(R\) is an analogy:
-    \(\mathbb{Z} / p^{n}\mathbb{Z}\) 
-    is to \(\mathbb{F}_{p}\) 
+    \(\mathbb{Z} / p^{n}\mathbb{Z}\)
+    is to \(\mathbb{F}_{p}\)
     as \(W_{n}(R)\) is to \(R\).
     For rings that are not perfect,
     this intuition is less precise but still
@@ -186,16 +183,16 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \end{rmk}
 
 \begin{nota}
-    We have a map (of sets) 
-    \(R \xrightarrow{} W(R)\) 
-    given by 
+    We have a map (of sets)
+    \(R \xrightarrow{} W(R)\)
+    given by
     \(c \mapsto (c, 0, \ldots)\).
     The element \((c, 0, \ldots)\) is denoted
     \([c]\).
     The map \(c \mapsto [c]\) is multiplicative
     but not additive (see \cite[Section~1]{kim-2017-witt-vec}).
     We have analogous maps \(R \xrightarrow{} W_{n}(R)\).
-    By abuse of notation, we denote 
+    By abuse of notation, we denote
     the image of \(c\) by \([c]\).
 \end{nota}
 
@@ -211,10 +208,10 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 	and
 	\[
 		S_{1}(X_{0}, X_{1}, Y_{0}, Y_{1})
-		= X_{1} + Y_{1} + 
+		= X_{1} + Y_{1} -
 		\frac{(X_{0} + Y_{0})^{p} - X_{0}^{p} - Y_{0}^{p}}{p}
-	.\] 
-	Thus we see that addition in \(W_{2}(R)\) involves raising 
+	.\]
+	Thus we see that addition in \(W_{2}(R)\) involves raising
 	elements in \(R\) (i.e. the first component) to the \(p\)-th
 	power in a lift of \(R\) to characteristic 0.
     Thus, the bottleneck for most computations with Witt vectors,
@@ -225,9 +222,9 @@ Thus, one has \(\lim_{n} W_{n}(R) = W(R)\).
 \subsection{Splittings of Frobenius}
 \label{subsec:split:frob}
 
-Let \(R\) be a ring of characteristic \(p\). 
-We have the Frobenius morphism 
-\(F \colon R \xrightarrow{} R\), 
+Let \(R\) be a ring of characteristic \(p\).
+We have the Frobenius morphism
+\(F \colon R \xrightarrow{} R\),
 defined as \(F(x) = x^p\).
 We describe a few alternative perspectives on
 the Frobenius which will be useful later.
@@ -236,7 +233,7 @@ the Frobenius which will be useful later.
 	\label{rmk:frob:perspectives}
     \hfill
     \begin{enumerate}[(1)]
-    	\item Let \(R\) be reduced. 
+    	\item Let \(R\) be reduced.
             We may formally identify \(R\) with the set \(R^{p}\)
             of symbols \(\{r^{p} : r \in R\}\),
             which inherits the ring structure from \(R\).
@@ -248,20 +245,20 @@ the Frobenius which will be useful later.
             so we may identify \(R^{p}\) with this image.
     		Thus, we may view the Frobenius as the inclusion
     		\(R^{p} \ins R\).
-    	\item 
+    	\item
             Similarly, again assuming that \(R\) is reduced
     		we may view the Frobenius as the inclusion
-    		\(R \ins R^{1 / p}\), where \(R^{1 / p}\) 
+    		\(R \ins R^{1 / p}\), where \(R^{1 / p}\)
     		is the ring of formal \(p\)-th roots of elements
     		of \(R\).
     	\item More generally, we define \(F_{\star}R\) to
-			be the \(R\)-algebra with ring structure 
+			be the \(R\)-algebra with ring structure
 			the same as \(R\), with module structure
 			\(r \cdot x = F(r)x = r^{p}x\).
 			Then we view the Frobenius as a map
 			\(R \xrightarrow{} F_{\star}R\).
-			In this description, \(F\) is an \(R\)-module 
-			homomorphism as well. 
+			In this description, \(F\) is an \(R\)-module
+			homomorphism as well.
 			The module \(F_{\star}R\) corresponds to the
 			pushforward construction from geometry
 			(i.e. pushforward of quasi-coherent
@@ -275,51 +272,51 @@ the Frobenius which will be useful later.
 
 \begin{defn}
 	We say that \(R\) is \textit{\(F\)-split} if the map \(F\) is
-	split as a map of 
+	split as a map of
 	\(R\)-modules \(R \xrightarrow{} F_{\star}R\).
-    That is, there exists a map \(\sigma : F_{\star}R \xrightarrow{} R\) 
+    That is, there exists a map \(\sigma : F_{\star}R \xrightarrow{} R\)
     such that \(\sigma \circ F = id\).
 \end{defn}
 
 We will be chiefly concerned with \textit{hypersurfaces},
 so we specialize to this case now.
 For what follows, we assume that \(k\) is a field
-of characteristic \(p > 0\) which is 
+of characteristic \(p > 0\) which is
 \textit{\(F\)-finite}; that is, the Frobenius
 map is module-finite (that is, finitely generated as a module).
 
 \begin{defn}
 	Let \(S = k[x_{1}, \ldots, x_{n}]\).
-	Then we say that \(f \in S\) is \(F\)-split if 
+	Then we say that \(f \in S\) is \(F\)-split if
 	\(S / (f)\) is.
 \end{defn}
 
 A fundamental fact about \(F\)-splitness is that there
-exists a very concrete criterion for whether or 
+exists a very concrete criterion for whether or
 not a polynomial (hypersurface) \(f\) is \(F\)-split.
 First, we introduce some notation.
-If \(I = (x_{1}, \ldots, x_{n})\) is a finitely generated 
-ideal of some ring \(R\), 
+If \(I = (x_{1}, \ldots, x_{n})\) is a finitely generated
+ideal of some ring \(R\),
 then \(I^{[p^{e}]}\)
 is defined to be \((x_{1}^{p^{e}}, \ldots, x_{n}^{p^{e}})\).
 
 \begin{thm}
 	[Fedder's Criterion]
     \label{thm:fedder:criterion}
-	Let \(f \in S = k[x_{1}, \ldots, x_{n}]\).
-	Let \(\mathfrak{m} = (x_{1}, \ldots, x_{n})\) 
+	Let \(f \in S = k[x_{1}, \ldots, x_{n}]\) be nonzero and homogeneous.
+	Let \(\mathfrak{m} = (x_{1}, \ldots, x_{n})\)
 	be the ideal generated by the variables.
-	Then \(f\) is \(F\)-split if and only if 
+	Then \(f\) is \(F\)-split if and only if
 	\(f^{p-1} \notin \mathfrak{m}^{[p]}\).
 \end{thm}
 
 \begin{proof}
-	See \cite[Theorem~2.5]{ma-polstra-2021-F-sing-comm-alg}.
+	See \cite[Theorem~2.5 and Remark~2.8]{ma-polstra-2021-F-sing-comm-alg}.
 \end{proof}
 
-Of particular interest is the case when \(f\) is 
+Of particular interest is the case when \(f\) is
 homogeneous of degree \(n\), which geometrically
-corresponds to a \textit{Calabi-Yau} hypersurface.
+corresponds, when smooth and of positive dimension, to a \textit{Calabi-Yau} hypersurface.
 In this case, we have
 
 \begin{thm}
@@ -327,25 +324,28 @@ In this case, we have
 	Let \(f \in S\), and
     \(Z(f) \colonequals \Proj (S / (f))\).
     If \(f\) is \(F\)-split,
-	homogeneous of degree \(n\), 
+	homogeneous of degree \(n\),
 	and \(Z(f)\) is smooth,
-	then the Artin--Mazur height 
-	of \(Z(f) = \Proj (S / (f))\) 
-	is 1. 
+	then the Artin--Mazur height
+	of \(Z(f) = \Proj (S / (f))\)
+	is 1.
 \end{thm}
 
 Recently, in \cite{yobuko-2019-qfs-calabi-yau}
-Yobuko introduced the notion of 
+Yobuko introduced the notion of
 quasi-\(F\)-splitness, which generalizes \(F\)-splitness.
 
 \begin{defn}
 	The ring \(R\) is \textit{\(n\)-quasi-\(F\)-split} if there exists
-	a map \(\phi \colon W_{n}(R) \xrightarrow{} R\) such that
+	a \(W_n(R)\)-linear map
+    \(\phi\colon F_{\star}W_n(R)\xrightarrow{}R\), where \(R\)
+    is a \(W_n(R)\)-module via first-coordinate truncation,
+    such that the following diagram commutes:
 	\[
 	\begin{tikzcd}
 		W_{n}(R) \arrow{r}{F} \arrow{d}[swap]{} &
 		F_{\star}W_{n}(R) \arrow{ld}{\phi} \\
-	R 
+	R
 	\end{tikzcd}
 	,\]
 	where the vertical map is the first Witt vector truncation.
@@ -356,17 +356,17 @@ then it is \(n+1\)-quasi-\(F\)-split, by composing \(\phi\)
 with the truncation map \(W_{n+1}(R) \xrightarrow{} W_{n}(R)\)
 (this uses that the Witt vector Frobenius commutes with truncation,
 which can be observed from Definition \ref{def:witt:frob}).
-We further define the \textit{quasi-\(F\)-split height} of \(R\) as the smallest \(n\) 
-for which \(R\) is \(n\)-quasi-\(F\)-split.
-As above, the quasi-\(F\)-split height of 
+We further define the \textit{quasi-\(F\)-split height} of \(R\) as the smallest \(n\)
+for which \(R\) is \(n\)-quasi-\(F\)-split, and as \(\infty\) if no such positive integer exists.
+As above, the quasi-\(F\)-split height of
 \(f \in S = k[x_{1}, \ldots, x_{n}]\) is that
 of \(R = S / (f)\).
 
 \begin{rmk}
-	Both \(F\)-splitness and quasi-\(F\)-splitness have 
+	Both \(F\)-splitness and quasi-\(F\)-splitness have
 	various geometric
-	variants which are more general than the 
-	ring-theoretic/affine versions given here. 
+	variants which are more general than the
+	ring-theoretic/affine versions given here.
 	These are covered extensively in the literature, for example
 	see \cite{kttwyy-2022-qfs-birat}.
 \end{rmk}
@@ -385,8 +385,7 @@ of Theorem \ref{thm:fsplit:ordinary}:
 \end{thm}
 
 \begin{proof}
-	This is a special case of 
-	\cite[Theorem~4.5]{yobuko-2019-qfs-calabi-yau}.
+	This is a special case of \cite[Theorem~4.5]{yobuko-2019-qfs-calabi-yau}.
 \end{proof}
 
 % \section{Fedder's criterion for quasi-\(F\)-splitness: an algorithmic perspective}
@@ -394,36 +393,36 @@ of Theorem \ref{thm:fsplit:ordinary}:
 \subsection{The computation of \(\Delta_{1}\)}
 \label{subsec:compute:delta1}
 
-We now describe how the ring of Witt vectors can be used to calculate the 
-quasi-\(F\)-split height (equivalently, Artin--Mazur height) of a Calabi-Yau 
+We now describe how the ring of Witt vectors can be used to calculate the
+quasi-\(F\)-split height (equivalently, Artin--Mazur height) of a Calabi-Yau
 hypersurface, using the version of Fedder's criterion in \cite{kty-2022-fedder}.
 We will describe the algorithm in more detail. Proofs can be
 found in \cite{kty-2022-fedder}.
 
-In what follows, 
-when we apply arithmetic operations to arrays, 
+In what follows,
+when we apply arithmetic operations to arrays,
 (particularly addition, multiplication, and modulo)
 we mean component-wise application of these operations.
 Use of arbitrary component-wise operations is called
 \textit{broadcasting} in Julia, and we will
 sometimes use this term.
-Homogeneous polynomials are represented in computer 
-memory as a list of their terms. 
-This is reflected in our notation, 
+Homogeneous polynomials are represented in computer
+memory as a list of their terms.
+This is reflected in our notation,
 thus the meaning of ``for \(\delta \in \Delta\)''
 is a for loop through all the monomials
 of \(\Delta\).
 
 \begin{defn}
     \label{def:poly:nota}
-    The \textit{exponent tuple} of a monomial 
-    $m = ax_{1}^{d_1} \cdots x_{n}^{d_n}$ is $(d_1, \dots, d_n)$. 
-	We will denote it $\exps(m)$, and we also 
-    define $\coeff(m) \colonequals a$
+    The \textit{exponent tuple} of a monomial
+    $m = ax_{1}^{d_1} \cdots x_{n}^{d_n}$ is $(d_1, \dots, d_n)$.
+	We will denote it $\exps(m)$, and we also
+    define $\coeff(m) \colonequals a$.
 \end{defn}
 
-For the following discussion, 
-let \(k\) be a perfect field of characteristic \(p\) and 
+For the following discussion,
+let \(k\) be a perfect field of characteristic \(p\) and
 let \(S := k[x_{1}, \ldots, x_{n}]\).
 Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
@@ -432,36 +431,36 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 	Let \(\Delta_{1}(f) \in S\)
 	be defined by the following equation in \(W_{2}(S)\):
 	\[
-		(0, \Delta_{1}(f)) = (f,0) - \sum_{I}^{} (a_{I}\mathbf{x}^{I}, 0) 
-	.\] 
+		(0, \Delta_{1}(f)) = (f,0) - \sum_{I}^{} (a_{I}\mathbf{x}^{I}, 0)
+	.\]
 \end{defn}
 
-% The following proposition demonstrates how we can calculate 
+% The following proposition demonstrates how we can calculate
 % \(\Delta_{1}(f)\) algorithmically.
 
 \begin{prop}
 	\label{prop:delta1:formula}
-	Let \(\tilde{f}\) be a lift of \(f\) to \(W(k)\),
+	Let \(\tilde{f}\) be a coefficient lift of \(f\) to \(W(k)[x_1,\ldots,x_n]\),
 	i.e.
 	\(\tilde{f} = \sum_{I}^{} [a_{I}] \mathbf{x}^{I}\).
 	If \(k = \mathbb{F}_{p}\),
-	we can compute \(\Delta_{1}(f)\) by 
+	we can compute \(\Delta_{1}(f)\) by
 	taking the reduction of
 	\[
 		\frac{\tilde{f}^{p} - \sum_{I}^{} ([a_{I}]\mathbf{x}^{I})^{p} }{p}
-	\] 
+	\]
 	mod \(p\).
 \end{prop}
 
 \begin{proof}
 	Iteratively apply the formula of the first
-    Witt polynomial \(S_{1}\) (see Remark \ref{rmk:polyraise:w2})
+    addition polynomial \(S_{1}\) (see Remark \ref{rmk:polyraise:w2})
 	to the monomials of \(\tilde{f}\).
 \end{proof}
 
 \begin{rmk}
-	If \(f\) is a homogeneous polynomial of degree \(d\), 
-	then \(\Delta_{1}(f)\) is a polynomial of degree \(pd\).
+	If \(f\) is a homogeneous polynomial of degree \(d\),
+	then \(\Delta_{1}(f)\) is homogeneous of degree \(pd\), possibly zero.
 \end{rmk}
 
 \begin{rmk}
@@ -479,36 +478,28 @@ Let \(f = \sum_{I}^{} a_{I}\mathbf{x}^{I}\) be a polynomial in \(S\).
 
 \begin{rmk}
     \label{rmk:lift:roi}
-    For \(k = \mathbb{F}_{q}\),
-    we may perform similar computations for 
-    \(q \neq p\) by replacing machine integers with
-    elements of \(\mathbb{Z}[\zeta_{q-1}]\).
-    This could be used to calculate the quasi-\(F\)-split 
-    heights for surfaces not defined over \(\mathbb{F}_{p}\).
-    More generally, if \(q = p^{e}\), one may take
-    any abelian extension \(K\) of degree \(e\) over \(\mathbb{Q}\) such that
-    \(p\) is an inert prime in \(K\).
-    Then, there is a unique prime \(\mathfrak{p}\) lying over \(p\) 
-    such that \(\mathcal{O}_{K} / \mathfrak{p} \isom k\).
-    Furthermore, \(\mathcal{O}_{K} \ins W(k)\)
-    so we may lift \(f\) to \(\mathcal{O}_{K}\) 
-    and do arithmetic there. 
-    Doing arithmetic in a degree \(e\) extension will have
-    better complexity than in the cyclotomic extension, which
-    has degree \(\phi(q) = \phi(p^{e}) = p^{e-1}(p-1)\), where
-    \(\phi\) is the Euler totient function.
-    We do not implement the calculation of quasi-\(F\)-split
-    heights for \(q \neq p\).
+    For \(k=\mathbb F_q\), \(q=p^e\), one can lift coefficients to
+    \(\mathbb Z[\zeta_{q-1}]\) after choosing a prime \(\mathfrak p\)
+    above \(p\) and an identification of its residue field with \(k\).
+    Computations modulo \(p^2\) in the localization at \(\mathfrak p\)
+    suffice for the coefficient-lift formula.
+    Alternatively, an abelian extension \(K/\mathbb Q\) of degree \(e\)
+    in which \(p\) is inert gives residue field \(k\), after choosing
+    an identification; its completion is the unramified lift of \(k\).
+    This degree can be smaller than the cyclotomic degree \(\phi(q-1)\),
+    where \(\phi\) is Euler's totient function.
+    We do not implement height computations for \(q\ne p\).
 \end{rmk}
 
 Proposition \ref{prop:delta1:formula} gives a natural algorithm
-for calculating the term \(\Delta_{1}(f)\): 
+for calculating the term \(\Delta_{1}(f)\):
 
 \begin{algorithm}[H]
-\label{alg:calc:delta1}
 \caption{Calculation of \(\Delta_{1}(f)\)}
+\label{alg:calc:delta1}
 \KwInput{$f \in \mathbb{F}_p[x_1, \dots , x_n]$}
-\KwOutput{$\Delta_1(f)$}
+\KwOutput{$\Delta_1(f)\in\mathbb F_p[x_1,\ldots,x_n]$}
+\KwNotation{$A=(\mathbb Z/p^2\mathbb Z)[x_1,\ldots,x_n]$; all powering and subtraction are in $A$}
 
 $\tilde{f} \gets \texttt{lift\_coefficients}(f,\mathbb{Z} / p^{2} \mathbb{Z})$\;
 $D \gets \tilde{f}^p$\;
@@ -524,50 +515,52 @@ $D \gets \texttt{divide\_by\_p\_and\_reduce\_mod\_p}(D)$
 
 \subsection{Splittings of Frobenius from a computational perspective}
 
-Let \(S = k[x_{1}, \ldots, x_{n}]\) as before. 
+Let \(S = k[x_{1}, \ldots, x_{n}]\) as before.
 We will use perspective (1) from
-Remark \ref{rmk:frob:perspectives}; 
-recall that we identify 
+Remark \ref{rmk:frob:perspectives};
+recall that we identify
 \(S\) with the target of Frobenius and
 \(S^{p}\) with the source.
-We see 
+We see
 by counting degrees
 that we have a generating set for \(S\) as an
 \(S^{p}\)-module given by
 all monomials
 \(x_{1}^{i_{1}}\cdots x_{n}^{i_{n}}\)
 where \(0 \leq i_{j} \leq p-1\) for all \(j\).
-Moreover, since \(S\) is a polynomial ring, 
+Moreover, since \(S\) is a polynomial ring,
 there are no (module-theoretic) relations
 and
-\(S\) is the free \(S^{p}\)-module generated by 
+\(S\) is the free \(S^{p}\)-module generated by
 these monomials, i.e.  \[
 S = \bigoplus_{\substack{1 \leq j \leq n,\\ 0 \leq i_{j} \leq p-1}}^{} x_{1}^{i_{1}}\cdots x_{n}^{i_{n}} S^{p}
-.\] 
-Then the projection of \(S\) to any of the direct sum components
-is an element of \(\Hom(S,S^{p})\), which is a
-splitting of Frobenius.
-Let \(u\) be the projection onto the component of
-\(x_{1}^{p-1} \ldots x_{n}^{p-1}\).
+.\]
+Coefficient projection onto a basis summand, followed by its
+identification with \(S^p\), is an \(S^p\)-linear map \(S\to S^p\).
+Let \(u\) be coefficient projection for
+\((x_1\cdots x_n)^{p-1}\), followed by the inverse of Frobenius
+\(S^p\cong S\). This is the Frobenius trace, a generator of
+\(\operatorname{Hom}_S(F_{\star}S,S)\), rather than a splitting:
+\(u(1)=0\). Composing \(u\) with multiplication by
+\((x_1\cdots x_n)^{p-1}\) gives a splitting.
+See \cite[Claim~2.6]{ma-polstra-2021-F-sing-comm-alg}.
 
-The splitting \(u\) plays an important role in \(F\)-singularity
-theory, see for example 
-\cite[Claim~2.6]{ma-polstra-2021-F-sing-comm-alg}.
-For our purposes, we are only concerned with computing \(u\) 
-for a polynomial in \(S\). 
-Given \(f \in S\), we will first compute
-\(u(f) \in S^{p}\), and then use the identification
-\(S^{p} \isom S\) by taking \(p\)-th roots of 
-exponents.
-Thus, the effect 
-of \(u\) on any polynomial is subtracting \(p-1\)
-from the exponents of the terms and dividing by \(p\) 
-(see Algorithm \ref{alg:naive:u}).
+For a perfect field, a surviving term is sent to
+\[
+ u(c\mathbf x^{\mathbf a})=
+ c^{1/p}\mathbf x^{(\mathbf a-(p-1)\mathbf1)/p};
+\]
+terms with another exponent residue are sent to zero.
+In particular, \(u(cg)=c^{1/p}u(g)\).
+For all computational algorithms below we restrict to
+\(k=\mathbb F_p\), so coefficients are unchanged and \(u\) is
+\(\mathbb F_p\)-linear. Over a general perfect field, iteration
+requires the corresponding Frobenius twists.
 
 \SetKwComment{Comment}{// }{}
 
 \begin{algorithm}[H]
-\caption{Splitting of Frobenius}
+\caption{Frobenius trace}
 \label{alg:naive:u}
 \KwInput{$f \in S$}
 \KwOutput{$u(f) \in S$}
@@ -596,9 +589,9 @@ $r \gets 0$\;
 
 \subsection{A Fedder-type criterion for quasi-\(F\)-splitness}
 
-Let \(f\) be a homogeneous polynomial of degree \(n\) 
-in \(S\), 
-so that \(Z(f)\) is a Calabi-Yau hypersurface.
+Let \(f\) be a homogeneous polynomial of degree \(n\)
+in \(S\),
+so that \(Z(f)\), when smooth and of positive dimension, is a Calabi-Yau hypersurface.
 Recall from Subsection \ref{subsec:split:frob} that
 \(\mathfrak{m}^{[p]} = (x_{1}^{p}, \ldots, x_{n}^{p})\)
 is the Frobenius power of the maximal ideal \((x_1, \ldots, x_n)\).
@@ -607,10 +600,10 @@ algorithm to calculate the quasi-\(F\)-split height.
 
 \begin{algorithm}[H]
 % I think consistency of the term overrides title capitalization.
-\caption{quasi-\(F\)-split height: naive algorithm}
+\caption{Quasi-\(F\)-split height: naive algorithm}
 \label{alg:qfs:naive}
 \KwInput{
-	Chosen bound $b \in \mathbb{N}$, \\
+	Known upper bound $b\in\mathbb N$ on all finite heights of the admissible inputs, \\
 	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
 }
 \KwOutput{$h(f)$}
@@ -635,7 +628,7 @@ $h \gets 2$\;
 \begin{thm}
 	[\cite{kty-2022-fedder}, Theorem C]
 	Assume that
-	\(Z(f)\) has quasi-\(F\)-split height \(h < b\).
+	\(Z(f)\) has quasi-\(F\)-split height \(h \leq b\).
 	Then Algorithm \ref{alg:qfs:naive} terminates
 	and returns \(h\).
 \end{thm}
@@ -646,7 +639,7 @@ $h \gets 2$\;
 
 In the case of Calabi-Yau hypersurfaces, we have bounds on the height by
 \cite{van-der-geer-katsura-2003-calabi-yau},
-so we can deterministically recover the height.  
+so we can deterministically recover the height.
 See also \cite[Theorem~0.1]{artin-1974-k3-surfaces},
 for the case of K3 surfaces.
 For a K3 surface, the height (if finite) is bounded by 10, inclusive.
@@ -660,7 +653,7 @@ For a K3 surface, the height (if finite) is bounded by 10, inclusive.
     Raising \(f\) to the power \(p-1 = 2\) in \(\mathbb{F}_{3}\), we get
     \[
     g = x^8 + 2x^4y^4 + 2x^4z^4 + 2x^4w^4 + y^8 + 2y^4z^4 + 2y^4w^4 + z^8 + 2z^4w^4 + w^8
-    .\] 
+    .\]
     The only monomial of degree \(8\) that is not contained
     in \(\mathfrak{m}^{[p]} = (x^{3}, y^{3}, z^{3}, w^{3})\) is \(x^{2}y^{2}z^{2}w^{2}\).
     Call this monomial \(c\).
@@ -668,21 +661,22 @@ For a K3 surface, the height (if finite) is bounded by 10, inclusive.
     by the classical Fedder's criterion (Theorem \ref{thm:fedder:criterion})
     that \(f\) is not \(F\)-split.
     Next, we must calculate \(\Delta_{1}(g)\).
-    To do this, we take a lift of \(g\) by regarding the coefficients
-    as being in \(\mathbb{Z}\) instead of \(\mathbb{F}_{3}\).
-    We raise \(g^3\) in the integers, and subtract by the cube of every term of \(g\).
-
-    Then, we multiply \(g\) by \(\Delta_{1}(g)\), getting a polynomial of degree 24.
-    We apply the splitting of Frobenius, as described in Algorithm \ref{alg:naive:u}, 
-    obtaining another polynomial of degree \(8\). 
-    We can now check the term \(x^2y^2z^2w^2\) again, and it will again be zero. 
-    For this choice of $f$, all of the exponents for all quantities 
-    must be multiples of four.\footnote{
-    In fact, this implies that the degree \(8\) polynomial is zero.
-    However, this phenomenon is quite rare.
-    }
-    We then continue, multiplying, applying the splitting, checking the coefficient, 
-    until we conclude that the height is greater than 10. 
-    Now, by Hodge theory, if the height is greater than 10, it must be infinity. 
-    So we conclude that the height is infinity.
+    To do this, lift the coefficients to \(\mathbb Z/9\mathbb Z\),
+    cube the lift, and subtract the cube of each term in that ring.
+    Divide the canonical coefficient representatives of the difference
+    by 3 and reduce modulo 3, as in Algorithm \ref{alg:calc:delta1}.
+    The degrees of \(g\), \(\Delta_1(g)\), and their product are
+    8, 24, and 32, respectively. Applying the Frobenius trace
+    gives degree \((32-8)/3=8\).
+    Every pre-trace exponent is a multiple of four, so the only
+    possible surviving monomial is \(x^2y^2z^2w^2\).
+    Using the integer lift \(g=(x^4+y^4+z^4+w^4)^2\), which gives
+    the same delta, its coefficient is
+    \[
+      \frac{1}{3}\frac{8!}{(2!)^4}=840\equiv0\pmod3.
+    \]
+    The cubed individual terms do not contribute to this coefficient.
+    Thus the first trace is zero and all later iterates remain zero.
+    This smooth quartic K3 surface has infinite height by the
+    finite-height bound 10.
 \end{ex}

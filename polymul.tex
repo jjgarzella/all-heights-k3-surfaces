@@ -5,7 +5,7 @@ bottleneck. We first explain our implementation
 of polynomial powering using the Number Theoretic 
 Transform (NTT), then explore other known polynomial 
 powering algorithms and their ability to be sped up 
-through mass parallelization.
+through parallel execution.
 
 \subsection{NTT}
 
@@ -16,7 +16,7 @@ through mass parallelization.
 We reduce the problem of multivariate 
 polynomial powering to univariate polynomial powering
 by the Kronecker substitution.
-Let $M$ be a non-inclusive upper bound on the degree of any variable of the polynomial
+Let $M$ be a strict upper bound on the degree of any variable of the polynomial
 $f \in R[x_1, \dots, x_n]$. 
 Then the Kronecker Substitution 
 \(g(z) = f(z, z^M, z^{M^2}, \dots, z^{M^{n-1}})\)
@@ -50,7 +50,7 @@ we can simply ignore one variable in all of our
 operations between monomials of the same degree. 
 As above, algebraically this is applying the evaluation
 homomorphism \(x_{n} \mapsto 1\).
-This map is of course not injective, but it is injective on homogeneous elements.
+This map is of course not injective, but it is injective on each fixed-degree homogeneous component.
 This effectively decreases the number of variables of our polynomial by 1, 
 which greatly lowers the degree of the univariate result of the
 Kronecker substitution.
@@ -74,7 +74,7 @@ slowing down the computation.
 To address this, we can exploit the fact that we are powering 
 polynomials in $(\mathbb{Z}/p^2\mathbb{Z})[x]$ instead of $\mathbb{Z}[x]$. 
 If we compute the power in smaller increments by repeatedly 
-multiplying to an accumulator, we can reduce coefficients $\mod p^2$ 
+multiplying the accumulator by a fixed intermediate power, we can reduce coefficients $\mod p^2$
 after each step, and completely avoid the consequences of having 
 extremely large coefficients. In fact, even for large problems like 
 computing the quasi-$F$-split height for K3 surfaces over 
@@ -85,9 +85,12 @@ one prime for the entire computation.
     \caption{Incremental polynomial powering}
     \label{alg:poly:incr}
     \KwInput{$f \in (\mathbb{Z}/m_1\mathbb{Z})[x], k \in \mathbb{Z}, 
-    m_1, m_2 \in \mathbb{Z}$}
+    m_1,m_2\in\mathbb Z_{>0},\ k\geq0$}
     \KwOutput{$\tilde{f}^k \in (\mathbb{Z}/m_2\mathbb{Z})[x]$}
-    $p_1, p_2, i \gets \code{steps}()$\;
+    \KwNotation{$\tilde f$ uses canonical coefficient representatives modulo $m_1$;
+    NTTs are over $\mathbb F_q$ with zero-padding as specified below}
+    \If{$k=0$}{\Return $1$}
+    $p_1,p_2,i\gets\code{steps}(k,m_1,m_2,M,\text{support bounds},q)$\;
     $vec \gets \code{dense}(f)$\;
     $\widehat{vec} \gets \code{NTT}(vec)$\;
     \Comment{Compute NTT of $f^{p_1} ~\%~ m_2$ and 
@@ -100,7 +103,7 @@ one prime for the entire computation.
     $\widehat{vec} \gets \widehat{vec}^{p_2}$\;
     $vec \gets \code{INTT}(\widehat{vec})$\;
     $vec \gets vec ~\%~ m_2$\;
-    \Comment{Start multiplying to accumulator}
+    \Comment{Start multiplying the accumulator by the auxiliary polynomial}
     \For{$\_ \in \{1, ... , i\}$}{
         $\widehat{vec} \gets \code{NTT}(vec)$\;
         $\widehat{vec} \gets \widehat{vec} \times \widehat{aux}$\;
@@ -114,16 +117,26 @@ one prime for the entire computation.
 The $\code{steps}$ function determines what intermediate powers 
 are used in the computation, satisfying $k = i \cdot p_1 + p_2$.
 The exact semantics and use of the $\code{steps}$ function are 
-given in section \ref{subsec:poly:bounds}. The $\code{dense}$ and 
+given in Subsection \ref{subsec:poly:bounds}. The $\code{dense}$ and
 $\code{sparse}$ functions use the Kronecker substitution to map a 
 multivariate polynomial to a dense univariate one, as described 
-in the previous section.
+in the previous subsection.
 
 The initial $f^{p_1}$ and $f^{p_2}$ computations can be done with 
 a smaller NTT size, amortizing their cost compared to the large 
 NTTs that need to be performed in the loop. The NTT size within the 
 loop stays constant, because otherwise for each iteration we would 
 need to compute the NTT and INTT of $aux$.
+Use a fixed Kronecker base $M$ strictly exceeding every coordinate
+exponent in the final product. Choose an NTT prime $q$ and a primitive
+$L$-th root with $L\mid(q-1)$, and zero-pad so that $L$ exceeds the
+encoded degree of each product being computed. Every unreduced integer
+coefficient must be strictly less than $q$; inverse transforms then
+recover integer coefficients before reduction modulo $m_2$.
+When initial transforms use smaller lengths, zero-pad $aux$ to the
+final loop length and recompute its transform before the loop.
+The cached step parameters depend on $k$, the moduli, the Kronecker base,
+the input support bounds, and $q$.
 
 \subsubsection{Goldilocks}
 
@@ -165,7 +178,7 @@ terms, and all coefficients taking on their maximum values. Then, using
 an arbitrary precision computer algebra system like FLINT, 
 we raise $f'$ to higher and higher powers 
 until we reach a power where the largest resulting coefficient is 
-larger than Goldilocks. We can then take $p_1$ to be the previous 
+greater than or equal to Goldilocks. We can then take $p_1$ to be the previous
 power, and solve for $p_2$ as the remainder 
 \(k \text{ mod } p_{1}\).
 % of the division of 
@@ -180,12 +193,12 @@ For the intermediate multiplications, we can use the trivial
 bound that convolving two 
 $n$-length vectors with maximum coefficient $m$ results in a maximum 
 coefficient of $m^2n$. This comes from the fact that 
-multiplying two univariate $n-1$ degree polynomials with maximum 
+multiplying two univariate polynomials of degree $n-1$ with maximum
 coefficients $m$ results in the $m^2n$ upper bound on the resulting 
 coefficients. Because our largest 
 FFT length ends up being $2^{28}$ for the quasi-$F$-split height of a 
 K3 surface over $\mathbb{F}_{13}$ problem, and we are working mod $p^2$,
-this gives us the upper bound $2^{28} \cdot 12^2$, which is less than 
+this gives us the upper bound $2^{28}(13^2-1)^2=7{,}576{,}322{,}310{,}144$, which is less than
 Goldilocks.
 
 \subsection{Other algorithms} \label{sec:poly:other}
@@ -208,8 +221,8 @@ provided by CUDA.jl, it is a relatively expensive operation on the GPU.
 There is a sorting algorithm proposed in \cite{gupta-2023-gpu-sort}
 which claims to beat the state-of-the-art, but we were unable to reproduce the result.
 
-\code{RSQR} uses the binary expansion of \(k\) to find the power in less
-total multiplications than \code{RMUL}.
+\code{RSQR} uses the binary expansion of \(k\) to find the power in fewer
+multiplications than \code{RMUL}.
 \code{BINA} and \code{BINB} use binomial expansion to more efficiently 
 expand \(f^{k}\), using \code{RMUL} to merge at the end.
 They both perform better in the case that the problem is sparse.

@@ -6,7 +6,8 @@ on the point counts of any variety in positive characteristic:
 \begin{thm}
     [Lang-Weil, \cite{lang-weil-1954-estimate}]
 	Let \(X \ins \mathbb{P}^{n}\)
-	be an irreducible projective variety of dimension \(r\), and \(k \in \mathbb{N}\). 
+	be a geometrically irreducible projective variety over \(\mathbb F_p\)
+    of dimension \(r\), and \(k \in \mathbb{N}\).
 	Then 
 	\[
 		\#X(\mathbb{F}_{p^{k}}) = (p^{k})^r + O((p^{k})^{r - \frac{1}{2}})
@@ -22,7 +23,7 @@ for the number of points that appear.
 \begin{heur}
     \label{heur:lang:weil}
     Let \(X \ins \mathbb{P}^{n}\) 
-    be an irreducible projective variety of dimension \(r\).
+    be a geometrically irreducible projective variety over \(\mathbb F_p\) of dimension \(r\).
     Then \(\#X(\mathbb{F}_{p}) \approx p^{r}\).
 \end{heur}
 
@@ -34,7 +35,8 @@ says that if we pick a random point \(x\),
 we can expect \(x\) to lie in \(D\) 
 with probability about \(1 / p\).
 By \cite[Section~7]{artin-1974-k3-surfaces}, 
-the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
+the nested locus \(M_i=\{X:h(X)\geq i\}\), with \(M_1=M\),
+for \(2\leq i\leq11\)
 is cut out by a single section in 
 \(M_{i-1}\).
 If we apply both of these facts,
@@ -51,27 +53,32 @@ in the moduli space being in the locus
 Inductively, we see:
 
 \begin{heur}
-The probability of a randomly
-chosen surface having height \(h\) is about \(1 / p^{h}\).
+For a randomly chosen smooth quartic K3 surface, the stratification
+heuristic predicts
+\[
+ \Pr(H\geq h)\approx p^{-(h-1)},\qquad
+ \Pr(H=h)\approx\frac{p-1}{p^h}\quad(1\leq h\leq10).
+\]
+The remaining tail \(\Pr(H=\infty)\approx p^{-10}\) corresponds
+to the supersingular locus. These are heuristic probabilities, not
+measured frequencies.
 \end{heur}
 
-Thus, we may find a surface of height \(h\) by 
-randomly choosing quartic K3 surfaces, and 
-if we compute a few times \(p^{h}\) 
-samples, we can be confident that we'll find
-one with high probability.
-
-In practice, our methodology is to choose
-random quartic polynomials,
-by sampling a point in the vector space
-of homogeneous polynomials, which is isomorphic to
-\(\mathbb{F}_{p}^{35}\).
-To obtain the moduli space \(M\) of quartic K3 surfaces, 
-we must projectivize and take the quotient by the action of 
-\(\text{PGL}_{4}(\mathbb{F}_{p})\) which acts by changes of variables. 
-Thus, there may be two sources of deviation from the expected
-probability--the group quotient and the actual 
-error term in the estimate.
+Under this model, the expected number of independent smooth samples
+needed for an example of exact finite height \(h\) is \(p^h/(p-1)\).
+In practice we sample coefficient vectors in \(\mathbb F_p^{35}\).
+Geometrically, the nonzero quartic forms must be projectivized and
+restricted to the smooth open subset before considering the action of
+\(\mathrm{PGL}_4\). Rational coordinate-change orbits under
+\(\mathrm{PGL}_4(\mathbb F_p)\) do not by themselves construct the
+moduli space, and different automorphism groups can bias equation
+sampling relative to uniform sampling in moduli.
+For each displayed example, the independent checks in the manuscript
+source repository certify geometric smoothness by verifying that the
+Jacobian ideal contains all degree-9 monomials.
+The historical sampling logs and their treatment of singular inputs
+are not included in that repository; we therefore do not claim a
+validated empirical frequency distribution.
 
 \subsection{Computations}
 \label{subsec:computations}
@@ -89,7 +96,7 @@ for low heights, with more variance at higher heights.
 
 For \(p=5\), the algorithm throughput is about
 1400 surfaces per second on 
-Nvidia 2080Ti GPUs provided by the 
+NVIDIA 2080Ti GPUs provided by the
 UCSD research cluster, with 8 CPU threads running
 examples on the same GPU.
 Since much less time is taken for height \(1\) examples
@@ -123,7 +130,7 @@ library ToricControlledReduction
 function of the surface, from which the Newton polygon and thus the
 height can be deduced).
 Our algorithm beats ToricControlledReduction by about 1.5 orders of magnitude:
-on an Nvidia 3090 our method took 
+on an NVIDIA 3090 our method took
 around 0.94 seconds per surface (one CPU thread) in characteristic \(p = 11\), 
 while ToricControlledReduction took 
 about 43 seconds per surface.
