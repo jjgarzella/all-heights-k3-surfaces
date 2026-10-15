@@ -114,7 +114,7 @@ one prime for the entire computation.
 The $\code{steps}$ function determines what intermediate powers 
 are used in the computation, satisfying $k = i \cdot p_1 + p_2$.
 The exact semantics and use of the $\code{steps}$ function are 
-given in section \ref{subsec:poly:bounds}. The $\code{dense}$ and 
+given in Subsection \ref{subsec:poly:bounds}. The $\code{dense}$ and
 $\code{sparse}$ functions use the Kronecker substitution to map a 
 multivariate polynomial to a dense univariate one, as described 
 in the previous section.
@@ -180,7 +180,7 @@ For the intermediate multiplications, we can use the trivial
 bound that convolving two 
 $n$-length vectors with maximum coefficient $m$ results in a maximum 
 coefficient of $m^2n$. This comes from the fact that 
-multiplying two univariate $n-1$ degree polynomials with maximum 
+multiplying two univariate degree $n-1$ polynomials with maximum
 coefficients $m$ results in the $m^2n$ upper bound on the resulting 
 coefficients. Because our largest 
 FFT length ends up being $2^{28}$ for the quasi-$F$-split height of a 
