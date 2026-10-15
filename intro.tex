@@ -16,7 +16,7 @@ point counts of \(X\) over finite fields,
 i.e. \(\#X(\mathbb{F}_{q})\) for \(q = p^{r}, r \in \mathbb{N}\).
 One may construct another polygon, the \textit{Hodge polygon},
 from the Hodge-theoretic data associated to \(X\).
-For K3 surfaces (and in fact for any surfaces), 
+For K3 surfaces,
 the Newton polygon equals the Hodge polygon
 (i.e. the variety is ordinary) if and only if \(h=1\),
 and the Newton polygon is \textit{supersingular} if and only if 
@@ -25,7 +25,7 @@ and the Newton polygon is \textit{supersingular} if and only if
 Given a field \(k\) of characteristic \(p\), one may ask
 
 \begin{quest}
-    For which values \(h\) does there exist a variety
+    For which values \(h\) does there exist a K3 surface
     \(X\) such that \(h(X) = h\)?
 \end{quest}
 
@@ -44,11 +44,13 @@ that this holds over an algebraically
 closed field \(k\) of characteristic \(p\) in the
 case that \(p \equiv 3 \mathmod 4\).
 In \cite{taelman-2016-k3-given-l-function}, 
-Taelman shows that
-all possible \(h\) are realized
-over some sufficiently big finite field \(\mathbb{F}_{q}\). 
-By base change, this implies the result for extensions
-thereof (e.g. algebraically closed fields).
+Taelman gives a realization theorem, conditional on a potential
+semistable reduction hypothesis, which yields all possible finite heights
+over sufficiently large finite fields \(\mathbb F_q\).
+Under this hypothesis, base change gives the corresponding realizations
+over extensions, including algebraically closed fields.
+Supersingular examples of infinite height are provided separately
+in the explicit tables discussed below.
 However, Taelman's argument is not constructive,
 and there is no known bound on how big \(q\) must be to guarantee
 existence of surfaces of any height.
@@ -57,7 +59,7 @@ More concretely, it follows from the work of
 Kedlaya and Sutherland in 
 \cite{kedlaya-sutherland-2016-census-k3-f2}
 that there exist quartic K3 surfaces
-(i.e. quartic surfaces in \(\mathbb{P}^{3}\))
+(i.e. smooth quartic surfaces in \(\mathbb{P}^{3}\))
 of all possible heights over \(\mathbb{F}_{2}\).
 More recently,
 Kawakami, Takamatsu, and Yoshikawa in \cite{kty-2022-fedder}
@@ -134,13 +136,12 @@ following elementary computations.
         \end{enumerate}
         The coefficients in these steps must be over 
         \(\mathbb{Z} / p^{2} \mathbb{Z}\).
-    \item A loop, which is guaranteed to run \(h-1\) times, in which we must
+    \item A loop, which runs \(h-1\) times for finite height \(h\) within the chosen cutoff, in which we must
         \begin{enumerate}[(a)]
             \item Perform a large polynomial multiplication 
-                for which \(\Delta_{1}\) is one of the summands.
-            \item Apply an operation which we call ``splitting'', 
-                following the literature on the
-                quasi-\(F\)-split height.
+                for which \(\Delta_{1}\) is one of the factors.
+            \item Apply the Frobenius trace, which we call ``splitting''
+                in the name of the multiply-then-split operation.
                 This is an operation on polynomials which involves
                 discarding many terms and lowering the exponents of
                 the remaining terms.
@@ -189,7 +190,7 @@ Instead, we implement polynomial powering via Fast Fourier Transform (FFT) using
 Graphics Processing Unit (GPU) hardware,
 allowing us to run the computation in a massively parallel way.
 Our GPU implementation of (1) takes 0.017 seconds for \(p = 5\) and 0.16 seconds for \(p = 7\).
-In order to avoid the memory overhead of communication between the Central Processing Unit (CPU) and
+In order to avoid the data-transfer overhead between the Central Processing Unit (CPU) and
 the GPU, we also provide a GPU implementation for calculating the matrix
 of multiply then split. 
 We also use NVIDIA's cuBLAS library \cite{nvidia-2024-cublas} to

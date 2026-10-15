@@ -2,6 +2,9 @@
 
 % \subsection{The key idea: finding the matrix of the linear operator ``multiply then split''}
 
+Throughout this section, \(S=\mathbb F_p[x_1,\ldots,x_n]\),
+so the Frobenius trace and the matrix operations are \(\mathbb F_p\)-linear.
+
 An implementation of Algorithm \ref{alg:qfs:naive}
 is provided in MMPSingularities.jl.
 The bottleneck ends up being polynomial multiplication, 
@@ -21,11 +24,10 @@ We now explain how to overcome the second
 bottleneck. Since \(Z(f)\) is Calabi-Yau
 (i.e. \(\deg f = n\)), we have that \(f^{p-1}\) has degree
 \(n(p-1)\). 
-Furthermore, by Proposition \ref{prop:delta1:formula}
-the degree of \(\Delta_{1}(f^{p-1})\) 
-is \(np(p - 1)\).
-Thus, \(\Delta_{1}(f^{p-1})g\) has degree
-\(n(p^{2} - 1)\).
+Furthermore, by Proposition \ref{prop:delta1:formula},
+\(\Delta_{1}(f^{p-1})\) is homogeneous of degree \(np(p-1)\),
+possibly zero. Thus \(\Delta_{1}(f^{p-1})g\) lies in the homogeneous
+component of degree \(n(p^2-1)\), including when it is zero.
 The effect 
 of \(u\) on any polynomial is subtracting \(p-1\)
 from the exponents of the terms and dividing by \(p\) 
@@ -56,7 +58,7 @@ The algorithm for Fedder's criterion then becomes:
 \caption{Quasi-\(F\)-split height: matrix-based algorithm}
 \label{alg:qfs:matrix}
 \KwInput{
-	Chosen bound $b \in \mathbb{N}$, \\
+	Known upper bound $b\in\mathbb N$ on all finite heights of the admissible inputs, \\
 	~~~~~~~~~~~~~Homogeneous polynomial $f \in S$ of degree $n$
 }
 \KwOutput{$h(f)$}
@@ -88,7 +90,7 @@ To find the matrix of ``multiply then split''
 in the Algorithm for the quasi-\(F\)-split height
 of a Calabi-Yau hypersurface, 
 we must first multiply all possible 
-monomials by \(\Delta_{1}(f)\) 
+monomials by \(\Delta_{1}(f^{p-1})\)
 and then apply the map \(u\).
 Here, we consider a slightly more general problem.
 As usual, let \(S = k[x_{1}, \ldots, x_{n}]\).
@@ -104,7 +106,7 @@ The target of this map is
 \(S_{d^{\prime}}\), where
 % \(d^{\prime} \colonequals \frac{d+D-n-1}{p}\).
 \(d^{\prime} \colonequals \tfrac{d+D-n(p-1)}{p}\).
-By convention, if \(d^{\prime}\) is not an integer,
+By convention, if \(d^{\prime}\) is negative or not an integer,
 we declare \(S_{d^{\prime}}\) to be zero.
 Note that in this case there are
 no terms which survive \(u\), so
@@ -141,6 +143,7 @@ all of these unnecessary terms.
     nonnegative integers
 	\((d_{1}, \ldots, d_{n})\) such that 
     \(d_{1} + \ldots + d_{n} = k\).
+    We set \(\wics(k,n)=\varnothing\) for negative or nonintegral \(k\).
 \end{defn}
 
 \begin{ex}
@@ -151,11 +154,11 @@ Thus, $\wics(d, n)$ generates the exponent tuples of the
 monomial basis of the vector space of \\
 $d$-homogeneous 
 $n$-variate polynomials over a field $F$.
-It follows that the dimension of the vector space is $|\wics(k, n)|$.
+It follows that the dimension of the vector space is $|\wics(d, n)|$.
 
 \begin{lem}
     \label{lem:wics:size}
-    $|\wics(k, n)| = \binom{k + n - 1}{n - 1}$
+    $|\wics(k, n)| = \binom{k + n - 1}{n - 1}$ for $k\in\mathbb Z_{\geq0}$ and $n\geq1$.
 \end{lem}
 
 \begin{proof}
@@ -222,10 +225,12 @@ get the lexicographical index of the result to find which
 row to add to.
 
 In this algorithm, the matrix can be generated in 
-$O(\ell_{d}\ell_{\Delta})$ operations. 
+$O(\ell_{d^\prime}\ell_d+\ell_d\ell_{\Delta})$ operations.
 This can be
 seen from the nested loops, assuming that integer 
-arithmetic operations are constant time.
+arithmetic operations and expected hash lookups are constant time,
+with $n$ fixed; initializing the dense output matrix costs
+$\Theta(\ell_{d^\prime}\ell_d)$.
 
 In practice, the majority of the combinations of 
 terms of $\Delta$ and $B_{d}$ don't match. This means in
@@ -354,7 +359,7 @@ fast enough to not be a bottleneck in practice.
 
 Essentially, this corollary says that
 when we consider the exponent tuple mod $p$ of 
-an arbitrary monomial of \(B\),
+an arbitrary monomial of \(B_d\),
 it has a unique
 match mod \(p\).
 
@@ -363,7 +368,7 @@ match mod \(p\).
     The set of exponent tuples of \(B_{d}\) that match with $\delta$ is given by 
     \[
         \left\{ m(\exps(\delta) \mathmod p) + p\cdot w ~\Big|~ w \in \wics 
-        \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \right\}
+        \left(\frac{d - \operatorname{sum}(m(\exps(\delta) \mathmod p))}{p}, n \right) \right\}
     \]
     where $\operatorname{sum}(X)$ is the sum of the elements of tuple $X$, and $m$ is the matching function from Corollary \ref{cor:unique:match}.
 \end{lem}
@@ -416,16 +421,17 @@ Because we need it later for our complexity computations, we have the corollary:
 
 \begin{proof}
     By Lemma \ref{lem:generate:matching}, there are 
-    $\Big |\wics \left(\frac{d - sum(m(\exps(\delta) \mathmod p))}{p}, n \right) \Big |$ 
+    $\Big |\wics \left(\frac{d - \operatorname{sum}(m(\exps(\delta) \mathmod p))}{p}, n \right) \Big |$
     monomials that match with $\delta$.
-    Because the division is exact, 
-    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - sum(m(\exps(\delta) \mathmod p))}{p}$,
+    If the composition argument is negative or nonintegral, there are no matches.
+    Otherwise the division is exact and
+    $\lfloor \frac{d}{p} \rfloor \geq \frac{d - \operatorname{sum}(m(\exps(\delta) \mathmod p))}{p}$,
     giving the upper bound 
     $|\wics(\lfloor \frac{d}{p} \rfloor, n)| = \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$.
 \end{proof}
 
 Denoting the expression from Lemma \ref{lem:generate:matching} 
-by \code{generateMatchingMonomials}$(\delta, p, M_d)$, we have
+by \code{generateMatchingMonomials}$(\delta, p, B_d)$, we have
 the following algorithm, which we call \wicsalg:
 
 \begin{algorithm}[H]
@@ -451,11 +457,12 @@ the following algorithm, which we call \wicsalg:
 
 This algorithm 
 generates the matrix in 
-$O \left( \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1} \right)$ operations.
+$O \left( \ell_{d^\prime}\ell_d + \ell_{\Delta} \cdot \binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1} \right)$ operations.
 The number of matching monomials each term $\delta$ 
 has is bounded above by $\binom{\lfloor \frac{d}{p} \rfloor + n - 1}{n - 1}$ 
 by Corollary \ref{cor:num:matches}, which is 
-effectively constant for all reasonably computable $n$ and $p$.
+bounded independently of $p$ for fixed $n$ in the Calabi-Yau
+specialization $d=n(p-1)$, but not in the unrestricted problem.
 
 \subsection{Implementation}
 
@@ -464,19 +471,20 @@ few optimizations and considerations common to all the implementations.
 First, all exponent tuples are bitpacked into 
 unsigned integers, improving memory efficiency 
 and allowing for faster comparisons.
-Note that a comparison between two unsigned integers 
-is the same as a lexicographical comparison between the tuples.
-Broadcasted addition and subtraction on bitpacked 
-$n$-tuples reduces to addition and subtraction of 
-integers, though broadcasted division and modulo still 
-require $n$ separate operations.
+Place the first coordinate in the most significant field so that unsigned
+comparison agrees with lexicographic comparison. For a field width $w$,
+require every intermediate exponent and coordinate sum to be less than
+$2^w$, and perform subtraction only when every coordinate difference
+is nonnegative. Under these no-carry and no-borrow conditions,
+broadcasted addition and subtraction reduce to integer operations;
+broadcasted division and modulo still require $n$ separate operations.
 
 All algorithms require the \code{indexof}$()$ function, 
 which we implement using Julia's \texttt{Dict\{K,V\}}, 
 which is implemented as a hash table.
 
 \triv ~and \wicsalg ~are easily GPU-parallelizable by creating 
-a thread for each term of $\Delta$, and performing the insides of the loop in each thread.
+a thread for each term of $\Delta$, and executing the loop body in each thread.
 This creates the problem of needing an \code{indexof}$()$ function, 
 since Julia's \texttt{Dict\{K,V\}} is not compatible with the GPU.
 The solution we implement is a static hash table, with size 
@@ -506,7 +514,6 @@ it to finish in a reasonable
 amount of time.
 
 \begin{figure}[ht]
-\label{fig:momts:compare}
 \begin{center}
 \begin{tabular}{c c c c c c}
     \toprule
@@ -529,6 +536,7 @@ amount of time.
 the matrix of ``multiply then split''. 
 Times are in seconds
 and are an average of 10 different trials.}
+\label{fig:momts:compare}
 \end{center}
 \end{figure}
 
