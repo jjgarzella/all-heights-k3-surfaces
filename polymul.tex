@@ -5,7 +5,7 @@ bottleneck. We first explain our implementation
 of polynomial powering using the Number Theoretic 
 Transform (NTT), then explore other known polynomial 
 powering algorithms and their ability to be sped up 
-through parallel execution.
+through mass parallelization.
 
 \subsection{NTT}
 
@@ -117,7 +117,7 @@ The exact semantics and use of the $\code{steps}$ function are
 given in Subsection \ref{subsec:poly:bounds}. The $\code{dense}$ and
 $\code{sparse}$ functions use the Kronecker substitution to map a 
 multivariate polynomial to a dense univariate one, as described 
-in the previous subsection.
+in the previous section.
 
 The initial $f^{p_1}$ and $f^{p_2}$ computations can be done with 
 a smaller NTT size, amortizing their cost compared to the large 
@@ -180,7 +180,7 @@ For the intermediate multiplications, we can use the trivial
 bound that convolving two 
 $n$-length vectors with maximum coefficient $m$ results in a maximum 
 coefficient of $m^2n$. This comes from the fact that 
-multiplying two univariate polynomials of degree $n-1$ with maximum
+multiplying two univariate degree $n-1$ polynomials with maximum
 coefficients $m$ results in the $m^2n$ upper bound on the resulting 
 coefficients. Because our largest 
 FFT length ends up being $2^{28}$ for the quasi-$F$-split height of a 
@@ -208,8 +208,8 @@ provided by CUDA.jl, it is a relatively expensive operation on the GPU.
 There is a sorting algorithm proposed in \cite{gupta-2023-gpu-sort}
 which claims to beat the state-of-the-art, but we were unable to reproduce the result.
 
-\code{RSQR} uses the binary expansion of \(k\) to find the power in fewer
-multiplications than \code{RMUL}.
+\code{RSQR} uses the binary expansion of \(k\) to find the power in less
+total multiplications than \code{RMUL}.
 \code{BINA} and \code{BINB} use binomial expansion to more efficiently 
 expand \(f^{k}\), using \code{RMUL} to merge at the end.
 They both perform better in the case that the problem is sparse.
