@@ -114,7 +114,7 @@ we produce examples of heights \(1 \leq h \leq 6\) and
 
 \subsection{On computational bottlenecks}
 
-We briefly overview the computational obstacles to fast computation
+We briefly describe the computational obstacles to fast computation
 of \(h\).
 As seen in Section \ref{sec:preliminaries},
 the algorithm presented in \cite{kty-2022-fedder} boils down to the 
@@ -192,7 +192,7 @@ Our GPU implementation of (1) takes 0.017 seconds for \(p = 5\) and 0.16 seconds
 In order to avoid the memory overhead of communication between the Central Processing Unit (CPU) and
 the GPU, we also provide a GPU implementation for calculating the matrix
 of multiply then split. 
-We also use Nvidia's CUBLAS library \cite{nvidia-2024-cublas} to
+We also use NVIDIA's cuBLAS library \cite{nvidia-2024-cublas} to
 do the matrix-vector multiplication.
 For $p=5$ and $p=7$, calculating the matrix of multiply then split consistently takes around 0.0001
 seconds, and each matrix-vector product takes around 0.0002 seconds.
@@ -283,14 +283,14 @@ In Section 4, we describe our GPU-based polynomial
 powering algorithm, which utilizes incremental FFT-based multiplication using  
 the Goldilocks prime.
 In Section 5, we describe the considerations we need to keep in mind
-to use CUBLAS.
+to use cuBLAS.
 In Section 6, we describe the computation of surfaces of all possible
 heights over \(\mathbb{F}_{5}\) and \(\mathbb{F}_{7}\).
 
 Throughout the paper, we do various timing experiments to compare 
 approaches for each computational step.
 All timing tests were performed with 
-an Intel i5-8400 CPU and a Nvidia GeForce RTX 3070 GPU
+an Intel i5-8400 CPU and a NVIDIA GeForce RTX 3070 GPU
 unless otherwise specified.
 
 \subsection{Future Work}
