@@ -181,8 +181,8 @@ This essentially eliminates (2) as a bottleneck.
 In our implementation of this version, step (2) takes
 0.0005 seconds per iteration for \(p = 5\) and 0.005 seconds per iteration for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
-takes 0.037 seconds for \(p=5\) and 
-0.343 seconds for \(p = 7\).
+takes 0.028 seconds for \(p=5\) and
+0.277 seconds for \(p=7\) using WICS, as in Figure \ref{fig:momts:compare}.
 
 To address the bottleneck of (1),
 we have no clever trick. 
@@ -195,15 +195,16 @@ the GPU, we also provide a GPU implementation for calculating the matrix
 of multiply then split. 
 We also use NVIDIA's cuBLAS library \cite{nvidia-2024-cublas} to
 do the matrix-vector multiplication.
-For $p=5$ and $p=7$, calculating the matrix of multiply then split consistently takes around 0.0001
-seconds, and each matrix-vector product takes around 0.0002 seconds.
+For $p=5$ and $p=7$, the GPU WICS matrix-construction times in
+Figure \ref{fig:momts:compare} are 0.0024 and 0.025 seconds, respectively.
+Each matrix-vector product takes around 0.0002 seconds.
 Thus, the algorithm is still bottlenecked by (1).
 % We emphasize that these are only necessary because of the communication overhead, and that matrix-vector
 % multiplication on the CPU is already fast enough to overcome bottleneck (2).
 
 In our tests, we were able to achieve a high throughput of examples,
-about 1400 surfaces per second over \(\mathbb{F}_{5}\) and
-about 180 surfaces per second over \(\mathbb{F}_{7}\).
+about 1400 inputs per second over \(\mathbb{F}_{5}\) and
+about 185 inputs per second over \(\mathbb{F}_{7}\).
 This is roughly three orders of magnitude better than the state of the art
 (see Section \ref{subsec:computations}).
 Our implementations can also compute the height \(h\) for examples
@@ -227,6 +228,26 @@ implements matrix multiplication utilities;
 GPUPolynomials.jl (version 0.1.1) contains implementations of polynomial multiplication
 \cite{gpupolynomials-jl};
 finally, CudaNTTs.jl contains GPU-accelerated implementations of NTT (version 1.2.0) \cite{cudantts-jl}.
+
+\subsection{Code and data availability}
+The source repositories are
+\href{https://github.com/jjgarzella/MMPSingularities.jl}{MMPSingularities.jl},
+\href{https://github.com/UCSD-computational-number-theory/GPUFiniteFieldMatrices.jl}{GPUFiniteFieldMatrices.jl},
+\href{https://github.com/alexp616/GPUPolynomials.jl}{GPUPolynomials.jl}, and
+\href{https://github.com/alexp616/CudaNTTs.jl}{CudaNTTs.jl};
+the package versions described here are listed above.
+The \href{https://github.com/jjgarzella/all-heights-k3-surfaces/tree/astra-review}{manuscript source repository (astra-review branch)}
+contains the defining polynomials in \texttt{heights.tex} and independent
+validation scripts requiring Python 3 and NumPy and recorded results in \texttt{review\_checks/}.
+From its root, run \texttt{python3 review\_checks/check\_examples.py}
+for all displayed examples' smoothness and height-1 tests, and
+\texttt{python3 review\_checks/check\_heights.py 5 7} for their full
+height recurrences over \(\mathbb F_5\) and \(\mathbb F_7\).
+Higher heights over \(\mathbb F_{11}\) and \(\mathbb F_{13}\) are not
+independently recomputed by these checks.
+The original raw timing trials, random-sampling logs, and a complete
+benchmark environment are not included in this repository; the
+validation timings are not substitutes for controlled benchmarks.
 
 % One possibility to further speed up the the computation
 % would be to compute the matrix of multiply then split
