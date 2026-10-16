@@ -21,6 +21,7 @@ $o' \cdot (N^2 - 2N + 1) = o^{\prime} \cdot (N-1)^{2} $ is larger than the integ
 \begin{align*}
     o = \left\lfloor \frac{\ell}{(N^2 - 2N + 1)} \right\rfloor - 1
 \end{align*}
+
 For NVIDIA GPUs, we wish to use the Float32 type, for the primes
 \(p \in \{3,5,7,11,13\}\).
 Respectively, for each of these values we have
@@ -55,10 +56,9 @@ Fedder type criterion calculations.
 
 To illustrate the performance difference between CPU and GPU, we timed
 matrix-matrix multiplication of various sizes on the CPU and GPU (an RTX 3060) in
-characteristic 11 (Figure \ref{fig:matmul:compare}).
-The first CPU column uses FLINT (via \texttt{nmod\_matrix}) with one
-BLAS thread; the second uses Julia default multiplication with three
-BLAS threads.
+characteristic 11 (Figure~\ref{fig:matmul:compare}).
+Note that our CPU BLAS tests are called via the default matrix multiplication from Julia and FLINT
+(via \texttt{nmod\_matrix}), respectively.
 
 \begin{figure}[h]
 \begin{center}
