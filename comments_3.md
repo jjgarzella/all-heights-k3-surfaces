@@ -17,12 +17,14 @@ Responses to reviewer comments
     * Issue 17: corrected the height-stratification inequality.
     * Issue 18: changed the height-frequency exponent from h to h - 1.
     * Issue 19: specified geometric irreducibility in the Lang-Weil theorem.
-    * Issue 20: replaced 12^2 with (13^2 - 1) in the NTT coefficient bound.
+    * Issue 20: corrected the NTT coefficient bound to use (13^2 - 1)^2.
+    * F7 examples: replaced the incorrect height-7 equation with its validated smooth height-7 example and moved the former height-7 equation to height 9.
     * Issue 23: corrected the matching tuple to (8, 5, 2, 1).
     * Issue 24: changed the K3 term-count equality to an upper bound.
     * Issue 26: added Ito's unconditional result for finite heights in characteristic p >= 5.
     * Issue 27: corrected the cited complexity from O(p^(1/2)) to O(p).
-    * Issue 35: changed the p = 7 throughput from 185 to 180 surfaces per second. The remaining wait-time arithmetic mismatch is recorded in the review disposition report.
+    * Issue 35: changed the p = 7 throughput from 185 to 180 surfaces per second and corrected the height-10 wait estimate to 224,187 seconds (about 62 compute hours).
+    * Intro timing: clarified that step (2) timings are from the GPU-based implementation.
 
 * typos
     * Issue 5: replaced the incorrect p-adic digit explanation with the approved Teichmuller and constant lift description.

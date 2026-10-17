@@ -104,8 +104,8 @@ For \(p=7\), the throughput is about 180 surfaces
 per second, also with 8 CPU cores calling the same GPU.
 Thus, the expected time to compute
 a height = \(10\) example is 
-\(7^{9} / 180 \approx \) 218,127 seconds, or about 
-60 compute hours.
+\(7^{9} / 180 \approx \) 224,187 seconds, or about
+62 compute hours.
 The actual times to find the examples were much 
 longer than this, because the authors were using a 
 less-optimized NTT and had not yet discovered $\wicsalg$
@@ -221,7 +221,11 @@ ToricControlledReduction would eventually beat it.
 			 
 			 6 & \(2x_1^3x_2 + 2x_1^3x_3 + 4x_1^3x_4 + 5x_1^2x_2^2 + 5x_1^2x_2x_3 + 4x_1^2x_2x_4 + 4x_1^2x_3^2 + x_1^2x_3x_4 + 2x_1^2x_4^2 + 2x_1x_2^3 + 4x_1x_2^2x_3 + x_1x_2x_3^2 + x_1x_2x_3x_4 + x_1x_2x_4^2 + 3x_1x_3^3 + 2x_1x_3^2x_4 + x_1x_4^3 + 5x_2^4 + 5x_2^3x_3 + 3x_2^3x_4 + 5x_2^2x_3x_4 + 5x_2x_3^3 + 6x_2x_3^2x_4 + 5x_2x_3x_4^2 + 3x_3^4 + 6x_3^3x_4 + x_3^2x_4^2 + 2x_3x_4^3\) \\
 			 
-			 7 & \(2x_1^4 + 3x_1^3x_2 + 4x_1^3x_3 + 4x_1^3x_4 + 6x_1^2x_2^2 + 2x_1^2x_2x_3 + x_1^2x_2x_4 + 6x_1^2x_3^2 + 4x_1^2x_3x_4 + x_1^2x_4^2 + 5x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 3x_1x_2x_3^2 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 5x_1x_3^2x_4 + 2x_1x_3x_4^2 + x_1x_4^3 + 5x_2^4 + 4x_2^3x_3 + x_2^3x_4 + 5x_2^2x_3^2 + x_2^2x_3x_4 + 4x_2x_3^3 + x_2x_3x_4^2 + 2x_2x_4^3 + 5x_3^4 + x_3^3x_4 + 2x_3^2x_4^2 + 4x_3x_4^3 + 4x_4^4\) \\
+			 7 & \(2x_1^3x_2 + 2x_1^3x_3 + 2x_1^3x_4 + x_1^2x_2^2 + 2x_1^2x_2x_3 + 3x_1^2x_2x_4 +
+             5x_1^2x_3^2 + 6x_1^2x_3x_4 + x_1^2x_4^2 + 2x_1x_2^3 + 5x_1x_2^2x_3 + x_1x_2x_3^2 +
+             2x_1x_2x_3x_4 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 6x_1x_3^2x_4 + 5x_1x_3x_4^2 + 2x_1x_4^3 +
+             2x_2^3x_3 + 3x_2^3x_4 + 4x_2^2x_3^2 + 3x_2^2x_4^2 + 3x_2x_3^3 + x_2x_3^2x_4 +
+             5x_2x_3x_4^2 + 5x_2x_4^3 + 5x_3^3x_4 + x_3^2x_4^2 + 6x_3x_4^3 + 6x_4^4\) \\
 			 
 			 8 & \(2x_1^3x_2 + 2x_1^3x_4 + 4x_1^2x_2^2 + 6x_1^2x_2x_3 + 5x_1^2x_2x_4 + 4x_1^2x_3^2 +
              3x_1^2x_3x_4 + 3x_1^2x_4^2 + 4x_1x_2^3 + x_1x_2^2x_3 + x_1x_2^2x_4 + 4x_1x_2x_3^2 +
@@ -229,11 +233,7 @@ ToricControlledReduction would eventually beat it.
              5x_2^3x_3 + 5x_2^3x_4 + 6x_2^2x_3x_4 + 6x_2^2x_4^2 + 4x_2x_3^2x_4 + 3x_2x_3x_4^2 +
              2x_2x_4^3 + 6x_3^3x_4 + 6x_3^2x_4^2 + 4x_3x_4^3\) \\
 			 
-			 9 & \(2x_1^3x_2 + x_1^3x_3 + 6x_1^3x_4 + 6x_1^2x_2^2 + 4x_1^2x_2x_3 + 2x_1^2x_2x_4 +
-             3x_1^2x_3x_4 + x_1^2x_4^2 + x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 6x_1x_2x_3^2 +
-             6x_1x_2x_3x_4 + 6x_1x_2x_4^2 + 2x_1x_3^3 + 4x_1x_3x_4^2 + 6x_1x_4^3 + 6x_2^3x_3 +
-             4x_2^3x_4 + 3x_2^2x_3^2 + 4x_2x_3^3 + 5x_2x_3^2x_4 + 4x_2x_3x_4^2 + 5x_2x_4^3 +
-             3x_3^3x_4 + 4x_3^2x_4^2 + 2x_3x_4^3 + 3x_4^4\) \\
+			 9 & \(2x_1^4 + 3x_1^3x_2 + 4x_1^3x_3 + 4x_1^3x_4 + 6x_1^2x_2^2 + 2x_1^2x_2x_3 + x_1^2x_2x_4 + 6x_1^2x_3^2 + 4x_1^2x_3x_4 + x_1^2x_4^2 + 5x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 3x_1x_2x_3^2 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 5x_1x_3^2x_4 + 2x_1x_3x_4^2 + x_1x_4^3 + 5x_2^4 + 4x_2^3x_3 + x_2^3x_4 + 5x_2^2x_3^2 + x_2^2x_3x_4 + 4x_2x_3^3 + x_2x_3x_4^2 + 2x_2x_4^3 + 5x_3^4 + x_3^3x_4 + 2x_3^2x_4^2 + 4x_3x_4^3 + 4x_4^4\) \\
 			 
 			 10 & \( 3x_1^4 + 2x_1^3x_2 + x_1^3x_3 + x_1^3x_4 + 4x_1^2x_2x_3 + 2x_1^2x_2x_4 +
              5x_1^2x_3x_4 + 6x_1^2x_4^2 + x_1x_2^3 + 2x_1x_2^2x_4 + 5x_1x_2x_3^2 + 3x_1x_2x_3x_4 +

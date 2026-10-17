@@ -178,7 +178,7 @@ underlying BLAS library.
 We provide algorithms for calculating the matrix of multiply
 then split in Section \ref{sec:alg:momts}.
 This essentially eliminates (2) as a bottleneck.
-In our implementation of this version, step (2) takes
+In our GPU-based implementation of this version, step (2) takes
 0.0005 seconds per iteration for \(p = 5\) and 0.005 seconds per iteration for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
 takes 0.037 seconds for \(p=5\) and 
