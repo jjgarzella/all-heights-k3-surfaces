@@ -16,7 +16,7 @@ Responses to reviewer comments
     * Issue 15: changed the worked-example product degree from 24 to 32 and removed the sentence and footnote about exponents divisible by four.
     * Issue 16: corrected the cyclotomic extension degree to phi(q - 1).
     * Issue 17: corrected the height-stratification inequality.
-    * Issue 18: changed the height-frequency exponent from h to h - 1.
+    * Issue 18: changed the height-frequency exponent from h to h - 1 in the heuristic and the reported F5/F7 probabilities.
     * Issue 19: specified geometric irreducibility in the Lang-Weil theorem.
     * Issue 20: corrected the NTT coefficient bound to use (13^2 - 1)^2.
     * F7 examples: replaced the incorrect height-7 equation with its validated smooth height-7 example and moved the former height-7 equation to height 9.
