@@ -6,7 +6,7 @@ on the point counts of any variety in positive characteristic:
 \begin{thm}
     [Lang-Weil, \cite{lang-weil-1954-estimate}]
 	Let \(X \ins \mathbb{P}^{n}\)
-	be an irreducible projective variety of dimension \(r\), and \(k \in \mathbb{N}\). 
+	be a geometrically irreducible projective variety of dimension \(r\), and \(k \in \mathbb{N}\).
 	Then 
 	\[
 		\#X(\mathbb{F}_{p^{k}}) = (p^{k})^r + O((p^{k})^{r - \frac{1}{2}})
@@ -34,7 +34,7 @@ says that if we pick a random point \(x\),
 we can expect \(x\) to lie in \(D\) 
 with probability about \(1 / p\).
 By \cite[Section~7]{artin-1974-k3-surfaces}, 
-the locus \(M_{i}\) of height \(i\) such that \(h \leq i\)
+the locus \(M_{i}\) of height \(i\) such that \(h \geq i\)
 is cut out by a single section in 
 \(M_{i-1}\).
 If we apply both of these facts,
@@ -52,7 +52,7 @@ Inductively, we see:
 
 \begin{heur}
 The probability of a randomly
-chosen surface having height \(h\) is about \(1 / p^{h}\).
+chosen surface having height \(h\) is about \(1 / p^{h-1}\).
 \end{heur}
 
 Thus, we may find a surface of height \(h\) by 
@@ -77,14 +77,14 @@ error term in the estimate.
 \label{subsec:computations}
 Over \(\mathbb{F}_{5}\), we 
 found that the probability of finding a K3 surface
-of height \(h\) was about \(1 / 5^{h}\), to three digits
+of height \(h\) was about \(1 / 5^{h-1}\), to three digits
 of precision, for all heights \(h \leq 6\).
 For higher heights we had fewer samples
 and more variance, although
 the probabilities seem to be less than expected
 for higher heights.
 Similarly, over \(\mathbb{F}_{7}\) we found that
-the probabilities very closely matched \(1 / 7^{h}\) 
+the probabilities very closely matched \(1 / 7^{h-1}\)
 for low heights, with more variance at higher heights.
 
 For \(p=5\), the algorithm throughput is about
@@ -100,12 +100,12 @@ Thus,
 the expected compute time necessary to find a height = \(10\) 
 example is about  \(5^{9} / 1400 \approx 1395\) seconds, or about 
 23 minutes.
-For \(p=7\), the throughput is about 185 surfaces
+For \(p=7\), the throughput is about 180 surfaces
 per second, also with 8 CPU cores calling the same GPU.
 Thus, the expected time to compute
 a height = \(10\) example is 
-\(7^{9} / 180 \approx \) 218,127 seconds, or about 
-60 compute hours.
+\(7^{9} / 180 \approx \) 224,187 seconds, or about
+62 compute hours.
 The actual times to find the examples were much 
 longer than this, because the authors were using a 
 less-optimized NTT and had not yet discovered $\wicsalg$
@@ -130,7 +130,7 @@ about 43 seconds per surface.
 For \(p = 13\), our 
 code took 4.5 seconds per surface, while ToricControlledReduction
 again took about 43 seconds per surface.
-Since ToricControlledReduction has complexity \(O(p^{1 / 2})\) as \(p\) 
+Since ToricControlledReduction has complexity \(O(p)\) as \(p\)
 grows, we expect that if we implemented our algorithms for larger primes,
 ToricControlledReduction would eventually beat it.
 
@@ -221,7 +221,11 @@ ToricControlledReduction would eventually beat it.
 			 
 			 6 & \(2x_1^3x_2 + 2x_1^3x_3 + 4x_1^3x_4 + 5x_1^2x_2^2 + 5x_1^2x_2x_3 + 4x_1^2x_2x_4 + 4x_1^2x_3^2 + x_1^2x_3x_4 + 2x_1^2x_4^2 + 2x_1x_2^3 + 4x_1x_2^2x_3 + x_1x_2x_3^2 + x_1x_2x_3x_4 + x_1x_2x_4^2 + 3x_1x_3^3 + 2x_1x_3^2x_4 + x_1x_4^3 + 5x_2^4 + 5x_2^3x_3 + 3x_2^3x_4 + 5x_2^2x_3x_4 + 5x_2x_3^3 + 6x_2x_3^2x_4 + 5x_2x_3x_4^2 + 3x_3^4 + 6x_3^3x_4 + x_3^2x_4^2 + 2x_3x_4^3\) \\
 			 
-			 7 & \(2x_1^4 + 3x_1^3x_2 + 4x_1^3x_3 + 4x_1^3x_4 + 6x_1^2x_2^2 + 2x_1^2x_2x_3 + x_1^2x_2x_4 + 6x_1^2x_3^2 + 4x_1^2x_3x_4 + x_1^2x_4^2 + 5x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 3x_1x_2x_3^2 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 5x_1x_3^2x_4 + 2x_1x_3x_4^2 + x_1x_4^3 + 5x_2^4 + 4x_2^3x_3 + x_2^3x_4 + 5x_2^2x_3^2 + x_2^2x_3x_4 + 4x_2x_3^3 + x_2x_3x_4^2 + 2x_2x_4^3 + 5x_3^4 + x_3^3x_4 + 2x_3^2x_4^2 + 4x_3x_4^3 + 4x_4^4\) \\
+			 7 & \(2x_1^3x_2 + 2x_1^3x_3 + 2x_1^3x_4 + x_1^2x_2^2 + 2x_1^2x_2x_3 + 3x_1^2x_2x_4 +
+             5x_1^2x_3^2 + 6x_1^2x_3x_4 + x_1^2x_4^2 + 2x_1x_2^3 + 5x_1x_2^2x_3 + x_1x_2x_3^2 +
+             2x_1x_2x_3x_4 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 6x_1x_3^2x_4 + 5x_1x_3x_4^2 + 2x_1x_4^3 +
+             2x_2^3x_3 + 3x_2^3x_4 + 4x_2^2x_3^2 + 3x_2^2x_4^2 + 3x_2x_3^3 + x_2x_3^2x_4 +
+             5x_2x_3x_4^2 + 5x_2x_4^3 + 5x_3^3x_4 + x_3^2x_4^2 + 6x_3x_4^3 + 6x_4^4\) \\
 			 
 			 8 & \(2x_1^3x_2 + 2x_1^3x_4 + 4x_1^2x_2^2 + 6x_1^2x_2x_3 + 5x_1^2x_2x_4 + 4x_1^2x_3^2 +
              3x_1^2x_3x_4 + 3x_1^2x_4^2 + 4x_1x_2^3 + x_1x_2^2x_3 + x_1x_2^2x_4 + 4x_1x_2x_3^2 +
@@ -229,11 +233,7 @@ ToricControlledReduction would eventually beat it.
              5x_2^3x_3 + 5x_2^3x_4 + 6x_2^2x_3x_4 + 6x_2^2x_4^2 + 4x_2x_3^2x_4 + 3x_2x_3x_4^2 +
              2x_2x_4^3 + 6x_3^3x_4 + 6x_3^2x_4^2 + 4x_3x_4^3\) \\
 			 
-			 9 & \(2x_1^3x_2 + x_1^3x_3 + 6x_1^3x_4 + 6x_1^2x_2^2 + 4x_1^2x_2x_3 + 2x_1^2x_2x_4 +
-             3x_1^2x_3x_4 + x_1^2x_4^2 + x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 6x_1x_2x_3^2 +
-             6x_1x_2x_3x_4 + 6x_1x_2x_4^2 + 2x_1x_3^3 + 4x_1x_3x_4^2 + 6x_1x_4^3 + 6x_2^3x_3 +
-             4x_2^3x_4 + 3x_2^2x_3^2 + 4x_2x_3^3 + 5x_2x_3^2x_4 + 4x_2x_3x_4^2 + 5x_2x_4^3 +
-             3x_3^3x_4 + 4x_3^2x_4^2 + 2x_3x_4^3 + 3x_4^4\) \\
+			 9 & \(2x_1^4 + 3x_1^3x_2 + 4x_1^3x_3 + 4x_1^3x_4 + 6x_1^2x_2^2 + 2x_1^2x_2x_3 + x_1^2x_2x_4 + 6x_1^2x_3^2 + 4x_1^2x_3x_4 + x_1^2x_4^2 + 5x_1x_2^3 + x_1x_2^2x_3 + 6x_1x_2^2x_4 + 3x_1x_2x_3^2 + 6x_1x_2x_4^2 + 4x_1x_3^3 + 5x_1x_3^2x_4 + 2x_1x_3x_4^2 + x_1x_4^3 + 5x_2^4 + 4x_2^3x_3 + x_2^3x_4 + 5x_2^2x_3^2 + x_2^2x_3x_4 + 4x_2x_3^3 + x_2x_3x_4^2 + 2x_2x_4^3 + 5x_3^4 + x_3^3x_4 + 2x_3^2x_4^2 + 4x_3x_4^3 + 4x_4^4\) \\
 			 
 			 10 & \( 3x_1^4 + 2x_1^3x_2 + x_1^3x_3 + x_1^3x_4 + 4x_1^2x_2x_3 + 2x_1^2x_2x_4 +
              5x_1^2x_3x_4 + 6x_1^2x_4^2 + x_1x_2^3 + 2x_1x_2^2x_4 + 5x_1x_2x_3^2 + 3x_1x_2x_3x_4 +

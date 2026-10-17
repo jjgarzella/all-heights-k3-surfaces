@@ -1,4 +1,6 @@
-Given an algebraic variety \(X\) over a field of characteristic \(p\),
+Given an algebraic variety \(X\) of dimension \(n\) over a field of characteristic \(p\)
+subject to the conditions \(h^n(X,\mathcal{O}_X)=1\) and
+\(h^{n-1}(X,\mathcal{O}_X)=0\),
 Artin and Mazur in \cite{artin-mazur-1977-height}
 define the height \(h(X) \in \mathbb{N} \cup \{\infty\}\) 
 (sometimes written \(h\) if \(X\) is obvious from the context)
@@ -8,7 +10,7 @@ The height is in some sense a measure of the
 ``arithmetic complexity'' of a variety,
 with larger heights indicating ``more complexity.''
 For example, consider the case when \(X\) is a 
-K3 surface (i.e. a surface for which \(\omega_{X} \isom \mathcal{O}_{X} \) 
+K3 surface (i.e. a smooth projective surface for which \(\omega_{X} \isom \mathcal{O}_{X} \)
 and \(H^{1}(X,\mathcal{O}_{X} ) = 0\)).
 In this case, \(h\) determines the \textit{Newton polygon}
 of \(X\), which in turn gives partial information about the 
@@ -49,6 +51,7 @@ all possible \(h\) are realized
 over some sufficiently big finite field \(\mathbb{F}_{q}\). 
 By base change, this implies the result for extensions
 thereof (e.g. algebraically closed fields).
+For finite heights in characteristic \(p \geq 5\), Ito gives an unconditional construction \cite[Theorem~6.4]{ito-2016-k3-given-l-function}.
 However, Taelman's argument is not constructive,
 and there is no known bound on how big \(q\) must be to guarantee
 existence of surfaces of any height.
@@ -137,7 +140,7 @@ following elementary computations.
     \item A loop, which is guaranteed to run \(h-1\) times, in which we must
         \begin{enumerate}[(a)]
             \item Perform a large polynomial multiplication 
-                for which \(\Delta_{1}\) is one of the summands.
+                for which \(\Delta_{1}\) is one of the factors.
             \item Apply an operation which we call ``splitting'', 
                 following the literature on the
                 quasi-\(F\)-split height.
@@ -177,7 +180,7 @@ underlying BLAS library.
 We provide algorithms for calculating the matrix of multiply
 then split in Section \ref{sec:alg:momts}.
 This essentially eliminates (2) as a bottleneck.
-In our implementation of this version, step (2) takes
+In our GPU-based implementation of this version, step (2) takes
 0.0005 seconds per iteration for \(p = 5\) and 0.005 seconds per iteration for \(p = 7\).
 Meanwhile, calculating the matrix of multiply then split
 takes 0.037 seconds for \(p=5\) and 
@@ -226,6 +229,9 @@ implements matrix multiplication utilities;
 GPUPolynomials.jl (version 0.1.1) contains implementations of polynomial multiplication
 \cite{gpupolynomials-jl};
 finally, CudaNTTs.jl contains GPU-accelerated implementations of NTT (version 1.2.0) \cite{cudantts-jl}.
+
+The data from our project is made available on Zenodo
+\cite{garzella-2025-k3-data}.
 
 % One possibility to further speed up the the computation
 % would be to compute the matrix of multiply then split
