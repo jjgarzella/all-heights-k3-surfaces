@@ -11,6 +11,7 @@ Responses to reviewer comments
     * Issue 8: stated the F_p assumption at the beginning of Section 2.4.
     * Issue 9: added the homogeneity assumption to Fedder's criterion.
     * Issue 11: updated the Frobenius and Verschiebung domains and the F_star module notation.
+    * Issue 12: added the cohomology hypotheses to the introductory Artin-Mazur height definition.
     * Issue 13: specified smooth projectivity for K3 surfaces and smoothness in the theorem and hypersurface description.
     * Issue 15: changed the worked-example product degree from 24 to 32 and removed the sentence and footnote about exponents divisible by four.
     * Issue 16: corrected the cyclotomic extension degree to phi(q - 1).
