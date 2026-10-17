@@ -26,6 +26,7 @@ Responses to reviewer comments
     * Issue 27: corrected the cited complexity from O(p^(1/2)) to O(p).
     * Issue 35: changed the p = 7 throughput from 185 to 180 surfaces per second and corrected the height-10 wait estimate to 224,187 seconds (about 62 compute hours).
     * Intro timing: clarified that step (2) timings are from the GPU-based implementation.
+    * Data availability: added the Zenodo record for the project data after the code-availability paragraph.
 
 * typos
     * Issue 5: replaced the incorrect p-adic digit explanation with the approved Teichmuller and constant lift description.
